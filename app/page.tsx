@@ -5,14 +5,14 @@ import React, { useEffect } from "react";
 
 type Props = {};
 
-const AdminPage = (props: Props) => {
+const TopPage = (props: Props) => {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/admin/schedules");
+    router.push("/admin");
   }, []);
 
-  return <div>AdminPage</div>;
+  return <div>TopPage</div>;
 };
 
-export default AdminPage;
+export default TopPage;
