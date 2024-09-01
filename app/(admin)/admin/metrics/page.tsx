@@ -1,6 +1,6 @@
 import React from "react";
 import { BarChartInteractive } from "./_components/bar-chart-interactive";
-import { getSchedulesInRecentTwoMonths } from "@/lib/schedules";
+import { getSchedulesInRecentThreeMonths } from "@/lib/schedules";
 import { ChartConfig } from "@/components/ui/chart";
 import { BarChartStackedLegend } from "./_components/bar-chart-stacked-legend";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -84,7 +84,7 @@ const AdminCustomerPage = async (props: Props) => {
     return total;
   };
 
-  const schedules = await getSchedulesInRecentTwoMonths();
+  const schedules = await getSchedulesInRecentThreeMonths();
   const scheduleCountByDate = calculateScheduleCountByDate(schedules);
   const total = calculateTotal(scheduleCountByDate);
 
@@ -102,7 +102,7 @@ const AdminCustomerPage = async (props: Props) => {
         <TabsContent value="scheduleCount">
           <BarChartInteractive
             title="日毎の予定の数"
-            description="直近2ヶ月の予定の数を表示しています。"
+            description="直近3ヶ月の予定の数を表示しています。"
             data={scheduleCountByDate}
             total={total}
             config={
@@ -118,7 +118,7 @@ const AdminCustomerPage = async (props: Props) => {
         <TabsContent value="attendanceCount">
           <BarChartStackedLegend
             title="日毎の出欠の数"
-            description="直近2ヶ月の出欠の数を表示しています。"
+            description="直近3ヶ月の出欠の数を表示しています。"
             data={scheduleCountByDate}
             total={total}
             config={

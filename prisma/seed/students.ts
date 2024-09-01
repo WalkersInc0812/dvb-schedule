@@ -19,7 +19,7 @@ export async function seedStudents(db: PrismaClient) {
     const class_ = classesBySchool[randomInt(classesBySchool.length)];
     students.push({
       name: `児童${index + 1}`,
-      schoolEnrollmentAcademicYear: 2024,
+      schoolEnrollmentAcademicYear: [2022, 2023, 2024][randomInt(3)],
       parent: {
         connect: {
           id: parent.id,

@@ -49,11 +49,11 @@ export async function getSchedulesByStudentId({
   return schedules;
 }
 
-export async function getSchedulesInRecentTwoMonths() {
+export async function getSchedulesInRecentThreeMonths() {
   const schedules = await db.schedule.findMany({
     where: {
       start: {
-        gte: new Date(new Date().setMonth(new Date().getMonth() - 2)),
+        gte: new Date(new Date().setMonth(new Date().getMonth() - 3)),
       },
     },
   });

@@ -6,11 +6,12 @@ export async function seedSchedules(db: PrismaClient) {
 
   let schedules: Prisma.ScheduleCreateInput[] = [];
   students.forEach((student, s_i) => {
-    const arrayLength = 2 * 4 * 3;
+    const arrayLength = 3 * 4 * 3;
+    const currentMonth = new Date().getMonth() + 1;
     Array.from({ length: arrayLength }).forEach((_, a_i) => {
       const start = new Date(
         2024,
-        randomInt(8 - 1, 9 + 1 - 1),
+        randomInt(currentMonth - 2 - 1, currentMonth + 1 - 1),
         randomInt(1, 28 + 1),
         randomInt(12, 15 + 1),
         randomInt(12) * 5
@@ -35,7 +36,9 @@ export async function seedSchedules(db: PrismaClient) {
           randomInt(2)
         ],
         attendance:
-          end <= new Date(2024, 9 - 1, 1) ? [true, false][randomInt(2)] : false,
+          end <= new Date(2024, currentMonth - 1, 1)
+            ? [true, true, true, true, true, false][randomInt(6)]
+            : false,
       });
     });
   });
