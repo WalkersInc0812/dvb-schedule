@@ -4,32 +4,71 @@ import * as React from "react";
 import { signIn } from "next-auth/react";
 
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { buttonVariants } from "./ui/button";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-  const [isGitHubLoading, setIsGitHubLoading] = React.useState<boolean>(false);
+  const router = useRouter();
+  const [role, setRole] = useState("STAFF");
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
+    setError("");
+
+    const result = await signIn("credentials", {
+      redirect: false,
+      role,
+    });
+
+    if (result && result.ok) {
+      if (role === "PARENT") {
+        router.push("/calendar");
+      } else if (role === "STAFF") {
+        router.push("/admin/schedules");
+      }
+    } else {
+      console.error(result?.error);
+      setError("Invalid role");
+    }
+  };
 
   return (
-    <div className={cn("grid gap-6", className)} {...props}>
-      <button
-        type="button"
-        className={cn(buttonVariants({ variant: "outline" }))}
-        onClick={() => {
-          setIsGitHubLoading(true);
-          signIn("github");
-        }}
-        disabled={isGitHubLoading}
+    <form onSubmit={handleLogin}>
+      <div
+        className={cn("flex items-center justify-between gap-2", className)}
+        {...props}
       >
-        {isGitHubLoading ? (
-          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Icons.gitHub className="mr-2 h-4 w-4" />
-        )}{" "}
-        Github
-      </button>
-    </div>
+        <Select required defaultValue="STAFF">
+          <SelectTrigger>
+            <SelectValue placeholder="職員" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="STAFF">職員</SelectItem>
+            <SelectItem value="PARENT">保護者</SelectItem>
+          </SelectContent>
+        </Select>
+        <p className="min-w-fit">として</p>
+        <button
+          type="submit"
+          className={cn(buttonVariants({ variant: "outline" }))}
+        >
+          Login
+        </button>
+      </div>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </form>
   );
 }
