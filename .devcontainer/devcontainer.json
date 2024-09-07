@@ -19,5 +19,11 @@
     }
   },
   "postCreateCommand": "pnpm install",
-  "postAttachCommand": "pnpm dev"
+  "postAttachCommand": "pnpm dev",
+  "portsAttributes": {
+    "3000": {
+      "label": "Application",
+      "onAutoForward": "openPreview"
+    }
+  }
 }
