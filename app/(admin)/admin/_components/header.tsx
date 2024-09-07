@@ -1,12 +1,16 @@
 "use client";
 
+import { toast } from "@/components/ui/use-toast";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 type Props = {};
 
 const AdminHeader = (props: Props) => {
+  const router = useRouter();
+
   return (
     <div className="bg-primary text-primary-foreground h-[56px] flex items-center justify-between px-[72px]">
       <p className="text-[20px] font-medium">
@@ -21,7 +25,18 @@ const AdminHeader = (props: Props) => {
         {/* <Link href="/admin/schools">学校管理</Link> */}
         {/* <Link href="/admin/facilities">教室管理</Link> */}
         <Link href="/admin/metrics">メトリクス</Link>
-        <span onClick={async () => await signOut()} className="cursor-pointer">
+        <span
+          onClick={async () => {
+            await signOut({
+              redirect: false,
+            });
+            router.push(window.location.origin);
+            toast({
+              title: "ログアウトしました",
+            });
+          }}
+          className="cursor-pointer"
+        >
           ログアウト
         </span>
       </div>
