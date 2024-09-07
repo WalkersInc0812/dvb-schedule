@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "./ui/use-toast";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
+import { Icons } from "./icons";
 
 const FormSchema = z.object({
   role: z.enum(["PARENT", "STAFF"]),
@@ -26,6 +27,7 @@ const FormSchema = z.object({
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const router = useRouter();
+  const [loading, setLoading] = React.useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -35,25 +37,30 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    const result = await signIn("credentials", {
-      redirect: false,
-      role: data.role,
-    });
+    try {
+      setLoading(true);
 
-    if (result && result.ok) {
-      if (data.role === "PARENT") {
-        router.push("/calendar");
-        toast({
-          title: "保護者としてログインしました",
-        });
-      } else if (data.role === "STAFF") {
-        router.push("/admin/schedules");
-        toast({
-          title: "職員としてログインしました",
-        });
+      const result = await signIn("credentials", {
+        redirect: false,
+        role: data.role,
+      });
+
+      if (result && result.ok) {
+        const role = data.role === "PARENT" ? "保護者" : "職員";
+        const path = data.role === "PARENT" ? "/calendar" : "/admin/schedules";
+        router.push(path);
+        setTimeout(() => {
+          toast({
+            title: `${role}としてログインしました`,
+          });
+          setLoading(false);
+        }, 1000);
+      } else {
+        throw new Error(result?.error ?? "unknown error");
       }
-    } else {
-      console.error(result?.error);
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
       toast({
         title: "ログインに失敗しました",
         variant: "destructive",
@@ -65,7 +72,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex items-center justify-between gap-2"
+        className="flex items-center justify-center gap-2"
       >
         <FormField
           control={form.control}
@@ -88,7 +95,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           )}
         />
         <p>として</p>
-        <Button type="submit">ログイン</Button>
+        <Button type="submit">
+          {loading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
+          ログイン
+        </Button>
       </form>
     </Form>
   );
