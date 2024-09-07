@@ -18,7 +18,7 @@
       }
     }
   },
-  "postCreateCommand": "pnpm install",
+  "postCreateCommand": "pnpm install && cp .env.example .env",
   "postAttachCommand": "pnpm dev",
   "portsAttributes": {
     "3000": {
