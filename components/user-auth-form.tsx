@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { buttonVariants } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 
 import {
   Select,
@@ -16,59 +16,93 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "./ui/use-toast";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
+
+const FormSchema = z.object({
+  role: z.enum(["PARENT", "STAFF"]),
+});
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
-
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const router = useRouter();
-  const [role, setRole] = useState("STAFF");
-  const [error, setError] = useState("");
 
-  const handleLogin = async (e: any) => {
-    e.preventDefault();
-    setError("");
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      role: "STAFF",
+    },
+  });
+
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    console.log(data);
 
     const result = await signIn("credentials", {
       redirect: false,
-      role,
+      role: data.role,
     });
 
     if (result && result.ok) {
-      if (role === "PARENT") {
+      if (data.role === "PARENT") {
         router.push("/calendar");
-      } else if (role === "STAFF") {
+        toast({
+          title: "保護者としてログインしました",
+        });
+      } else if (data.role === "STAFF") {
         router.push("/admin/schedules");
+        toast({
+          title: "職員としてログインしました",
+        });
       }
     } else {
       console.error(result?.error);
-      setError("Invalid role");
+      toast({
+        title: "ログインに失敗しました",
+        variant: "destructive",
+      });
     }
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      <div
-        className={cn("flex items-center justify-between gap-2", className)}
-        {...props}
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex items-center justify-between gap-2"
       >
-        <Select required defaultValue="STAFF">
-          <SelectTrigger>
-            <SelectValue placeholder="職員" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="STAFF">職員</SelectItem>
-            <SelectItem value="PARENT">保護者</SelectItem>
-          </SelectContent>
-        </Select>
-        <p className="min-w-fit">として</p>
-        <button
-          type="submit"
-          className={cn(buttonVariants({ variant: "outline" }))}
-        >
-          Login
-        </button>
-      </div>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-    </form>
+        <FormField
+          control={form.control}
+          name="role"
+          render={({ field }) => (
+            <FormItem>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="STAFF">職員</SelectItem>
+                  <SelectItem value="PARENT">保護者</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <p>として</p>
+        <Button type="submit">ログイン</Button>
+      </form>
+    </Form>
   );
 }
