@@ -18,5 +18,6 @@
       }
     }
   },
-  "postCreateCommand": "pnpm install && pnpm dev"
+  "postCreateCommand": "pnpm install",
+  "postAttachCommand": "pnpm dev"
 }
