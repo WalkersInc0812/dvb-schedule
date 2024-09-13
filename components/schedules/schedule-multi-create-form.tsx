@@ -1,7 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { scheduleSchema, ScheduleSchemaType } from "@/lib/validations/schedule";
+import {
+  scheduleMultiCreateSchema,
+  ScheduleMultiCreateSchemaType,
+} from "@/lib/validations/schedule";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -27,56 +30,50 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { hourOptions, minuteOptions } from "./utils";
 
-type ScheduleCreateFormProps = {
+type Props = {
   studentId: string;
-  date: Date;
+  dates: Date[];
   onSuccess?: () => void;
   onError?: () => void;
 };
-export const ScheduleCreateForm = ({
+export const ScheduleMultiCreateForm = ({
   studentId,
-  date,
+  dates,
   onSuccess,
   onError,
-}: ScheduleCreateFormProps) => {
+}: Props) => {
   const router = useRouter();
 
-  const form = useForm<ScheduleSchemaType>({
-    resolver: zodResolver(scheduleSchema),
+  const form = useForm<ScheduleMultiCreateSchemaType>({
+    resolver: zodResolver(scheduleMultiCreateSchema),
     defaultValues: {
       studentId,
-      start: date,
-      end: date,
+      dates: dates.map((date) => ({
+        start: date,
+        end: date,
+      })),
       meal: false,
       attendance: false,
       notes: "",
     },
   });
 
-  const onSubmit = async (data: ScheduleSchemaType) => {
+  const onSubmit = async (data: ScheduleMultiCreateSchemaType) => {
     try {
-      const response = await fetch(`/api/schedules`, {
+      const response = await fetch(`/api/schedules/multi`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          studentId: data.studentId,
-          start: data.start.toISOString(),
-          end: data.end.toISOString(),
-          meal: data.meal,
-          attendance: data.attendance,
-          notes: data.notes,
-        }),
+        body: JSON.stringify(data),
       });
 
-      console.log(response);
       if (!response.ok) {
-        throw new Error("Failed to create schedule");
+        throw new Error("Failed to create schedules");
       }
 
       toast({
-        title: "予定を登録しました",
+        title: `${dates.length}件の予定を登録しました`,
         description: "カレンダーに表示されます。",
       });
 
@@ -97,24 +94,31 @@ export const ScheduleCreateForm = ({
 
   return (
     <Form {...form}>
-      <p className="text-[20px] font-bold">
-        {format(date, "PPP(E)", { locale: ja })}
-      </p>
+      <p className="text-[20px] font-bold mb-6">{dates.length}件の予定を追加</p>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormItem className="flex flex-col items-start">
+          <FormLabel>日付</FormLabel>
+          <p>
+            {dates
+              .map((date) => format(date, "M/d", { locale: ja }))
+              .join(", ")}
+          </p>
+        </FormItem>
+
         <FormField
           control={form.control}
-          name="start"
+          name="dates"
           render={({ field }) => (
             <FormItem className="flex flex-col items-start">
               <FormLabel>開始時間</FormLabel>
               <div className="flex gap-1 items-center">
                 <Select
                   onValueChange={(value) => {
-                    const date = field.value;
-                    date.setHours(parseInt(value));
-                    field.onChange(date);
+                    field.value.forEach((date) => {
+                      date.start.setHours(parseInt(value));
+                    });
                   }}
-                  defaultValue={field.value.getHours().toString()}
+                  defaultValue={field.value[0].start.getHours().toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger>
@@ -132,11 +136,11 @@ export const ScheduleCreateForm = ({
                 時
                 <Select
                   onValueChange={(value) => {
-                    const date = field.value;
-                    date.setMinutes(parseInt(value));
-                    field.onChange(date);
+                    field.value.forEach((date) => {
+                      date.start.setMinutes(parseInt(value));
+                    });
                   }}
-                  defaultValue={field.value.getMinutes().toString()}
+                  defaultValue={field.value[0].start.getMinutes().toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger>
@@ -160,18 +164,18 @@ export const ScheduleCreateForm = ({
 
         <FormField
           control={form.control}
-          name="end"
+          name="dates"
           render={({ field }) => (
             <FormItem className="flex flex-col items-start">
               <FormLabel>終了時間</FormLabel>
               <div className="flex gap-1 items-center">
                 <Select
                   onValueChange={(value) => {
-                    const date = field.value;
-                    date.setHours(parseInt(value));
-                    field.onChange(date);
+                    field.value.forEach((date) => {
+                      date.end.setHours(parseInt(value));
+                    });
                   }}
-                  defaultValue={field.value.getHours().toString()}
+                  defaultValue={field.value[0].end.getHours().toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger>
@@ -189,11 +193,11 @@ export const ScheduleCreateForm = ({
                 時
                 <Select
                   onValueChange={(value) => {
-                    const date = field.value;
-                    date.setMinutes(parseInt(value));
-                    field.onChange(date);
+                    field.value.forEach((date) => {
+                      date.end.setMinutes(parseInt(value));
+                    });
                   }}
-                  defaultValue={field.value.getMinutes().toString()}
+                  defaultValue={field.value[0].end.getMinutes().toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger>
