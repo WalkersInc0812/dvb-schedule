@@ -2,8 +2,9 @@
 
 ## Using
 
-- [Next.js](https://nextjs.org/)
 - [pnpm](https://pnpm.io)
+- [Next.js](https://nextjs.org/)
+- [shadcn/ui](https://ui.shadcn.com/)
 
 ## Running Locally
 
