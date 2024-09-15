@@ -26,10 +26,10 @@ export function DataTablePagination<TData>({
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm">
+        {table.getFilteredRowModel().rows.length}行
         {showSelectedRowCount && (
           <>
-            {table.getFilteredRowModel().rows.length}行中{" "}
-            {table.getFilteredSelectedRowModel().rows.length}行
+            中 {table.getFilteredSelectedRowModel().rows.length}行
             が選択されています
           </>
         )}

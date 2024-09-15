@@ -1,5 +1,29 @@
+import { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { differenceInYears, parse, isBefore } from "date-fns";
+
+export type StudentWithParntAndFacilityAndSchoolAndClasses =
+  Prisma.StudentGetPayload<{
+    include: {
+      parent: true;
+      facility: true;
+      school: true;
+      classes: true;
+    };
+  }>;
+export async function getStudents(): Promise<
+  StudentWithParntAndFacilityAndSchoolAndClasses[]
+> {
+  const students = await db.student.findMany({
+    include: {
+      parent: true,
+      facility: true,
+      school: true,
+      classes: true,
+    },
+  });
+  return students;
+}
 
 export async function getStudentsByParentId({
   parentId,
