@@ -41,6 +41,34 @@ export async function seedStudents(db: PrismaClient) {
         },
       },
     });
+
+    // add second student to some few parents
+    if (index % 25 === 0) {
+      students.push({
+        name: `児童${index + 1}の姉妹兄弟`,
+        schoolEnrollmentAcademicYear: [2022, 2023, 2024][randomInt(3)],
+        parent: {
+          connect: {
+            id: parent.id,
+          },
+        },
+        facility: {
+          connect: {
+            id: facility.id,
+          },
+        },
+        school: {
+          connect: {
+            id: school.id,
+          },
+        },
+        classes: {
+          connect: {
+            id: class_.id,
+          },
+        },
+      });
+    }
   });
 
   for (const student of students) {
