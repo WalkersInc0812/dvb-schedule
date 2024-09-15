@@ -73,6 +73,7 @@ model User {
   // Application
   role String @default("PARENT") // PARENT | STAFF | SUPER_STAFF // TODO: enumにしたい
 
+  // TODO: PARENTもfacilityが複数の場合もある？PARENTはfacilityを持つのではなく、studentにだけ紐づける？
   facilities Facility[] // PARENTの場合は1つ。STAFFの場合は基本1つだが複数の施設を担当する場合がありそう。SUPER_STAFFの場合は全ての施設を管理するので指定しない。
   students   Student[] // PARENTの場合のみ。複数の子供を通わせる場合がある。
 
