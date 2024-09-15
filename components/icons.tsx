@@ -25,6 +25,8 @@ import {
   Trash,
   User,
   X,
+  Filter,
+  FilterX,
 } from "lucide-react";
 
 export const Icons = {
@@ -70,4 +72,6 @@ export const Icons = {
   check: Check,
   pencil: Pencil,
   arrowUpDown: ArrowUpDown,
+  filter: Filter,
+  filterX: FilterX,
 };
