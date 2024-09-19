@@ -1,3 +1,5 @@
+"use server"; // TODO: 使い方合ってる？
+
 import { Prisma } from "@prisma/client";
 import { db } from "./db";
 
@@ -29,6 +31,41 @@ export async function getSchedulesWithStudentAndFacilityAndSchool(): Promise<
           school: true,
         },
       },
+    },
+  });
+  return schedules;
+}
+
+// TODO: refactor
+export type ScheduleWithStudent = Prisma.ScheduleGetPayload<{
+  include: {
+    student: true;
+  };
+}>;
+export async function getSchedulesByMonth({
+  year,
+  month,
+}: {
+  year: number;
+  month: number;
+}): Promise<ScheduleWithStudent[]> {
+  const schedules = await db.schedule.findMany({
+    include: {
+      student: true,
+    },
+    where: {
+      AND: [
+        {
+          start: {
+            gte: new Date(year, month - 1, 1),
+          },
+        },
+        {
+          start: {
+            lt: new Date(year, month, 1),
+          },
+        },
+      ],
     },
   });
   return schedules;

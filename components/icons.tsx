@@ -27,6 +27,7 @@ import {
   X,
   Filter,
   FilterX,
+  FileDown,
 } from "lucide-react";
 
 export const Icons = {
@@ -74,4 +75,5 @@ export const Icons = {
   arrowUpDown: ArrowUpDown,
   filter: Filter,
   filterX: FilterX,
+  fileDown: FileDown,
 };
