@@ -1,11 +1,12 @@
 "use client";
 
+import { filterFns } from "@/components/data-table/helpers";
 import { Button } from "@/components/ui/button";
 import {
   calculateGrade,
   StudentWithParntAndFacilityAndSchoolAndClasses,
 } from "@/lib/students";
-import { ColumnDef, filterFns } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 
 type Props = {
   onEditClick: (student: any) => void;

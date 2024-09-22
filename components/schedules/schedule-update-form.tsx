@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Schedule } from "@prisma/client";
+import { hourOptions, minuteOptions } from "./utils";
 
 type ScheduleUpdateFormProps = {
   schedule: Schedule;
@@ -69,7 +70,6 @@ export const ScheduleUpdateForm = ({
         }),
       });
 
-      console.log(response);
       if (!response.ok) {
         throw new Error("Failed to create schedule");
       }
@@ -93,9 +93,6 @@ export const ScheduleUpdateForm = ({
       });
     }
   };
-
-  const hours = Array.from({ length: 24 }, (_, i) => i.toString());
-  const minutes = Array.from({ length: 12 }, (_, i) => (i * 5).toString());
 
   return (
     <Form {...form}>
@@ -125,7 +122,7 @@ export const ScheduleUpdateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {hours.map((hour, i) => (
+                    {hourOptions.map((hour, i) => (
                       <SelectItem key={`${i}-${hour}`} value={hour}>
                         {hour}
                       </SelectItem>
@@ -147,7 +144,7 @@ export const ScheduleUpdateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {minutes.map((minute, i) => (
+                    {minuteOptions.map((minute, i) => (
                       <SelectItem key={`${i}-${minute}`} value={minute}>
                         {minute}
                       </SelectItem>
@@ -183,7 +180,7 @@ export const ScheduleUpdateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {hours.map((hour, i) => (
+                    {hourOptions.map((hour, i) => (
                       <SelectItem key={`${i}-${hour}`} value={hour}>
                         {hour}
                       </SelectItem>
@@ -205,7 +202,7 @@ export const ScheduleUpdateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {minutes.map((minute, i) => (
+                    {minuteOptions.map((minute, i) => (
                       <SelectItem key={`${i}-${minute}`} value={minute}>
                         {minute}
                       </SelectItem>

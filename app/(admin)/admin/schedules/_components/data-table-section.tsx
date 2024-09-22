@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/dialog";
 import { ScheduleUpdateForm } from "@/components/schedules/schedule-update-form";
 import { ScheduleDeleteForm } from "@/components/schedules/schedule-delete-form";
+import ScheduleMultiUpdateForm from "@/components/schedules/schedule-multi-update-form";
 
-type DialogType = "read" | "update" | "delete";
+type DialogType = "read" | "update" | "multi-update" | "delete";
 
 type Props = {
   schedules: ScheduleWithStudentAndFacilityAndSchool[];
@@ -25,6 +26,9 @@ const DataTableSection = ({ schedules }: Props) => {
   const [clickedSchedule, setClickedSchedule] = React.useState<
     ScheduleWithStudentAndFacilityAndSchool | undefined
   >();
+  const [selectedSchedules, setSelectedSchedules] = React.useState<
+    ScheduleWithStudentAndFacilityAndSchool[]
+  >([]);
 
   const handleEditClick = (
     schedule: ScheduleWithStudentAndFacilityAndSchool
@@ -42,6 +46,14 @@ const DataTableSection = ({ schedules }: Props) => {
     setDialogOpen(true);
   };
 
+  const handleMultiUpdateClick = (
+    schedules: ScheduleWithStudentAndFacilityAndSchool[]
+  ) => {
+    setSelectedSchedules(schedules);
+    setDialogType("multi-update");
+    setDialogOpen(true);
+  };
+
   const columns = makeColumns({
     onEditClick: handleEditClick,
     onDeleteClick: handleDeleteClick,
@@ -49,30 +61,40 @@ const DataTableSection = ({ schedules }: Props) => {
 
   return (
     <>
-      <DataTable columns={columns} data={schedules} />
+      <DataTable
+        columns={columns}
+        data={schedules}
+        onMultiUpdateClick={handleMultiUpdateClick}
+      />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogDescription className="text-foreground">
-              {clickedSchedule &&
-                (dialogType === "update" ? (
-                  <ScheduleUpdateForm
-                    schedule={clickedSchedule}
-                    onSuccess={() => {
-                      setDialogOpen(false);
-                      setClickedSchedule(undefined);
-                    }}
-                  />
-                ) : dialogType === "delete" ? (
-                  <ScheduleDeleteForm
-                    schedule={clickedSchedule}
-                    onSuccess={() => {
-                      setDialogOpen(false);
-                      setClickedSchedule(undefined);
-                    }}
-                  />
-                ) : null)}
+              {dialogType === "update" && clickedSchedule ? (
+                <ScheduleUpdateForm
+                  schedule={clickedSchedule}
+                  onSuccess={() => {
+                    setDialogOpen(false);
+                    setClickedSchedule(undefined);
+                  }}
+                />
+              ) : dialogType === "delete" && clickedSchedule ? (
+                <ScheduleDeleteForm
+                  schedule={clickedSchedule}
+                  onSuccess={() => {
+                    setDialogOpen(false);
+                    setClickedSchedule(undefined);
+                  }}
+                />
+              ) : dialogType === "multi-update" && selectedSchedules ? (
+                <ScheduleMultiUpdateForm
+                  schedules={selectedSchedules}
+                  onSuccess={() => {
+                    setDialogOpen(false);
+                  }}
+                />
+              ) : null}
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

@@ -1,6 +1,9 @@
 import { db } from "@/lib/db";
 import { checkIsParent, checkIsStaff, getCurrentUser } from "@/lib/session";
-import { scheduleMultiCreateSchema } from "@/lib/validations/schedule";
+import {
+  scheduleMultiCreateSchema,
+  scheduleMultiUpdateSchema,
+} from "@/lib/validations/schedule";
 import { z } from "zod";
 
 export async function POST(req: Request) {
@@ -45,6 +48,45 @@ export async function POST(req: Request) {
         notes: payload.notes,
         studentId: payload.studentId,
       })),
+    });
+
+    return new Response(null, { status: 200 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return new Response(JSON.stringify(error.issues), { status: 422 });
+    }
+
+    return new Response(null, { status: 500 });
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return new Response(null, { status: 403 });
+    }
+
+    const body = await req.json();
+    const payload = scheduleMultiUpdateSchema.parse({
+      ...body,
+      start: new Date(body.start),
+    });
+
+    const isStaff = await checkIsStaff();
+    if (!isStaff) {
+      return new Response(null, { status: 400 });
+    }
+
+    await db.schedule.updateMany({
+      where: {
+        id: {
+          in: payload.ids,
+        },
+      },
+      data: {
+        start: payload.start,
+      },
     });
 
     return new Response(null, { status: 200 });
