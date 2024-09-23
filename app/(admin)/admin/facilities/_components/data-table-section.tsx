@@ -3,7 +3,6 @@
 import React from "react";
 import { makeColumns } from "./columns";
 import { DataTable } from "./data-table";
-import { Facility } from "@prisma/client";
 import {
   Dialog,
   DialogContent,
@@ -11,18 +10,21 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { FacilityUpdateForm } from "@/components/facilities/facility-update-form";
+import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
 
 type Props = {
-  facilities: Facility[];
+  facilities: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement[];
 };
 
 export const DataTableSection = ({ facilities }: Props) => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [clickedFacility, setClickedFacility] = React.useState<
-    Facility | undefined
+    FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement | undefined
   >();
 
-  const handleEditClick = (facility: Facility) => {
+  const handleEditClick = (
+    facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement
+  ) => {
     setClickedFacility(facility);
     setDialogOpen(true);
   };

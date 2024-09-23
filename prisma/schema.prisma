@@ -117,6 +117,7 @@ model MealSetting {
   @@map(name: "meal_settings")
 }
 
+// TODO: ScheduleMonthlySetting の方がいいかも
 // 学童保育の施設の編集可能期間
 model ScheduleEditablePeriod {
   id          String   @id @default(cuid())
