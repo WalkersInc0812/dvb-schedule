@@ -91,13 +91,60 @@ model Facility {
   id   String @id @default(cuid())
   name String
 
-  users    User[]
-  students Student[]
+  users                   User[]
+  students                Student[]
+  mealSettings            MealSetting[]
+  scheduleEditablePeriods ScheduleEditablePeriod[]
+  announcements           Announcement[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map(name: "facilities")
+}
+
+// 学童保育の施設の給食設定
+model MealSetting {
+  id             String   @id @default(cuid())
+  facility       Facility @relation(fields: [facilityId], references: [id])
+  facilityId     String
+  activeFromDate String // yyyy-MM-dd
+  activeToDate   String // yyyy-MM-dd
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map(name: "meal_settings")
+}
+
+// 学童保育の施設の編集可能期間
+model ScheduleEditablePeriod {
+  id          String   @id @default(cuid())
+  facility    Facility @relation(fields: [facilityId], references: [id])
+  facilityId  String
+  targetMonth String // yyyy-MM
+  fromDate    String // yyyy-MM-dd
+  toDate      String // yyyy-MM-dd
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map(name: "schedule_editable_periods")
+}
+
+// 学童保育の施設のお知らせ
+model Announcement {
+  id                String   @id @default(cuid())
+  facility          Facility @relation(fields: [facilityId], references: [id])
+  facilityId        String
+  content           String
+  displayStartMonth String // yyyy-MM
+  displayEndMonth   String // yyyy-MM
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map(name: "announcements")
 }
 
 // 学校

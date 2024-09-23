@@ -6,11 +6,17 @@ import { seedStaffs } from "./staffs";
 import { seedParents } from "./parents";
 import { seedStudents } from "./students";
 import { seedSchedules } from "./schedules";
+import { seedMealSettings } from "./mealSettings";
+import { seedScheduleEditablePeriods } from "./scheduleEditablePeriods";
+import { seedAnnouncements } from "./announcements";
 
 const db = new PrismaClient();
 
 async function main() {
   await seedFacilities(db);
+  await seedMealSettings(db);
+  await seedScheduleEditablePeriods(db);
+  await seedAnnouncements(db);
   await seedSchools(db);
   await seedClasses(db);
   await seedStaffs(db);
