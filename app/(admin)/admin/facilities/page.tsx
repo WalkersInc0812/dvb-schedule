@@ -1,4 +1,4 @@
-import { getfacilitiesWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
+import { getFacilitiesWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
 import React from "react";
 import { DataTableSection } from "./_components/data-table-section";
 
@@ -6,7 +6,7 @@ type Props = {};
 
 const AdminFacilityPage = async (props: Props) => {
   const facilities =
-    await getfacilitiesWithMealSettingAndScheduleEditablePeriodAndAnnouncement();
+    await getFacilitiesWithMealSettingAndScheduleEditablePeriodAndAnnouncement();
 
   return (
     <div>

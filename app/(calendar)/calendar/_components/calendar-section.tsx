@@ -1,6 +1,8 @@
+// TODO: refactor
+
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Calendar } from "@/components/ui/calendar";
 
@@ -10,8 +12,8 @@ import {
   DialogDescription,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { format, isSameDay } from "date-fns";
-import { Schedule } from "@prisma/client";
+import { format, isSameDay, parse } from "date-fns";
+import { Schedule, ScheduleEditablePeriod } from "@prisma/client";
 import { ScheduleCreateForm } from "@/components/schedules/schedule-create-form";
 import { ScheduleDetail } from "@/components/schedules/schedule-detail";
 import { ScheduleUpdateForm } from "@/components/schedules/schedule-update-form";
@@ -21,17 +23,22 @@ import { DateFormatter } from "react-day-picker";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { ScheduleMultiCreateForm } from "@/components/schedules/schedule-multi-create-form";
+import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
 
 type Mode = "single" | "multiple";
 type DialogType = "create" | "multi-create" | "read" | "update" | "delete";
 
 type Props = {
   studentId: string;
+  facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement;
   schedules: Schedule[];
 };
-export const CalendarSection = ({ studentId, schedules }: Props) => {
+export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [clickedDate, setClickedDate] = React.useState<Date | undefined>();
+  const [isClickeDateEditable, setIsClickedDateEditable] =
+    React.useState(false);
+  const [isMonthEditable, setIsMonthEditable] = React.useState(false);
   const [selectedDatesForMultiCreate, setSelectedDatesForMultiCreate] =
     React.useState<Date[]>([]);
   const [clickedSchedule, setClickedSchedule] = React.useState<
@@ -39,8 +46,50 @@ export const CalendarSection = ({ studentId, schedules }: Props) => {
   >();
   const [dialogType, setDialogType] = React.useState<DialogType>("read");
   const [mode, setMode] = React.useState<Mode>("single");
+  const [month, setMonth] = React.useState<Date>(new Date());
+  const [scheduleEditablePeriod, setScheduleEditablePeriod] = React.useState<
+    ScheduleEditablePeriod | undefined
+  >(undefined);
+
+  const handleMonthChange = (date: Date) => {
+    const targetMonth = format(date, "yyyy-MM");
+    const period = facility.scheduleEditablePeriods.find(
+      (p) => p.targetMonth === targetMonth
+    );
+    setScheduleEditablePeriod(period);
+    setIsMonthEditable(
+      !!period &&
+        parse(period.fromDate, "yyyy-MM-dd", new Date()) <= new Date() &&
+        new Date() <= parse(period.toDate, "yyyy-MM-dd", new Date())
+    );
+
+    setMonth(date);
+  };
+  useEffect(() => {
+    handleMonthChange(month);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleDayClick = (date: Date, modifiers: any) => {
+    // date の yyyy-MM から scheduleEditablePeriod を取得し、その scheduleEditablePeriod の fromDate と toDate の中に 現在の日付が含まれているかを確認する
+    const targetMonth = format(date, "yyyy-MM");
+    const targetScheduleEditablePeriod = facility.scheduleEditablePeriods.find(
+      (p) => p.targetMonth === targetMonth
+    );
+    const editable =
+      !!targetScheduleEditablePeriod &&
+      parse(targetScheduleEditablePeriod.fromDate, "yyyy-MM-dd", new Date()) <=
+        new Date() &&
+      new Date() <=
+        parse(targetScheduleEditablePeriod.toDate, "yyyy-MM-dd", new Date());
+
+    setIsClickedDateEditable(editable);
+
+    // editable ではなく、 create の時はそのままreturn
+    if (!editable && !schedules.find((s) => isSameDay(s.start, date))) {
+      return;
+    }
+
     if (mode === "single") {
       const _clickedSchedule = schedules.find((s) => isSameDay(s.start, date));
       if (_clickedSchedule) {
@@ -98,26 +147,28 @@ export const CalendarSection = ({ studentId, schedules }: Props) => {
     <div className="p-[16px]">
       <div className="flex justify-between items-center mb-[16px]">
         <h2 className="text-[22px] font-bold">カレンダー</h2>
-        {mode === "single" ? (
-          <Button
-            size={"sm"}
-            className="flex items-center"
-            onClick={() => setMode("multiple")}
-          >
-            <Icons.circlePlus className="w-4 h-4 mr-2" />
-            予定を登録する
-          </Button>
-        ) : mode === "multiple" ? (
-          <Button
-            size={"sm"}
-            variant={"secondary"}
-            onClick={handleCancelMultiCreate}
-          >
-            キャンセル
-          </Button>
-        ) : (
-          <></>
-        )}
+        {isMonthEditable &&
+          (mode === "single" ? (
+            <Button
+              size={"sm"}
+              className="flex items-center"
+              onClick={() => setMode("multiple")}
+            >
+              <Icons.circlePlus className="w-4 h-4 mr-2" />
+              予定を登録する
+            </Button>
+          ) : mode === "multiple" ? (
+            <Button
+              size={"sm"}
+              variant={"secondary"}
+              onClick={handleCancelMultiCreate}
+            >
+              キャンセル
+            </Button>
+          ) : (
+            <></>
+          ))}
+        {}
       </div>
 
       <div className="flex justify-center mb-[16px]">
@@ -131,6 +182,8 @@ export const CalendarSection = ({ studentId, schedules }: Props) => {
           locale={ja}
           formatters={{ formatCaption }}
           mode="multiple"
+          month={month}
+          onMonthChange={handleMonthChange}
           selected={schedules.map((schedule) => schedule.start)}
           onDayClick={handleDayClick}
           weekStartsOn={1}
@@ -163,6 +216,13 @@ export const CalendarSection = ({ studentId, schedules }: Props) => {
             </Button>
           </div>
         )}
+
+        {scheduleEditablePeriod && (
+          <p>
+            編集可能期間: {scheduleEditablePeriod.fromDate} ~{" "}
+            {scheduleEditablePeriod.toDate}
+          </p>
+        )}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -192,6 +252,10 @@ export const CalendarSection = ({ studentId, schedules }: Props) => {
               ) : dialogType === "read" && clickedSchedule ? (
                 <ScheduleDetail
                   schedule={clickedSchedule}
+                  editablePeriod={facility.scheduleEditablePeriods.find(
+                    (p) =>
+                      p.targetMonth === format(clickedSchedule.start, "yyyy-MM")
+                  )}
                   onClickUpdate={handleClickUpdateInDetail}
                   onClickDelete={handleClickDeleteInDetail}
                 />

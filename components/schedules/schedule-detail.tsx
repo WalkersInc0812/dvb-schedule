@@ -1,20 +1,28 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { ja } from "date-fns/locale";
-import { Schedule } from "@prisma/client";
+import { Schedule, ScheduleEditablePeriod } from "@prisma/client";
+import { cn } from "@/lib/utils";
 
 type ScheduleDetailProps = {
   schedule: Schedule;
+  editablePeriod: ScheduleEditablePeriod | undefined;
   onClickUpdate: () => void;
   onClickDelete: () => void;
 };
 export const ScheduleDetail = ({
   schedule,
+  editablePeriod,
   onClickUpdate,
   onClickDelete,
 }: ScheduleDetailProps) => {
+  const editable =
+    !!editablePeriod &&
+    parse(editablePeriod.fromDate, "yyyy-MM-dd", new Date()) <= new Date() &&
+    new Date() <= parse(editablePeriod.toDate, "yyyy-MM-dd", new Date());
+
   return (
     <div className="space-y-4 text-start">
       <p className="text-[20px] font-bold">
@@ -47,17 +55,37 @@ export const ScheduleDetail = ({
       </div>
 
       <div className="flex gap-4">
-        <Button className="w-full" onClick={onClickUpdate}>
+        <Button
+          className={cn("w-full", !editable && "bg-slate-400")}
+          onClick={onClickUpdate}
+          disabled={!editable}
+        >
           予定を変更する
         </Button>
         <Button
-          className="w-full"
+          className={cn("w-full", !editable && "bg-slate-400")}
           variant="destructive"
           onClick={onClickDelete}
+          disabled={!editable}
         >
           予定を削除する
         </Button>
       </div>
+
+      {!editable && (
+        <div>
+          <p>
+            この予定は編集可能期間を過ぎています。
+            <br />
+            もし編集したい場合は〇〇で先生にメッセージをお願いします。
+          </p>
+          {editablePeriod && (
+            <p>
+              編集可能期間: {editablePeriod.fromDate}~{editablePeriod.toDate}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

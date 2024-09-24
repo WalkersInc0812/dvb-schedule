@@ -9,7 +9,8 @@ export type FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement =
       announcements: true;
     };
   }>;
-export async function getfacilitiesWithMealSettingAndScheduleEditablePeriodAndAnnouncement(): Promise<
+
+export async function getFacilitiesWithMealSettingAndScheduleEditablePeriodAndAnnouncement(): Promise<
   FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement[]
 > {
   // TODO: 全てのデータを取得するのはパフォーマンスに影響あるので、改善する
@@ -23,4 +24,19 @@ export async function getfacilitiesWithMealSettingAndScheduleEditablePeriodAndAn
   });
 
   return facilities;
+}
+
+export async function getFacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementById(
+  id: string
+): Promise<FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement | null> {
+  const facility = await db.facility.findUnique({
+    where: { id },
+    include: {
+      mealSettings: true,
+      scheduleEditablePeriods: true,
+      announcements: true,
+    },
+  });
+
+  return facility;
 }
