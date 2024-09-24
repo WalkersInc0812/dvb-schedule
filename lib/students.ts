@@ -25,6 +25,16 @@ export async function getStudents(): Promise<
   return students;
 }
 
+export async function getStudentById({ id }: { id: string }) {
+  const student = await db.student.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  return student;
+}
+
 export async function getStudentsByParentId({
   parentId,
 }: {

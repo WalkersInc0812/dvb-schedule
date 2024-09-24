@@ -1,9 +1,12 @@
 import { db } from "@/lib/db";
+import { getFacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementById } from "@/lib/facilities";
 import { checkIsParent, checkIsStaff, getCurrentUser } from "@/lib/session";
+import { getStudentById } from "@/lib/students";
 import {
   scheduleMultiCreateSchema,
   scheduleMultiUpdateSchema,
 } from "@/lib/validations/schedule";
+import { parse } from "date-fns";
 import { z } from "zod";
 
 export async function POST(req: Request) {
@@ -39,11 +42,32 @@ export async function POST(req: Request) {
       }
     }
 
+    const student = await getStudentById({ id: payload.studentId });
+    if (!student) {
+      return new Response(null, { status: 404 });
+    }
+
+    const facility =
+      await getFacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementById(
+        student.facilityId
+      );
+    if (!facility) {
+      return new Response(null, { status: 404 });
+    }
+
     await db.schedule.createMany({
       data: payload.dates.map((date) => ({
         start: date.start,
         end: date.end,
-        meal: payload.meal,
+        // TODO: 境界値のチェック
+        // TODO: timezoneのチェック
+        meal:
+          payload.meal &&
+          facility.mealSettings.some(
+            (s) =>
+              parse(s.activeFromDate, "yyyy-MM-dd", new Date()) <= date.start &&
+              date.start <= parse(s.activeToDate, "yyyy-MM-dd", new Date())
+          ),
         attendance: payload.attendance,
         notes: payload.notes,
         studentId: payload.studentId,
@@ -60,6 +84,10 @@ export async function POST(req: Request) {
   }
 }
 
+/**
+ * スタッフのみ更新できる
+ * 開始日時のみ更新できる
+ */
 export async function PATCH(req: Request) {
   try {
     const user = await getCurrentUser();

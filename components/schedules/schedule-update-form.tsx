@@ -30,14 +30,17 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Schedule } from "@prisma/client";
 import { hourOptions, minuteOptions } from "./utils";
+import { cn } from "@/lib/utils";
 
 type ScheduleUpdateFormProps = {
   schedule: Schedule;
+  mealServable: boolean;
   onSuccess?: () => void;
   onError?: () => void;
 };
 export const ScheduleUpdateForm = ({
   schedule,
+  mealServable,
   onSuccess,
   onError,
 }: ScheduleUpdateFormProps) => {
@@ -222,11 +225,14 @@ export const ScheduleUpdateForm = ({
           render={({ field, fieldState }) => (
             <FormItem className="flex flex-col items-start">
               <p>{fieldState.error?.message}</p>
-              <FormLabel>給食の有無</FormLabel>
+              <FormLabel className={cn(!mealServable && "text-gray-400")}>
+                給食の有無 {!mealServable && "※この日は給食はありません"}
+              </FormLabel>
               <FormControl>
                 <Switch
                   checked={field.value}
                   onCheckedChange={field.onChange}
+                  disabled={!mealServable}
                 />
               </FormControl>
               <FormMessage />

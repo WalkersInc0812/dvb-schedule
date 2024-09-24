@@ -36,8 +36,6 @@ type Props = {
 export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [clickedDate, setClickedDate] = React.useState<Date | undefined>();
-  const [isClickeDateEditable, setIsClickedDateEditable] =
-    React.useState(false);
   const [isMonthEditable, setIsMonthEditable] = React.useState(false);
   const [selectedDatesForMultiCreate, setSelectedDatesForMultiCreate] =
     React.useState<Date[]>([]);
@@ -82,8 +80,6 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
         new Date() &&
       new Date() <=
         parse(targetScheduleEditablePeriod.toDate, "yyyy-MM-dd", new Date());
-
-    setIsClickedDateEditable(editable);
 
     // editable ではなく、 create の時はそのままreturn
     if (!editable && !schedules.find((s) => isSameDay(s.start, date))) {
@@ -256,6 +252,15 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
                 <ScheduleCreateForm
                   studentId={studentId}
                   date={clickedDate}
+                  mealServable={
+                    !!facility.mealSettings.find(
+                      (s) =>
+                        parse(s.activeFromDate, "yyyy-MM-dd", new Date()) <=
+                          clickedDate &&
+                        clickedDate <=
+                          parse(s.activeToDate, "yyyy-MM-dd", new Date())
+                    )
+                  }
                   onSuccess={() => {
                     setDialogOpen(false);
                     setClickedDate(undefined);
@@ -266,6 +271,7 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
                 <ScheduleMultiCreateForm
                   studentId={studentId}
                   dates={selectedDatesForMultiCreate}
+                  mealSettings={facility.mealSettings}
                   onSuccess={() => {
                     setDialogOpen(false);
                     setMode("single");
@@ -285,6 +291,13 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
               ) : dialogType === "update" && clickedSchedule ? (
                 <ScheduleUpdateForm
                   schedule={clickedSchedule}
+                  mealServable={facility.mealSettings.some(
+                    (s) =>
+                      parse(s.activeFromDate, "yyyy-MM-dd", new Date()) <=
+                        clickedSchedule.start &&
+                      clickedSchedule.start <=
+                        parse(s.activeToDate, "yyyy-MM-dd", new Date())
+                  )}
                   onSuccess={() => {
                     setDialogOpen(false);
                     setClickedDate(undefined);

@@ -26,19 +26,23 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { ja } from "date-fns/locale";
 import { hourOptions, minuteOptions } from "./utils";
+import { MealSetting } from "@prisma/client";
+import { cn } from "@/lib/utils";
 
 type Props = {
   studentId: string;
   dates: Date[];
+  mealSettings: MealSetting[];
   onSuccess?: () => void;
   onError?: () => void;
 };
 export const ScheduleMultiCreateForm = ({
   studentId,
   dates,
+  mealSettings,
   onSuccess,
   onError,
 }: Props) => {
@@ -91,6 +95,18 @@ export const ScheduleMultiCreateForm = ({
       });
     }
   };
+
+  const mealServableDates = dates.filter((date) => {
+    // TODO: 境界値のチェック
+    // TODO: timezoneのチェック
+    const servable = !!mealSettings.find(
+      (mealSetting) =>
+        parse(mealSetting.activeFromDate, "yyyy-MM-dd", new Date()) <= date &&
+        date <= parse(mealSetting.activeToDate, "yyyy-MM-dd", new Date())
+    );
+
+    return servable;
+  });
 
   return (
     <Form {...form}>
@@ -224,11 +240,23 @@ export const ScheduleMultiCreateForm = ({
           name="meal"
           render={({ field }) => (
             <FormItem className="flex flex-col items-start">
-              <FormLabel>給食の有無</FormLabel>
+              <FormLabel
+                className={cn(
+                  mealServableDates.length === 0 && "text-gray-400"
+                )}
+              >
+                給食の有無{" "}
+                {mealServableDates.length === 0
+                  ? "※この期間は給食はありません"
+                  : `※${mealServableDates
+                      .map((d) => format(d, "MM/dd"))
+                      .join(", ")}のみ`}
+              </FormLabel>
               <FormControl>
                 <Switch
                   checked={field.value}
                   onCheckedChange={field.onChange}
+                  disabled={mealServableDates.length === 0}
                 />
               </FormControl>
               <FormMessage />

@@ -26,16 +26,19 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { hourOptions, minuteOptions } from "./utils";
+import { cn } from "@/lib/utils";
 
 type ScheduleCreateFormProps = {
   studentId: string;
   date: Date;
+  mealServable: boolean;
   onSuccess?: () => void;
   onError?: () => void;
 };
 export const ScheduleCreateForm = ({
   studentId,
   date,
+  mealServable,
   onSuccess,
   onError,
 }: ScheduleCreateFormProps) => {
@@ -220,11 +223,14 @@ export const ScheduleCreateForm = ({
           name="meal"
           render={({ field }) => (
             <FormItem className="flex flex-col items-start">
-              <FormLabel>給食の有無</FormLabel>
+              <FormLabel className={cn(!mealServable && "text-gray-400")}>
+                給食の有無 {!mealServable && "※この日は給食はありません"}
+              </FormLabel>
               <FormControl>
                 <Switch
                   checked={field.value}
                   onCheckedChange={field.onChange}
+                  disabled={!mealServable}
                 />
               </FormControl>
               <FormMessage />
