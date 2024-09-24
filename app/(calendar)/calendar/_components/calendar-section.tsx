@@ -194,7 +194,30 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
           }}
           modifiersClassNames={{
             selectedForMultiCreate: "border border-primary",
+            disabled: "text-red-700",
           }}
+          disabled={[
+            {
+              dayOfWeek: [0, 6],
+            },
+            (day: Date) => {
+              // TODO: 仮置き
+              const closed = [
+                "12/26",
+                "12/27",
+                "12/28",
+                "12/29",
+                "12/30",
+                "12/31",
+                "01/01",
+                "01/02",
+                "01/03",
+                "01/04",
+              ];
+
+              return closed.includes(format(day, "MM/dd"));
+            },
+          ]}
         />
 
         {mode === "multiple" && (
