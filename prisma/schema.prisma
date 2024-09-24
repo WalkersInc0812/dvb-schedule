@@ -201,6 +201,7 @@ model Student {
 }
 
 // 学童保育の生徒の予定
+// TODO: date: yyyy-MM-dd, startTime: HH:mm, endTime: HH:mm の方がいいかも
 model Schedule {
   id         String   @id @default(cuid())
   studentId  String
