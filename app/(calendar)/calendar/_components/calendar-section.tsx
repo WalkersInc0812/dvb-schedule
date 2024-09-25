@@ -1,4 +1,5 @@
 // TODO: refactor
+// TODO: check timezone
 
 "use client";
 
@@ -12,7 +13,7 @@ import {
   DialogDescription,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { format, isSameDay, parse } from "date-fns";
+import { endOfDay, format, isSameDay, parse, startOfDay } from "date-fns";
 import { Schedule, ScheduleEditablePeriod } from "@prisma/client";
 import { ScheduleCreateForm } from "@/components/schedules/schedule-create-form";
 import { ScheduleDetail } from "@/components/schedules/schedule-detail";
@@ -29,6 +30,22 @@ import {
   ScheduleLogWithUser,
 } from "@/lib/scheduleLogs";
 import { Logs } from "./logs";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 type Mode = "single" | "multiple";
 type DialogType = "create" | "multi-create" | "read" | "update" | "delete";
@@ -65,8 +82,9 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
     setScheduleEditablePeriod(period);
     setIsMonthEditable(
       !!period &&
-        parse(period.fromDate, "yyyy-MM-dd", new Date()) <= new Date() &&
-        new Date() <= parse(period.toDate, "yyyy-MM-dd", new Date())
+        startOfDay(parse(period.fromDate, "yyyy-MM-dd", new Date())) <=
+          new Date() &&
+        new Date() <= endOfDay(parse(period.toDate, "yyyy-MM-dd", new Date()))
     );
 
     setMonth(date);
@@ -84,10 +102,13 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
     );
     const editable =
       !!targetScheduleEditablePeriod &&
-      parse(targetScheduleEditablePeriod.fromDate, "yyyy-MM-dd", new Date()) <=
-        new Date() &&
+      startOfDay(
+        parse(targetScheduleEditablePeriod.fromDate, "yyyy-MM-dd", new Date())
+      ) <= new Date() &&
       new Date() <=
-        parse(targetScheduleEditablePeriod.toDate, "yyyy-MM-dd", new Date());
+        endOfDay(
+          parse(targetScheduleEditablePeriod.toDate, "yyyy-MM-dd", new Date())
+        );
 
     // editable ではなく、 create の時はそのままreturn
     if (!editable && !schedules.find((s) => isSameDay(s.start, date))) {
@@ -152,7 +173,7 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
 
   return (
     <div className="p-[16px]">
-      <div className="flex justify-between items-center mb-[16px]">
+      <div className="flex justify-between items-center mb-3">
         <h2 className="text-[22px] font-bold">カレンダー</h2>
         {isMonthEditable &&
           (mode === "single" ? (
@@ -178,7 +199,81 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
         {}
       </div>
 
-      <div className="flex justify-center mb-[16px]">
+      {/* TODO: make dynamic */}
+      {/* TODO: refactor */}
+      <div className="mb-4 space-y-1">
+        <Accordion type="single" collapsible>
+          <AccordionItem value="item-1" className="border-b-0">
+            <AccordionTrigger className="hover:no-underline py-0 text-[14px] justify-start gap-1">
+              固定利用曜日を確認する
+            </AccordionTrigger>
+            <AccordionContent className="pb-0">
+              <Table className="text-[12px] mb-2">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-center px-2">曜日</TableHead>
+                    <TableHead className="text-center px-2">月</TableHead>
+                    <TableHead className="text-center px-2">火</TableHead>
+                    <TableHead className="text-center px-2">水</TableHead>
+                    <TableHead className="text-center px-2">木</TableHead>
+                    <TableHead className="text-center px-2">金</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="text-center bg-primary bg-opacity-5">
+                  <TableRow className="border-dashed">
+                    <TableCell className="p-2">①</TableCell>
+                    <TableCell className="p-2">英語</TableCell>
+                    <TableCell className="p-2"></TableCell>
+                    <TableCell className="p-2">英語</TableCell>
+                    <TableCell className="p-2"></TableCell>
+                    <TableCell className="p-2">コ・ラボ</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="p-2">時間</TableCell>
+                    <TableCell className="p-2">
+                      16:10
+                      <br />
+                      ~17:10
+                    </TableCell>
+                    <TableCell className="p-2"></TableCell>
+                    <TableCell className="p-2">
+                      16:10
+                      <br />
+                      ~17:10
+                    </TableCell>
+                    <TableCell className="p-2"></TableCell>
+                    <TableCell className="p-2">
+                      17:15
+                      <br />
+                      ~18:00
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-dashed">
+                    <TableCell className="p-2">②</TableCell>
+                    <TableCell className="p-2">プログラミング初級</TableCell>
+                    <TableCell className="p-2"></TableCell>
+                    <TableCell className="p-2"></TableCell>
+                    <TableCell className="p-2"></TableCell>
+                    <TableCell className="p-2"></TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="p-2">時間</TableCell>
+                    <TableCell className="p-2">
+                      17:20
+                      <br />
+                      ~18:20
+                    </TableCell>
+                    <TableCell className="p-2"></TableCell>
+                    <TableCell className="p-2"></TableCell>
+                    <TableCell className="p-2"></TableCell>
+                    <TableCell className="p-2"></TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
         <p className="text-[14px] font-medium">
           日付をタップすると、予定の確認と編集ができます。
         </p>
@@ -266,10 +361,13 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
                   mealServable={
                     !!facility.mealSettings.find(
                       (s) =>
-                        parse(s.activeFromDate, "yyyy-MM-dd", new Date()) <=
-                          clickedDate &&
+                        startOfDay(
+                          parse(s.activeFromDate, "yyyy-MM-dd", new Date())
+                        ) <= clickedDate &&
                         clickedDate <=
-                          parse(s.activeToDate, "yyyy-MM-dd", new Date())
+                          endOfDay(
+                            parse(s.activeToDate, "yyyy-MM-dd", new Date())
+                          )
                     )
                   }
                   onSuccess={() => {
@@ -305,10 +403,13 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
                   schedule={clickedSchedule}
                   mealServable={facility.mealSettings.some(
                     (s) =>
-                      parse(s.activeFromDate, "yyyy-MM-dd", new Date()) <=
-                        clickedSchedule.start &&
+                      startOfDay(
+                        parse(s.activeFromDate, "yyyy-MM-dd", new Date())
+                      ) <= clickedSchedule.start &&
                       clickedSchedule.start <=
-                        parse(s.activeToDate, "yyyy-MM-dd", new Date())
+                        endOfDay(
+                          parse(s.activeToDate, "yyyy-MM-dd", new Date())
+                        )
                   )}
                   logs={<Logs value={clickedScheduleLogs} />}
                   onSuccess={() => {

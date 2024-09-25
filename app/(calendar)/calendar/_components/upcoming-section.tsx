@@ -1,6 +1,6 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Schedule } from "@prisma/client";
-import { format } from "date-fns";
+import { format, isAfter, startOfDay } from "date-fns";
 import { ja } from "date-fns/locale";
 
 type Props = {
@@ -14,19 +14,25 @@ export const UpcomingSection = ({ schedules }: Props) => {
       </div>
 
       <div className="space-y-2">
-        {schedules.slice(0, 5).map((s) => (
-          <Card className="p-[14px]" key={s.id}>
-            <p className="text-[16px] font-medium">
-              {format(s.start, "PPP(E)", { locale: ja })}{" "}
-              {format(s.start, "p", { locale: ja })}~
-              {format(s.end, "p", { locale: ja })}
-            </p>
-            <div className="text-[14px] font-normal">
-              <p>給食: {s.meal ? "有" : "無"}</p>
-              <p>備考: {s.notes ? s.notes : "-"}</p>
-            </div>
-          </Card>
-        ))}
+        {schedules
+          .filter((s) => isAfter(s.start, startOfDay(new Date()))) // TODO: check timezone
+          .toSorted((a, b) => {
+            return a.start.getTime() - b.start.getTime();
+          })
+          .slice(0, 5)
+          .map((s) => (
+            <Card className="p-[14px]" key={s.id}>
+              <p className="text-[16px] font-medium">
+                {format(s.start, "PPP(E)", { locale: ja })}{" "}
+                {format(s.start, "p", { locale: ja })}~
+                {format(s.end, "p", { locale: ja })}
+              </p>
+              <div className="text-[14px] font-normal">
+                <p>給食: {s.meal ? "有" : "無"}</p>
+                <p>備考: {s.notes ? s.notes : "-"}</p>
+              </div>
+            </Card>
+          ))}
       </div>
     </div>
   );
