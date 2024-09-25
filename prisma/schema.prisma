@@ -74,8 +74,9 @@ model User {
   role String @default("PARENT") // PARENT | STAFF | SUPER_STAFF // TODO: enumにしたい
 
   // TODO: PARENTもfacilityが複数の場合もある？PARENTはfacilityを持つのではなく、studentにだけ紐づける？
-  facilities Facility[] // PARENTの場合は1つ。STAFFの場合は基本1つだが複数の施設を担当する場合がありそう。SUPER_STAFFの場合は全ての施設を管理するので指定しない。
-  students   Student[] // PARENTの場合のみ。複数の子供を通わせる場合がある。
+  facilities   Facility[] // PARENTの場合は1つ。STAFFの場合は基本1つだが複数の施設を担当する場合がありそう。SUPER_STAFFの場合は全ての施設を管理するので指定しない。
+  students     Student[] // PARENTの場合のみ。複数の子供を通わせる場合がある。
+  scheduleLogs ScheduleLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -105,11 +106,12 @@ model Facility {
 
 // 学童保育の施設の給食設定
 model MealSetting {
-  id             String   @id @default(cuid())
-  facility       Facility @relation(fields: [facilityId], references: [id])
+  id             String @id @default(cuid())
   facilityId     String
   activeFromDate String // yyyy-MM-dd
   activeToDate   String // yyyy-MM-dd
+
+  facility Facility @relation(fields: [facilityId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -120,12 +122,13 @@ model MealSetting {
 // TODO: ScheduleMonthlySetting の方がいいかも
 // 学童保育の施設の編集可能期間
 model ScheduleEditablePeriod {
-  id          String   @id @default(cuid())
-  facility    Facility @relation(fields: [facilityId], references: [id])
+  id          String @id @default(cuid())
   facilityId  String
   targetMonth String // yyyy-MM
   fromDate    String // yyyy-MM-dd
   toDate      String // yyyy-MM-dd
+
+  facility Facility @relation(fields: [facilityId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -135,12 +138,13 @@ model ScheduleEditablePeriod {
 
 // 学童保育の施設のお知らせ
 model Announcement {
-  id                String   @id @default(cuid())
-  facility          Facility @relation(fields: [facilityId], references: [id])
+  id                String @id @default(cuid())
   facilityId        String
   content           String
   displayStartMonth String // yyyy-MM
   displayEndMonth   String // yyyy-MM
+
+  facility Facility @relation(fields: [facilityId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -211,10 +215,28 @@ model Schedule {
   attendance Boolean  @default(false)
   notes      String?
 
-  student Student @relation(fields: [studentId], references: [id])
+  student Student       @relation(fields: [studentId], references: [id])
+  logs    ScheduleLog[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@map(name: "schedules")
+}
+
+// 生徒の予定の操作ログテーブル
+// TODO: パフォーマンスを上げる必要があれば、indexを貼る
+model ScheduleLog {
+  id         String @id @default(cuid())
+  scheduleId String
+  userId     String
+  operation  String // 'CREATE' | 'UPDATE' | 'DELETE' // TODO: enumにしたい
+
+  schedule Schedule @relation(fields: [scheduleId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  timestamp DateTime @default(now())
+
+  @@map(name: "schedule_logs")
 }

@@ -55,24 +55,35 @@ export async function POST(req: Request) {
       return new Response(null, { status: 404 });
     }
 
-    await db.schedule.createMany({
-      data: payload.dates.map((date) => ({
-        start: date.start,
-        end: date.end,
-        // TODO: 境界値のチェック
-        // TODO: timezoneのチェック
-        meal:
-          payload.meal &&
-          facility.mealSettings.some(
-            (s) =>
-              parse(s.activeFromDate, "yyyy-MM-dd", new Date()) <= date.start &&
-              date.start <= parse(s.activeToDate, "yyyy-MM-dd", new Date())
-          ),
-        attendance: payload.attendance,
-        notes: payload.notes,
-        studentId: payload.studentId,
-      })),
-    });
+    await db.$transaction(
+      payload.dates.map((date) =>
+        db.schedule.create({
+          data: {
+            start: date.start,
+            end: date.end,
+            // TODO: 境界値のチェック
+            // TODO: timezoneのチェック
+            meal:
+              payload.meal &&
+              facility.mealSettings.some(
+                (s) =>
+                  parse(s.activeFromDate, "yyyy-MM-dd", new Date()) <=
+                    date.start &&
+                  date.start <= parse(s.activeToDate, "yyyy-MM-dd", new Date())
+              ),
+            attendance: payload.attendance,
+            notes: payload.notes,
+            studentId: payload.studentId,
+            logs: {
+              create: {
+                userId: user.id,
+                operation: "CREATE",
+              },
+            },
+          },
+        })
+      )
+    );
 
     return new Response(null, { status: 200 });
   } catch (error) {
@@ -106,16 +117,24 @@ export async function PATCH(req: Request) {
       return new Response(null, { status: 400 });
     }
 
-    await db.schedule.updateMany({
-      where: {
-        id: {
-          in: payload.ids,
-        },
-      },
-      data: {
-        start: payload.start,
-      },
-    });
+    await db.$transaction(
+      payload.ids.map((id) =>
+        db.schedule.update({
+          where: {
+            id,
+          },
+          data: {
+            start: payload.start,
+            logs: {
+              create: {
+                userId: user.id,
+                operation: "UPDATE",
+              },
+            },
+          },
+        })
+      )
+    );
 
     return new Response(null, { status: 200 });
   } catch (error) {

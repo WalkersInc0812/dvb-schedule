@@ -4,7 +4,11 @@ import { Prisma } from "@prisma/client";
 import { db } from "./db";
 
 export async function getSchedules() {
-  const schedules = await db.schedule.findMany();
+  const schedules = await db.schedule.findMany({
+    where: {
+      deletedAt: null,
+    },
+  });
   return schedules;
 }
 
@@ -24,6 +28,9 @@ export async function getSchedulesWithStudentAndFacilityAndSchool(): Promise<
   ScheduleWithStudentAndFacilityAndSchool[]
 > {
   const schedules = await db.schedule.findMany({
+    where: {
+      deletedAt: null,
+    },
     include: {
       student: {
         include: {
@@ -56,6 +63,9 @@ export async function getSchedulesByMonth({
     where: {
       AND: [
         {
+          deletedAt: null,
+        },
+        {
           start: {
             gte: new Date(year, month - 1, 1),
           },
@@ -81,6 +91,7 @@ export async function getSchedulesByStudentId({
       student: {
         id: studentId,
       },
+      deletedAt: null,
     },
   });
   return schedules;
@@ -89,6 +100,7 @@ export async function getSchedulesByStudentId({
 export async function getSchedulesInRecentThreeMonths() {
   const schedules = await db.schedule.findMany({
     where: {
+      deletedAt: null,
       start: {
         gte: new Date(new Date().setMonth(new Date().getMonth() - 3)),
       },

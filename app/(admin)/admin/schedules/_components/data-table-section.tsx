@@ -13,6 +13,11 @@ import {
 import { ScheduleUpdateForm } from "@/components/schedules/schedule-update-form";
 import { ScheduleDeleteForm } from "@/components/schedules/schedule-delete-form";
 import ScheduleMultiUpdateForm from "@/components/schedules/schedule-multi-update-form";
+import {
+  getScheduleLogsByScheduleId,
+  ScheduleLogWithUser,
+} from "@/lib/scheduleLogs";
+import { Logs } from "./logs";
 
 type DialogType = "read" | "update" | "multi-update" | "delete";
 
@@ -26,22 +31,27 @@ const DataTableSection = ({ schedules }: Props) => {
   const [clickedSchedule, setClickedSchedule] = React.useState<
     ScheduleWithStudentAndFacilityAndSchool | undefined
   >();
+  const [clickedScheduleLogs, setClickedScheduleLogs] = React.useState<
+    ScheduleLogWithUser[]
+  >([]);
   const [selectedSchedules, setSelectedSchedules] = React.useState<
     ScheduleWithStudentAndFacilityAndSchool[]
   >([]);
 
-  const handleEditClick = (
+  const handleEditClick = async (
     schedule: ScheduleWithStudentAndFacilityAndSchool
   ) => {
     setClickedSchedule(schedule);
+    setClickedScheduleLogs(await getScheduleLogsByScheduleId(schedule.id));
     setDialogType("update");
     setDialogOpen(true);
   };
 
-  const handleDeleteClick = (
+  const handleDeleteClick = async (
     schedule: ScheduleWithStudentAndFacilityAndSchool
   ) => {
     setClickedSchedule(schedule);
+    setClickedScheduleLogs(await getScheduleLogsByScheduleId(schedule.id));
     setDialogType("delete");
     setDialogOpen(true);
   };
@@ -74,6 +84,8 @@ const DataTableSection = ({ schedules }: Props) => {
               {dialogType === "update" && clickedSchedule ? (
                 <ScheduleUpdateForm
                   schedule={clickedSchedule}
+                  mealServable={true}
+                  logs={<Logs value={clickedScheduleLogs} />}
                   onSuccess={() => {
                     setDialogOpen(false);
                     setClickedSchedule(undefined);
@@ -82,6 +94,7 @@ const DataTableSection = ({ schedules }: Props) => {
               ) : dialogType === "delete" && clickedSchedule ? (
                 <ScheduleDeleteForm
                   schedule={clickedSchedule}
+                  logs={<Logs value={clickedScheduleLogs} />}
                   onSuccess={() => {
                     setDialogOpen(false);
                     setClickedSchedule(undefined);

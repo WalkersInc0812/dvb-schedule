@@ -35,12 +35,14 @@ import { cn } from "@/lib/utils";
 type ScheduleUpdateFormProps = {
   schedule: Schedule;
   mealServable: boolean;
+  logs: JSX.Element;
   onSuccess?: () => void;
   onError?: () => void;
 };
 export const ScheduleUpdateForm = ({
   schedule,
   mealServable,
+  logs,
   onSuccess,
   onError,
 }: ScheduleUpdateFormProps) => {
@@ -258,6 +260,8 @@ export const ScheduleUpdateForm = ({
             </FormItem>
           )}
         />
+
+        {logs}
 
         <Button type="submit" className="w-full">
           この内容で予定を変更する

@@ -24,6 +24,11 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { ScheduleMultiCreateForm } from "@/components/schedules/schedule-multi-create-form";
 import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
+import {
+  getScheduleLogsByScheduleId,
+  ScheduleLogWithUser,
+} from "@/lib/scheduleLogs";
+import { Logs } from "./logs";
 
 type Mode = "single" | "multiple";
 type DialogType = "create" | "multi-create" | "read" | "update" | "delete";
@@ -42,6 +47,9 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
   const [clickedSchedule, setClickedSchedule] = React.useState<
     Schedule | undefined
   >();
+  const [clickedScheduleLogs, setClickedScheduleLogs] = React.useState<
+    ScheduleLogWithUser[]
+  >([]);
   const [dialogType, setDialogType] = React.useState<DialogType>("read");
   const [mode, setMode] = React.useState<Mode>("single");
   const [month, setMonth] = React.useState<Date>(new Date());
@@ -68,7 +76,7 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleDayClick = (date: Date, modifiers: any) => {
+  const handleDayClick = async (date: Date, modifiers: any) => {
     // date の yyyy-MM から scheduleEditablePeriod を取得し、その scheduleEditablePeriod の fromDate と toDate の中に 現在の日付が含まれているかを確認する
     const targetMonth = format(date, "yyyy-MM");
     const targetScheduleEditablePeriod = facility.scheduleEditablePeriods.find(
@@ -90,6 +98,9 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
       const _clickedSchedule = schedules.find((s) => isSameDay(s.start, date));
       if (_clickedSchedule) {
         setDialogType("read");
+
+        const logs = await getScheduleLogsByScheduleId(_clickedSchedule.id);
+        setClickedScheduleLogs(logs);
       } else {
         setDialogType("create");
       }
@@ -285,6 +296,7 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
                     (p) =>
                       p.targetMonth === format(clickedSchedule.start, "yyyy-MM")
                   )}
+                  logs={<Logs value={clickedScheduleLogs} />}
                   onClickUpdate={handleClickUpdateInDetail}
                   onClickDelete={handleClickDeleteInDetail}
                 />
@@ -298,6 +310,7 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
                       clickedSchedule.start <=
                         parse(s.activeToDate, "yyyy-MM-dd", new Date())
                   )}
+                  logs={<Logs value={clickedScheduleLogs} />}
                   onSuccess={() => {
                     setDialogOpen(false);
                     setClickedDate(undefined);
@@ -306,6 +319,7 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
               ) : dialogType === "delete" && clickedSchedule ? (
                 <ScheduleDeleteForm
                   schedule={clickedSchedule}
+                  logs={<Logs value={clickedScheduleLogs} />}
                   onSuccess={() => {
                     setDialogOpen(false);
                     setClickedDate(undefined);

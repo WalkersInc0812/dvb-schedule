@@ -46,6 +46,12 @@ export async function POST(req: Request) {
             id: payload.studentId,
           },
         },
+        logs: {
+          create: {
+            userId: user.id,
+            operation: "CREATE",
+          },
+        },
       },
     });
 

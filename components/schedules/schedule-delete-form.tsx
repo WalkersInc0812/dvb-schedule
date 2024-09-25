@@ -9,11 +9,13 @@ import { Schedule } from "@prisma/client";
 
 type ScheduleDeleteFormProps = {
   schedule: Schedule;
+  logs: JSX.Element;
   onSuccess?: () => void;
   onError?: () => void;
 };
 export const ScheduleDeleteForm = ({
   schedule,
+  logs,
   onSuccess,
   onError,
 }: ScheduleDeleteFormProps) => {
@@ -80,6 +82,8 @@ export const ScheduleDeleteForm = ({
         <p>備考</p>
         <p>{schedule.notes ? schedule.notes : "-"}</p>
       </div>
+
+      {logs}
 
       <p className="text-[20px] font-bold text-center">
         本当に予定を削除しますか？

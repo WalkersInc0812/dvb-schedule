@@ -43,9 +43,78 @@ export async function seedSchedules(db: PrismaClient) {
     });
   });
 
+  const staff = await db.user.findFirst({
+    where: {
+      role: "STAFF",
+    },
+  });
+  if (!staff) {
+    throw new Error("Staff not found");
+  }
+
+  // create
   for (const schedule of schedules) {
     await db.schedule.create({
-      data: schedule,
+      data: {
+        ...schedule,
+        logs: {
+          create: [
+            {
+              userId: staff.id,
+              operation: "CREATE",
+            },
+          ],
+        },
+      },
+    });
+  }
+
+  const createdSchedules = await db.schedule.findMany();
+
+  // update
+  for (let i = 0; i < createdSchedules.length; i++) {
+    if (i % 3 !== 0) {
+      continue;
+    }
+    const schedule = createdSchedules[i];
+    await db.schedule.update({
+      where: {
+        id: schedule.id,
+      },
+      data: {
+        logs: {
+          create: [
+            {
+              userId: staff.id,
+              operation: "UPDATE",
+            },
+          ],
+        },
+      },
+    });
+  }
+
+  // soft delete
+  for (let i = 0; i < createdSchedules.length; i++) {
+    if (i % 10 !== 0) {
+      continue;
+    }
+    const schedule = createdSchedules[i];
+    await db.schedule.update({
+      where: {
+        id: schedule.id,
+      },
+      data: {
+        deletedAt: new Date(),
+        logs: {
+          create: [
+            {
+              userId: staff.id,
+              operation: "DELETE",
+            },
+          ],
+        },
+      },
     });
   }
 }

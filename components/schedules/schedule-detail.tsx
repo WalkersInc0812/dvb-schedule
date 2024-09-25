@@ -9,12 +9,14 @@ import { cn } from "@/lib/utils";
 type ScheduleDetailProps = {
   schedule: Schedule;
   editablePeriod: ScheduleEditablePeriod | undefined;
+  logs: JSX.Element;
   onClickUpdate: () => void;
   onClickDelete: () => void;
 };
 export const ScheduleDetail = ({
   schedule,
   editablePeriod,
+  logs,
   onClickUpdate,
   onClickDelete,
 }: ScheduleDetailProps) => {
@@ -53,6 +55,8 @@ export const ScheduleDetail = ({
         <p>備考</p>
         <p>{schedule.notes ? schedule.notes : "-"}</p>
       </div>
+
+      {logs}
 
       <div className="flex gap-4">
         <Button

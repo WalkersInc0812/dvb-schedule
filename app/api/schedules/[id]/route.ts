@@ -53,6 +53,12 @@ export async function PATCH(
         meal: payload.meal,
         attendance: payload.attendance,
         notes: payload.notes,
+        logs: {
+          create: {
+            userId: user.id,
+            operation: "UPDATE",
+          },
+        },
       },
     });
 
@@ -92,9 +98,18 @@ export async function DELETE(
       return new Response(null, { status: 400 });
     }
 
-    await db.schedule.delete({
+    await db.schedule.update({
       where: {
         id: context.params.id,
+      },
+      data: {
+        deletedAt: new Date(),
+        logs: {
+          create: {
+            userId: user.id,
+            operation: "DELETE",
+          },
+        },
       },
     });
 
