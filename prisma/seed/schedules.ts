@@ -42,7 +42,7 @@ export async function seedSchedules(db: PrismaClient) {
           randomInt(2)
         ],
         attendance:
-          end <= new Date(2024, currentMonth - 1, 1)
+          end <= new Date()
             ? [true, true, true, true, true, false][randomInt(6)]
             : false,
       });
