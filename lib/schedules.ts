@@ -77,6 +77,7 @@ export async function getSchedulesByMonth({
         },
       ],
     },
+    take: 100,
   });
   return schedules;
 }
