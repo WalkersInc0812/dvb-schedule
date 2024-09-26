@@ -13,7 +13,18 @@ import {
   DialogDescription,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { endOfDay, format, isSameDay, parse, startOfDay } from "date-fns";
+import {
+  addDays,
+  addHours,
+  endOfDay,
+  endOfMonth,
+  format,
+  isSameDay,
+  parse,
+  startOfDay,
+  startOfMonth,
+  subHours,
+} from "date-fns";
 import { Schedule, ScheduleEditablePeriod } from "@prisma/client";
 import { ScheduleCreateForm } from "@/components/schedules/schedule-create-form";
 import { ScheduleDetail } from "@/components/schedules/schedule-detail";
@@ -73,10 +84,23 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
   const [scheduleEditablePeriod, setScheduleEditablePeriod] = React.useState<
     ScheduleEditablePeriod | undefined
   >(undefined);
+  // TODO: refactor
+  // TODO: check timezone
   const announcements = facility.announcements.filter(
     (a) =>
       parse(a.displayStartMonth, "yyyy-MM", new Date()) <= month &&
       month <= parse(a.displayEndMonth, "yyyy-MM", new Date())
+  );
+  // TODO: refactor
+  // TODO: check timezone
+  const mealServablePeriods = facility.mealSettings.filter(
+    (s) =>
+      !(
+        endOfDay(parse(s.activeFromDate, "yyyy-MM-dd", new Date())) <
+          startOfMonth(month) ||
+        endOfMonth(month) <
+          startOfDay(parse(s.activeToDate, "yyyy-MM-dd", new Date()))
+      )
   );
 
   const handleMonthChange = (date: Date) => {
@@ -360,6 +384,17 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
             編集可能期間: {scheduleEditablePeriod.fromDate} ~{" "}
             {scheduleEditablePeriod.toDate}
           </p>
+        )}
+
+        {mealServablePeriods.length > 0 && (
+          <div className="w-full">
+            <p className="text-[14px]">
+              給食提供期間:{" "}
+              {mealServablePeriods
+                .map((s) => `${s.activeFromDate} ~ ${s.activeToDate}`)
+                .join(", ")}
+            </p>
+          </div>
         )}
       </div>
 

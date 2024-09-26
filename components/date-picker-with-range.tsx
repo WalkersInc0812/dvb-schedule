@@ -75,6 +75,7 @@ export function DatePickerWithRange({
             selected={value}
             onSelect={onSelect}
             numberOfMonths={2}
+            weekStartsOn={1}
           />
         </PopoverContent>
       </Popover>
