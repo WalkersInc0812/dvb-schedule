@@ -85,6 +85,7 @@ export const makeColumns = ({
     id: "facilityName",
     header: "教室名",
     accessorFn: (info) => info.student.facility.name,
+    filterFn: filterFns.arrIncludesSome,
   },
   {
     id: "studentName",
@@ -105,12 +106,14 @@ export const makeColumns = ({
     id: "schoolName",
     header: "学校名",
     accessorFn: (info) => info.student.school.name,
+    filterFn: filterFns.arrIncludesSome,
   },
   {
     id: "grade",
     header: "学年",
     accessorFn: (info) =>
       `${calculateGrade(info.student.schoolEnrollmentAcademicYear)}年`,
+    filterFn: filterFns.arrIncludesSome,
   },
   {
     id: "meal",

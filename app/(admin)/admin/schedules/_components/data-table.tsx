@@ -18,6 +18,7 @@ import { DataTableBody } from "@/components/data-table/data-table-body";
 import { DataTableHeader } from "@/components/data-table/data-table-header";
 import { DataTableToolbar } from "./data-table-toobar";
 import { ScheduleWithStudentAndFacilityAndSchool } from "@/lib/schedules";
+import { StudentWithParntAndFacilityAndSchoolAndClasses } from "@/lib/students";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -55,7 +56,38 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} onMultiUpdateClick={onMultiUpdateClick} />
+      <DataTableToolbar
+        table={table}
+        facilities={Array.from(
+          new Set(
+            data.map(
+              (schedule) =>
+                (schedule as ScheduleWithStudentAndFacilityAndSchool).student
+                  .facility.name
+            )
+          )
+        )
+          .sort((a, b) => a.localeCompare(b))
+          .map((name) => ({
+            value: name,
+            label: name,
+          }))}
+        schools={Array.from(
+          new Set(
+            data.map(
+              (schedule) =>
+                (schedule as ScheduleWithStudentAndFacilityAndSchool).student
+                  .school.name
+            )
+          )
+        )
+          .sort((a, b) => a.localeCompare(b))
+          .map((name) => ({
+            value: name,
+            label: name,
+          }))}
+        onMultiUpdateClick={onMultiUpdateClick}
+      />
       <div>
         <Table>
           <DataTableHeader table={table} />

@@ -50,6 +50,21 @@ export function DataTableToolbar<TData>({
             options={schools}
           />
         )}
+        {table.getColumn("grade") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("grade")}
+            title="学年で絞り込む"
+            // TODO: refactor
+            options={[
+              { value: "1年生", label: "1年生" },
+              { value: "2年生", label: "2年生" },
+              { value: "3年生", label: "3年生" },
+              { value: "4年生", label: "4年生" },
+              { value: "5年生", label: "5年生" },
+              { value: "6年生", label: "6年生" },
+            ]}
+          />
+        )}
         {isFiltered && (
           <Button
             variant="ghost"

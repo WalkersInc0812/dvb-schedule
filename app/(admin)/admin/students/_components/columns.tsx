@@ -43,6 +43,7 @@ export const makeColumns = ({
     header: "学年",
     accessorFn: (info) =>
       `${calculateGrade(info.schoolEnrollmentAcademicYear)}年生`,
+    filterFn: filterFns.arrIncludesSome,
   },
   {
     id: "edit",

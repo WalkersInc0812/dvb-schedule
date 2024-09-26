@@ -12,9 +12,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
+  facilities: {
+    value: string;
+    label: string;
+  }[];
+  schools: {
+    value: string;
+    label: string;
+  }[];
   onMultiUpdateClick: (
     schedules: ScheduleWithStudentAndFacilityAndSchool[]
   ) => void;
@@ -22,9 +31,12 @@ interface DataTableToolbarProps<TData> {
 
 export function DataTableToolbar({
   table,
+  facilities,
+  schools,
   onMultiUpdateClick,
 }: DataTableToolbarProps<ScheduleWithStudentAndFacilityAndSchool>) {
-  const isFiltered = table.getState().columnFilters.length > 0;
+  const isFiltered =
+    table.getState().columnFilters.length > 0 || table.getState().globalFilter;
   const handleCsvDownload = () => {
     const data = formatAndSortForCsv(table);
     const csv = unparse(data);
@@ -39,7 +51,7 @@ export function DataTableToolbar({
   };
 
   return (
-    <div className="flex item-center justify-between">
+    <div className="flex gap-4 flex-col-reverse">
       <div className="flex flex-1 items-center space-x-2">
         <DatePickerWithRange
           placeholder="日付で絞り込む"
@@ -50,6 +62,35 @@ export function DataTableToolbar({
           }
           onSelect={(value) => table.getColumn("date")?.setFilterValue(value)}
         />
+        {table.getColumn("facilityName") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("facilityName")}
+            title="教室で絞り込む"
+            options={facilities}
+          />
+        )}
+        {table.getColumn("schoolName") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("schoolName")}
+            title="学校で絞り込む"
+            options={schools}
+          />
+        )}
+        {table.getColumn("grade") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("grade")}
+            title="学年で絞り込む"
+            // TODO: refactor
+            options={[
+              { value: "1年生", label: "1年生" },
+              { value: "2年生", label: "2年生" },
+              { value: "3年生", label: "3年生" },
+              { value: "4年生", label: "4年生" },
+              { value: "5年生", label: "5年生" },
+              { value: "6年生", label: "6年生" },
+            ]}
+          />
+        )}
         {isFiltered && (
           <Button
             variant="ghost"
@@ -66,18 +107,19 @@ export function DataTableToolbar({
       </div>
 
       <div className="flex gap-2">
-        {(table.getIsSomeRowsSelected() || table.getIsAllRowsSelected()) && (
-          <Button
-            onClick={() =>
-              onMultiUpdateClick(
-                table.getSelectedRowModel().rows.map((row) => row.original)
-              )
-            }
-          >
-            <Icons.pencil className="mr-2 w-4 h-4" />
-            開始時間を一括変更する
-          </Button>
-        )}
+        <Button
+          disabled={
+            !(table.getIsSomeRowsSelected() || table.getIsAllRowsSelected())
+          }
+          onClick={() =>
+            onMultiUpdateClick(
+              table.getSelectedRowModel().rows.map((row) => row.original)
+            )
+          }
+        >
+          <Icons.pencil className="mr-2 w-4 h-4" />
+          開始時間を一括変更する ({table.getSelectedRowModel().rows.length}件)
+        </Button>
 
         <TooltipProvider>
           <Tooltip>
@@ -85,16 +127,19 @@ export function DataTableToolbar({
               onClick={handleCsvDownload}
               className={buttonVariants()}
             >
-              {/* <Button onClick={handleCsvDownload}> */}
               <Icons.fileDown className="mr-2 w-4 h-4" />
               今の条件でcsvをダウンロードする
-              {/* </Button> */}
             </TooltipTrigger>
             <TooltipContent>
               <p>学校、学年、開始時間でソートされます</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+
+        <Button onClick={() => alert("TODO: 実装する")}>
+          <Icons.circlePlus className="mr-2 w-4 h-4" />
+          新規登録
+        </Button>
       </div>
     </div>
   );
