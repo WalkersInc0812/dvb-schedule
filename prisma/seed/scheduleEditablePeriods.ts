@@ -4,7 +4,7 @@ export async function seedScheduleEditablePeriods(db: PrismaClient) {
   const facilities = await db.facility.findMany();
   const targetMonths = ["2024-08", "2024-09", "2024-10", "2024-11", "2024-12"];
   const fromDate = "yyyy-MM-10";
-  const toDate = "yyyy-MM-25";
+  const toDate = "yyyy-MM-30";
 
   let periods: Prisma.ScheduleEditablePeriodCreateInput[] = [];
   facilities.forEach((facility) => {

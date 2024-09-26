@@ -23,6 +23,12 @@ export async function seedSchedules(db: PrismaClient) {
         Math.max(start.getHours() + 1, randomInt(12, 22 + 1)),
         randomInt(12) * 5
       );
+
+      // 土日は除外
+      if (start.getDay() === 0 || start.getDay() === 6) {
+        return;
+      }
+
       schedules.push({
         student: {
           connect: {
