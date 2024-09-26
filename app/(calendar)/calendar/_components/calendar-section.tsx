@@ -73,6 +73,11 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
   const [scheduleEditablePeriod, setScheduleEditablePeriod] = React.useState<
     ScheduleEditablePeriod | undefined
   >(undefined);
+  const announcements = facility.announcements.filter(
+    (a) =>
+      parse(a.displayStartMonth, "yyyy-MM", new Date()) <= month &&
+      month <= parse(a.displayEndMonth, "yyyy-MM", new Date())
+  );
 
   const handleMonthChange = (date: Date) => {
     const targetMonth = format(date, "yyyy-MM");
@@ -342,8 +347,16 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
           </div>
         )}
 
+        {announcements.length > 0 && (
+          <div className="w-full">
+            <p className="text-[14px]">
+              お知らせ: {announcements.map((a) => a.content).join(", ")}
+            </p>
+          </div>
+        )}
+
         {scheduleEditablePeriod && (
-          <p>
+          <p className="text-[14px] text-left w-full">
             編集可能期間: {scheduleEditablePeriod.fromDate} ~{" "}
             {scheduleEditablePeriod.toDate}
           </p>
