@@ -6,7 +6,7 @@ type Props = {
 };
 export const Logs = ({ value }: Props) => {
   return (
-    <div>
+    <div className="text-left">
       <p>履歴</p>
       <ul>
         {value.map((log) => (
