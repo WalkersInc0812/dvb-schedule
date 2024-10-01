@@ -21,7 +21,8 @@ import { Input } from "../ui/input";
 import { Icons } from "../icons";
 import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
 import { Calendar } from "../ui/calendar";
-import { addDays, parse } from "date-fns";
+import { addDays, isSameMonth, isSameYear, parse } from "date-fns";
+import ScheduleEditablePeriodsFormControlContent from "./schedule-editable-periods-form-control-content";
 
 type Props = {
   facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement;
@@ -36,7 +37,14 @@ export const FacilityUpdateForm = ({ facility, onSuccess, onError }: Props) => {
     resolver: zodResolver(facilityUpdateSchema),
     defaultValues: {
       name: facility.name,
-      activeDates: facility.mealSettings.flatMap((mealSetting) => {
+      scheduleEditablePeriods: facility.scheduleEditablePeriods.map(
+        (period) => ({
+          targetMonth: parse(period.targetMonth, "yyyy-MM", new Date()),
+          fromDate: parse(period.fromDate, "yyyy-MM-dd", new Date()),
+          toDate: parse(period.toDate, "yyyy-MM-dd", new Date()),
+        })
+      ),
+      mealSettingActiveDates: facility.mealSettings.flatMap((mealSetting) => {
         const activeFromDate = parse(
           mealSetting.activeFromDate,
           "yyyy-MM-dd",
@@ -111,7 +119,81 @@ export const FacilityUpdateForm = ({ facility, onSuccess, onError }: Props) => {
 
         <FormField
           control={form.control}
-          name="activeDates"
+          name="scheduleEditablePeriods"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>予定の編集可能な期間</FormLabel>
+              <FormControl>
+                <ScheduleEditablePeriodsFormControlContent
+                  scheduleEditablePeriods={field.value}
+                  onSelect={({ month, dates }) => {
+                    const period = field.value.find((period) => {
+                      return (
+                        isSameYear(period.targetMonth, month) &&
+                        isSameMonth(period.targetMonth, month)
+                      );
+                    });
+
+                    if (
+                      typeof period !== "undefined" &&
+                      typeof dates === "undefined"
+                    ) {
+                      // すでに同じ月の設定があり、datesがundefinedの場合は削除
+                      field.onChange(
+                        field.value.filter((p) => {
+                          return !(
+                            isSameYear(p.targetMonth, month) &&
+                            isSameMonth(p.targetMonth, month)
+                          );
+                        })
+                      );
+                    } else if (
+                      typeof period !== "undefined" &&
+                      typeof dates !== "undefined"
+                    ) {
+                      // すでに同じ月の設定があり、datesがある場合は更新
+                      field.onChange(
+                        field.value.map((p) => {
+                          if (
+                            isSameYear(p.targetMonth, month) &&
+                            isSameMonth(p.targetMonth, month)
+                          ) {
+                            return {
+                              ...p,
+                              fromDate: dates?.from,
+                              toDate: dates?.to,
+                            };
+                          }
+
+                          return p;
+                        })
+                      );
+                    } else if (
+                      typeof period === "undefined" &&
+                      typeof dates !== "undefined"
+                    ) {
+                      // 無い場合は新しく追加
+                      field.onChange([
+                        ...field.value,
+                        {
+                          targetMonth: month,
+                          fromDate: dates.from,
+                          toDate: dates.to || dates.from,
+                        },
+                      ]);
+                    } else {
+                      // それ以外は何もしない
+                    }
+                  }}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="mealSettingActiveDates"
           render={({ field }) => (
             <FormItem>
               <FormLabel>給食の受付</FormLabel>

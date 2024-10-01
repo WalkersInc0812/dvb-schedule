@@ -29,12 +29,25 @@ export async function PATCH(
     const body = await req.json();
     const payload = facilityUpdateSchema.parse({
       ...body,
-      activeDates: body.activeDates.map((d: string) => new Date(d)),
+      scheduleEditablePeriods: body.scheduleEditablePeriods.map(
+        (period: {
+          targetMonth: string;
+          fromDate: string;
+          toDate: string;
+        }) => ({
+          targetMonth: new Date(period.targetMonth),
+          fromDate: new Date(period.fromDate),
+          toDate: new Date(period.toDate),
+        })
+      ),
+      mealSettingActiveDates: body.mealSettingActiveDates.map(
+        (d: string) => new Date(d)
+      ),
     });
 
     // payload.activeDates を mealSettings に変換する
     let mealSettings: Prisma.MealSettingCreateManyFacilityInput[] = [];
-    payload.activeDates.forEach((activeDate) => {
+    payload.mealSettingActiveDates.forEach((activeDate) => {
       // activeDateの前日が期間に含まれるsettingのindexを取得
       const prevDaySettingIndex = mealSettings.findIndex((mealSetting) =>
         isSameDay(
@@ -110,26 +123,34 @@ export async function PATCH(
       }
     });
 
-    await db.$transaction([
-      db.mealSetting.deleteMany({
-        where: {
-          facilityId: context.params.id,
-        },
-      }),
-      db.facility.update({
-        where: {
-          id: context.params.id,
-        },
-        data: {
-          name: payload.name,
-          mealSettings: {
-            createMany: {
-              data: mealSettings,
-            },
+    await db.facility.update({
+      where: {
+        id: context.params.id,
+      },
+      data: {
+        name: payload.name,
+        scheduleEditablePeriods: {
+          deleteMany: {
+            facilityId: context.params.id,
+          },
+          createMany: {
+            data: payload.scheduleEditablePeriods.map((period) => ({
+              targetMonth: format(period.targetMonth, "yyyy-MM"),
+              fromDate: format(period.fromDate, "yyyy-MM-dd"),
+              toDate: format(period.toDate, "yyyy-MM-dd"),
+            })),
           },
         },
-      }),
-    ]);
+        mealSettings: {
+          deleteMany: {
+            facilityId: context.params.id,
+          },
+          createMany: {
+            data: mealSettings,
+          },
+        },
+      },
+    });
 
     return new Response(null, { status: 200 });
   } catch (error) {

@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
 import { Announcement } from "@prisma/client";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { parse } from "date-fns";
+import { parse, subMonths } from "date-fns";
 import React, { useEffect } from "react";
 
 const AnnouncementCell = ({
@@ -32,8 +32,7 @@ const AnnouncementCell = ({
 
   useEffect(() => {
     handleMonthChange(month);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [handleMonthChange]);
 
   return (
     <>
@@ -67,6 +66,7 @@ const ScheduleEditablePeriodCell = ({
   row: Row<FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement>;
 }) => {
   const [month, setMonth] = React.useState(new Date());
+  const [month2, setMonth2] = React.useState(new Date());
   const [period, setPeriod] = React.useState<
     | FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement["scheduleEditablePeriods"][0]
     | undefined
@@ -83,36 +83,40 @@ const ScheduleEditablePeriodCell = ({
       });
       setPeriod(period);
       setMonth(month);
+      setMonth2(subMonths(month, 1));
     },
     [row.original.scheduleEditablePeriods]
   );
 
   useEffect(() => {
     handleMonthChange(month);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [handleMonthChange]);
 
   return (
-    <>
+    <div className="flex flex-col items-center gap-2 justify-start">
       <Calendar
         className="rounded-md border w-fit"
         month={month}
         onMonthChange={handleMonthChange}
         classNames={{
-          table: "w-[252px]",
+          caption: "flex justify-center relative items-center",
+          table: "w-[252px] !mt-0",
           head_row: "hidden",
           row: "hidden",
         }}
       />
 
-      {period ? (
-        <span>
-          {period.fromDate} 〜 {period.toDate}
-        </span>
-      ) : (
-        <span>予定入力可能期間はありません</span>
-      )}
-    </>
+      <Calendar
+        mode="range"
+        className="rounded-md border w-fit"
+        selected={{
+          from: period && new Date(period.fromDate),
+          to: period && new Date(period.toDate),
+        }}
+        month={month2}
+        onMonthChange={setMonth2}
+      />
+    </div>
   );
 };
 
@@ -152,7 +156,8 @@ export const makeColumns = ({
           })),
         }}
         modifiersClassNames={{
-          mealActive: "bg-blue-200 hover:bg-blue-200",
+          mealActive:
+            "bg-primary hover:bg-primary text-primary-foreground hover:text-primary-foreground",
         }}
       />
     ),
