@@ -17,12 +17,14 @@ import {
   facilityUpdateSchema,
   FacilityUpdateSchemaType,
 } from "@/lib/validations/facility";
-import { Facility } from "@prisma/client";
 import { Input } from "../ui/input";
 import { Icons } from "../icons";
+import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
+import { Calendar } from "../ui/calendar";
+import { addDays, parse } from "date-fns";
 
 type Props = {
-  facility: Facility;
+  facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement;
   onSuccess?: () => void;
   onError?: () => void;
 };
@@ -34,6 +36,25 @@ export const FacilityUpdateForm = ({ facility, onSuccess, onError }: Props) => {
     resolver: zodResolver(facilityUpdateSchema),
     defaultValues: {
       name: facility.name,
+      activeDates: facility.mealSettings.flatMap((mealSetting) => {
+        const activeFromDate = parse(
+          mealSetting.activeFromDate,
+          "yyyy-MM-dd",
+          new Date()
+        );
+        const activeToDate = parse(
+          mealSetting.activeToDate,
+          "yyyy-MM-dd",
+          new Date()
+        );
+
+        const days = [];
+        for (let i = activeFromDate; i <= activeToDate; i = addDays(i, 1)) {
+          days.push(i);
+        }
+
+        return days;
+      }),
     },
   });
 
@@ -84,6 +105,26 @@ export const FacilityUpdateForm = ({ facility, onSuccess, onError }: Props) => {
                 <Input placeholder="教室名を入力して下さい" {...field} />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="activeDates"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>給食の受付</FormLabel>
+              <FormControl>
+                <Calendar
+                  mode="multiple"
+                  className="rounded-md border w-fit"
+                  selected={field.value}
+                  onSelect={(dates) => {
+                    field.onChange(dates);
+                  }}
+                />
+              </FormControl>
             </FormItem>
           )}
         />

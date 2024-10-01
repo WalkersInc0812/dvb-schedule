@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
-import { checkIsParent, checkIsStaff, getCurrentUser } from "@/lib/session";
+import { checkIsStaff, getCurrentUser } from "@/lib/session";
 import { facilityUpdateSchema } from "@/lib/validations/facility";
+import { Prisma } from "@prisma/client";
+import { addDays, format, isSameDay, parse, subDays } from "date-fns";
 import { z } from "zod";
 
 const routeContextSchema = z.object({
@@ -25,19 +27,114 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const payload = facilityUpdateSchema.parse(body);
-
-    await db.facility.update({
-      where: {
-        id: context.params.id,
-      },
-      data: {
-        name: payload.name,
-      },
+    const payload = facilityUpdateSchema.parse({
+      ...body,
+      activeDates: body.activeDates.map((d: string) => new Date(d)),
     });
+
+    // payload.activeDates を mealSettings に変換する
+    let mealSettings: Prisma.MealSettingCreateManyFacilityInput[] = [];
+    payload.activeDates.forEach((activeDate) => {
+      // activeDateの前日が期間に含まれるsettingのindexを取得
+      const prevDaySettingIndex = mealSettings.findIndex((mealSetting) =>
+        isSameDay(
+          subDays(activeDate, 1),
+          parse(mealSetting.activeToDate, "yyyy-MM-dd", new Date())
+        )
+      );
+
+      // activeDateの翌日が期間に含まれるsettingのindexを取得
+      const nextDaySettingIndex = mealSettings.findIndex((mealSetting) =>
+        isSameDay(
+          addDays(activeDate, 1),
+          parse(mealSetting.activeFromDate, "yyyy-MM-dd", new Date())
+        )
+      );
+
+      if (prevDaySettingIndex !== -1 && nextDaySettingIndex !== -1) {
+        // 前日にも翌日にもsettingがある場合、それら2つの期間を繋げる
+        const prevDaySetting = mealSettings[prevDaySettingIndex];
+        const nextDaySetting = mealSettings[nextDaySettingIndex];
+        mealSettings = [
+          ...mealSettings.filter(
+            (_value, index) =>
+              index !== prevDaySettingIndex && index !== nextDaySettingIndex
+          ),
+          {
+            activeFromDate: prevDaySetting.activeFromDate,
+            activeToDate: nextDaySetting.activeToDate,
+          },
+        ];
+      } else if (prevDaySettingIndex !== -1 && nextDaySettingIndex === -1) {
+        // 前日のみにsettingがある場合、その期間の終了日を1日伸ばす
+        const prevDaySetting = mealSettings[prevDaySettingIndex];
+        mealSettings = [
+          ...mealSettings.filter(
+            (_value, index) => index !== prevDaySettingIndex
+          ),
+          {
+            activeFromDate: prevDaySetting.activeFromDate,
+            activeToDate: format(
+              addDays(
+                parse(prevDaySetting.activeToDate, "yyyy-MM-dd", new Date()),
+                1
+              ),
+              "yyyy-MM-dd"
+            ),
+          },
+        ];
+      } else if (prevDaySettingIndex === -1 && nextDaySettingIndex !== -1) {
+        // 翌日のみにsettingがある場合、その期間の開始日を1日延ばす
+        const nextDaySetting = mealSettings[nextDaySettingIndex];
+        mealSettings = [
+          ...mealSettings.filter(
+            (_value, index) => index !== nextDaySettingIndex
+          ),
+          {
+            activeFromDate: format(
+              subDays(
+                parse(nextDaySetting.activeFromDate, "yyyy-MM-dd", new Date()),
+                1
+              ),
+              "yyyy-MM-dd"
+            ),
+            activeToDate: nextDaySetting.activeToDate,
+          },
+        ];
+      } else {
+        // それ以外の場合、新しくmealSettingを追加する
+        mealSettings.push({
+          activeFromDate: format(activeDate, "yyyy-MM-dd"),
+          activeToDate: format(activeDate, "yyyy-MM-dd"),
+        });
+      }
+    });
+
+    await db.$transaction([
+      db.mealSetting.deleteMany({
+        where: {
+          facilityId: context.params.id,
+        },
+      }),
+      db.facility.update({
+        where: {
+          id: context.params.id,
+        },
+        data: {
+          name: payload.name,
+          mealSettings: {
+            createMany: {
+              data: mealSettings,
+            },
+          },
+        },
+      }),
+    ]);
 
     return new Response(null, { status: 200 });
   } catch (error) {
+    console.error(error);
+
     if (error instanceof z.ZodError) {
       return new Response(JSON.stringify(error.issues), { status: 422 });
     }
