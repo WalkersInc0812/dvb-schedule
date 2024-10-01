@@ -106,40 +106,44 @@ export function DataTableToolbar({
         )}
       </div>
 
-      <div className="flex gap-2">
-        <Button
-          disabled={
-            !(table.getIsSomeRowsSelected() || table.getIsAllRowsSelected())
-          }
-          onClick={() =>
-            onMultiUpdateClick(
-              table.getSelectedRowModel().rows.map((row) => row.original)
-            )
-          }
-        >
-          <Icons.pencil className="mr-2 w-4 h-4" />
-          開始時間を一括変更する ({table.getSelectedRowModel().rows.length}件)
-        </Button>
+      <div className="flex justify-between">
+        <div className="flex gap-2">
+          <Button
+            disabled={
+              !(table.getIsSomeRowsSelected() || table.getIsAllRowsSelected())
+            }
+            onClick={() =>
+              onMultiUpdateClick(
+                table.getSelectedRowModel().rows.map((row) => row.original)
+              )
+            }
+          >
+            <Icons.pencil className="mr-2 w-4 h-4" />
+            開始時間を一括変更する ({table.getSelectedRowModel().rows.length}件)
+          </Button>
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger
-              onClick={handleCsvDownload}
-              className={buttonVariants()}
-            >
-              <Icons.fileDown className="mr-2 w-4 h-4" />
-              今の条件でcsvをダウンロードする
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>学校、学年、開始時間でソートされます</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger
+                onClick={handleCsvDownload}
+                className={buttonVariants()}
+              >
+                <Icons.fileDown className="mr-2 w-4 h-4" />
+                今の条件でcsvをダウンロードする
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>学校、学年、開始時間でソートされます</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
 
-        <Button onClick={() => alert("TODO: 実装する")}>
-          <Icons.circlePlus className="mr-2 w-4 h-4" />
-          新規登録
-        </Button>
+        <div>
+          <Button onClick={() => alert("TODO: 実装する")}>
+            <Icons.circlePlus className="mr-2 w-4 h-4" />
+            新規登録
+          </Button>
+        </div>
       </div>
     </div>
   );
