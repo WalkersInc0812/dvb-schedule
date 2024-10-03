@@ -38,7 +38,7 @@ export const DataTableSection = ({ facilities }: Props) => {
       <DataTable columns={columns} data={facilities} />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent className="h-[90vh] overflow-scroll">
           <DialogHeader>
             <DialogDescription className="text-foreground">
               {clickedFacility ? (

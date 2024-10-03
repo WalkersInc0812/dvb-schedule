@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
 import { Announcement } from "@prisma/client";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { parse, subMonths } from "date-fns";
+import { format, parse, subMonths } from "date-fns";
 import React, { useEffect } from "react";
 
 const AnnouncementCell = ({
@@ -35,28 +35,42 @@ const AnnouncementCell = ({
   }, [handleMonthChange]);
 
   return (
-    <>
+    <div className="flex flex-col items-center gap-2">
       <Calendar
         className="rounded-md border w-fit"
         month={month}
         onMonthChange={handleMonthChange}
         classNames={{
-          table: "w-[252px]",
+          caption: "flex justify-center relative items-center",
+          table: "w-[252px] !mt-0",
           head_row: "hidden",
           row: "hidden",
         }}
       />
 
-      {announcements.length > 0 ? (
-        <ul>
-          {announcements.map((announcement) => (
-            <li key={announcement.id}>{announcement.content}</li>
-          ))}
-        </ul>
-      ) : (
-        <span>お知らせはありません</span>
-      )}
-    </>
+      <div className="text-center">
+        {announcements.length > 0 ? (
+          <ul>
+            {announcements.map((announcement) => (
+              <li key={announcement.id}>
+                {format(
+                  parse(announcement.displayStartMonth, "yyyy-MM", new Date()),
+                  "yyyy年M月"
+                )}
+                ~
+                {format(
+                  parse(announcement.displayEndMonth, "yyyy-MM", new Date()),
+                  "yyyy年M月"
+                )}
+                : {announcement.content}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <span>お知らせはありません</span>
+        )}
+      </div>
+    </div>
   );
 };
 

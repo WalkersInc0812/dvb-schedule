@@ -29,6 +29,17 @@ export async function PATCH(
     const body = await req.json();
     const payload = facilityUpdateSchema.parse({
       ...body,
+      announcements: body.announcements.map(
+        (announcement: {
+          content: string;
+          displayStartMonth: string;
+          displayEndMonth: string;
+        }) => ({
+          content: announcement.content,
+          displayStartMonth: new Date(announcement.displayStartMonth),
+          displayEndMonth: new Date(announcement.displayEndMonth),
+        })
+      ),
       scheduleEditablePeriods: body.scheduleEditablePeriods.map(
         (period: {
           targetMonth: string;
@@ -129,6 +140,21 @@ export async function PATCH(
       },
       data: {
         name: payload.name,
+        announcements: {
+          deleteMany: {
+            facilityId: context.params.id,
+          },
+          createMany: {
+            data: payload.announcements.map((announcement) => ({
+              content: announcement.content,
+              displayStartMonth: format(
+                announcement.displayStartMonth,
+                "yyyy-MM"
+              ),
+              displayEndMonth: format(announcement.displayEndMonth, "yyyy-MM"),
+            })),
+          },
+        },
         scheduleEditablePeriods: {
           deleteMany: {
             facilityId: context.params.id,

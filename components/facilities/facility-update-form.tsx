@@ -23,6 +23,7 @@ import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from 
 import { Calendar } from "../ui/calendar";
 import { addDays, isSameMonth, isSameYear, parse } from "date-fns";
 import ScheduleEditablePeriodsFormControlContent from "./schedule-editable-periods-form-control-content";
+import { AnnouncementsFormControlContent } from "./announcements-form-control-content";
 
 type Props = {
   facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement;
@@ -37,6 +38,20 @@ export const FacilityUpdateForm = ({ facility, onSuccess, onError }: Props) => {
     resolver: zodResolver(facilityUpdateSchema),
     defaultValues: {
       name: facility.name,
+      announcements: facility.announcements.map((announcement) => ({
+        id: announcement.id,
+        content: announcement.content,
+        displayStartMonth: parse(
+          announcement.displayStartMonth,
+          "yyyy-MM",
+          new Date()
+        ),
+        displayEndMonth: parse(
+          announcement.displayEndMonth,
+          "yyyy-MM",
+          new Date()
+        ),
+      })),
       scheduleEditablePeriods: facility.scheduleEditablePeriods.map(
         (period) => ({
           targetMonth: parse(period.targetMonth, "yyyy-MM", new Date()),
@@ -113,6 +128,22 @@ export const FacilityUpdateForm = ({ facility, onSuccess, onError }: Props) => {
                 <Input placeholder="教室名を入力して下さい" {...field} />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="announcements"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>お知らせ</FormLabel>
+              <FormControl>
+                <AnnouncementsFormControlContent
+                  announcements={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
             </FormItem>
           )}
         />
