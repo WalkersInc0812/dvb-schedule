@@ -16,11 +16,13 @@ import { DataTableToolbar } from "./data-table-toolbar";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onCreateClick: () => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onCreateClick,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -31,7 +33,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar table={table} onCreateClick={onCreateClick} />
 
       <div>
         <Table>

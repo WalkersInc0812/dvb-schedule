@@ -11,6 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { FacilityUpdateForm } from "@/components/facilities/facility-update-form";
 import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
+import { FacilityCreateForm } from "@/components/facilities/facility-create-form";
+
+type DialogType = "update" | "create";
 
 type Props = {
   facilities: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement[];
@@ -18,6 +21,7 @@ type Props = {
 
 export const DataTableSection = ({ facilities }: Props) => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [dialogType, setDialogType] = React.useState<DialogType>("create");
   const [clickedFacility, setClickedFacility] = React.useState<
     FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement | undefined
   >();
@@ -26,6 +30,13 @@ export const DataTableSection = ({ facilities }: Props) => {
     facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement
   ) => {
     setClickedFacility(facility);
+    setDialogType("update");
+    setDialogOpen(true);
+  };
+
+  const handleCreateClick = () => {
+    setClickedFacility(undefined);
+    setDialogType("create");
     setDialogOpen(true);
   };
 
@@ -35,13 +46,24 @@ export const DataTableSection = ({ facilities }: Props) => {
 
   return (
     <>
-      <DataTable columns={columns} data={facilities} />
+      <DataTable
+        columns={columns}
+        data={facilities}
+        onCreateClick={handleCreateClick}
+      />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="h-[90vh] overflow-scroll">
           <DialogHeader>
             <DialogDescription className="text-foreground">
-              {clickedFacility ? (
+              {dialogType === "create" ? (
+                <FacilityCreateForm
+                  onSuccess={() => {
+                    setDialogOpen(false);
+                    setClickedFacility(undefined);
+                  }}
+                />
+              ) : dialogType === "update" && clickedFacility ? (
                 <FacilityUpdateForm
                   facility={clickedFacility}
                   onSuccess={() => {

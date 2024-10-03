@@ -1,5 +1,10 @@
 import z from "zod";
 
+export const facilityCreateSchema = z.object({
+  name: z.string().min(1),
+});
+export type FacilityCreateSchemaType = z.infer<typeof facilityCreateSchema>;
+
 export const facilityUpdateSchema = z.object({
   name: z.string().min(1),
   announcements: z.array(
