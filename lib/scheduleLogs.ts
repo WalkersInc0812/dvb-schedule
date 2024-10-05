@@ -1,4 +1,4 @@
-"use server";
+"use server"; // TODO: 使い方合ってる？
 
 import { Prisma } from "@prisma/client";
 import { db } from "./db";

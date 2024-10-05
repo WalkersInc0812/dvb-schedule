@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { db } from "./db";
-import { differenceInYears, parse, isBefore } from "date-fns";
+import { getYear, getMonth } from "date-fns";
 
 export type StudentWithParntAndFacilityAndSchoolAndClasses =
   Prisma.StudentGetPayload<{
@@ -50,32 +50,32 @@ export async function getStudentsByParentId({
 
 export function calculateGrade(enrollmentYear: number) {
   // 現在の日付を取得
-  const currentDate = new Date();
+  const now = new Date();
+  const nowYear = getYear(now);
+  const nowMonth = getMonth(now);
 
-  // 入学年度の4月1日の日付を作成
-  const enrollmentDate = parse(
-    `${enrollmentYear}-04-01`,
-    "yyyy-MM-dd",
-    new Date()
-  );
+  // 現在の年と入学年の差を取得
+  const diffYear = nowYear - enrollmentYear;
 
-  // 現在の日付と入学日の年数差を計算
-  let grade = differenceInYears(currentDate, enrollmentDate);
-
-  // 現在の日付が4月1日より前の場合、学年を1つ減らす
-  const currentYear = currentDate.getFullYear();
-  const newSchoolYearStart = parse(
-    `${currentYear}-04-01`,
-    "yyyy-MM-dd",
-    new Date()
-  );
-
-  if (isBefore(currentDate, newSchoolYearStart)) {
-    grade -= 1;
+  // 現在が4月以降の場合は1学年増やす
+  let grade = diffYear;
+  if (nowMonth + 1 >= 4) {
+    grade += 1;
   }
 
-  // 学年が0以下の場合は1年生とする
-  grade = Math.max(grade, 1);
-
   return grade;
+}
+
+export function calculateEnrollmentAcademicYear(grade: number) {
+  // 現在の日付を取得
+  const now = new Date();
+  const nowYear = getYear(now);
+  const nowMonth = getMonth(now);
+
+  // 学年と現在日時から入学年度を計算する
+  // ただし、4月1日が年度開始日であることに注意
+  const schoolEnrollmentAcademicYear =
+    nowYear - (nowMonth < 3 ? 1 : 0) - (grade - 1);
+
+  return schoolEnrollmentAcademicYear;
 }

@@ -1,5 +1,11 @@
-import { Prisma } from "@prisma/client";
+import { Facility, Prisma } from "@prisma/client";
 import { db } from "./db";
+
+export async function getFacilities(): Promise<Facility[]> {
+  const facilities = await db.facility.findMany();
+
+  return facilities;
+}
 
 export type FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement =
   Prisma.FacilityGetPayload<{

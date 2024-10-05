@@ -21,26 +21,20 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { StudentWithParntAndFacilityAndSchoolAndClasses } from "@/lib/students";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-} from "@/components/ui/dialog";
-import StudentCreateForm from "@/components/students/student-create-form";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onCreateClick?: () => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onCreateClick,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   const table = useReactTable({
     data,
@@ -93,7 +87,7 @@ export function DataTable<TData, TValue>({
               label: name,
             }))}
         />
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button onClick={onCreateClick}>
           <Icons.circlePlus className="mr-2 w-4 h-4" />
           新規登録
         </Button>
@@ -105,16 +99,6 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <DataTablePagination table={table} showSelectedRowCount={false} />
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogDescription className="text-foreground">
-              <StudentCreateForm />
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

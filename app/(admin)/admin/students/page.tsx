@@ -1,11 +1,15 @@
 import { getStudents } from "@/lib/students";
 import React from "react";
 import DataTableSection from "./_components/data-table-section";
+import { getFacilities } from "@/lib/facilities";
+import { getSchools } from "@/lib/schools";
 
 type Props = {};
 
 const AdminStudentPage = async (props: Props) => {
   const students = await getStudents();
+  const facilities = await getFacilities();
+  const schools = await getSchools();
 
   return (
     <div>
@@ -13,7 +17,11 @@ const AdminStudentPage = async (props: Props) => {
         利用者管理
       </h1>
 
-      <DataTableSection students={students} />
+      <DataTableSection
+        students={students}
+        facilities={facilities}
+        schools={schools}
+      />
     </div>
   );
 };
