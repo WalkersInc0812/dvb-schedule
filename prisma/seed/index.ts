@@ -9,6 +9,8 @@ import { seedSchedules } from "./schedules";
 import { seedMealSettings } from "./mealSettings";
 import { seedScheduleEditablePeriods } from "./scheduleEditablePeriods";
 import { seedAnnouncements } from "./announcements";
+import { seedPrograms } from "./programs";
+import { seedFixedUsageDayOfWeeks } from "./fixedUsageDayOfWeeks";
 
 const db = new PrismaClient();
 
@@ -23,6 +25,8 @@ async function main() {
   await seedParents(db);
   await seedStudents(db);
   await seedSchedules(db);
+  await seedPrograms(db);
+  await seedFixedUsageDayOfWeeks(db);
 }
 
 main()

@@ -32,6 +32,7 @@ import {
 import { searchClasses } from "../../lib/classes";
 import { getMonth, getYear } from "date-fns";
 import { calculateEnrollmentAcademicYear } from "@/lib/students";
+import FixedUsageDayOfWeeksFormField from "./fixed-usage-day-of-weeks-form-field";
 
 type Props = {
   facilities: Facility[];
@@ -52,7 +53,20 @@ const StudentCreateForm = ({
   const router = useRouter();
 
   const form = useForm<StudentCreateSchemaType>({
+    mode: "onBlur",
     resolver: zodResolver(studentCreateSchema),
+    defaultValues: {
+      parent: {
+        name: "",
+        email: "",
+      },
+      name: "",
+      facilityId: "",
+      schoolId: "",
+      grade: undefined,
+      classId: "",
+      fixedUsageDayOfWeeks: [],
+    },
   });
 
   const onSubmit = async (data: StudentCreateSchemaType) => {
@@ -90,67 +104,78 @@ const StudentCreateForm = ({
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="parent.name"
-          render={({ field }) => (
-            <FormItem className="flex flex-col items-start">
-              <FormLabel>保護者氏名</FormLabel>
-              <FormControl>
-                <Input placeholder="保護者指名を入力してください" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="parent.name"
+            render={({ field }) => (
+              <FormItem className="flex flex-col items-start">
+                <FormLabel>保護者氏名</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="保護者氏名を入力してください"
+                    {...field}
+                    onBlur={field.onBlur}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="parent.email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>メールアドレス</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="メールアドレスを入力してください"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="parent.email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>メールアドレス</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="メールアドレスを入力してください"
+                    {...field}
+                    onBlur={field.onBlur}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>児童氏名</FormLabel>
-              <FormControl>
-                <Input placeholder="児童氏名を入力してください" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>児童氏名</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="児童氏名を入力してください"
+                    {...field}
+                    onBlur={field.onBlur}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name={"facilityId"}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>教室</FormLabel>
-              <FormControl>
+          <FormField
+            control={form.control}
+            name={"facilityId"}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>教室</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="教室を選択してください" />
-                  </SelectTrigger>
+                  <FormControl>
+                    <SelectTrigger onBlur={field.onBlur}>
+                      <SelectValue placeholder="教室を選択してください" />
+                    </SelectTrigger>
+                  </FormControl>
                   <SelectContent>
                     {facilities.map((facility) => (
                       <SelectItem key={facility.id} value={facility.id}>
@@ -159,26 +184,30 @@ const StudentCreateForm = ({
                     ))}
                   </SelectContent>
                 </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name={"schoolId"}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>学校</FormLabel>
-              <FormControl>
+          <FormField
+            control={form.control}
+            name={"schoolId"}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>学校</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    form.resetField("grade");
+                    form.resetField("classId");
+                  }}
                   defaultValue={field.value}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="学校を選択してください" />
-                  </SelectTrigger>
+                  <FormControl>
+                    <SelectTrigger onBlur={field.onBlur}>
+                      <SelectValue placeholder="学校を選択してください" />
+                    </SelectTrigger>
+                  </FormControl>
                   <SelectContent>
                     {schools.map((school) => (
                       <SelectItem key={school.id} value={school.id}>
@@ -187,22 +216,22 @@ const StudentCreateForm = ({
                     ))}
                   </SelectContent>
                 </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name={"grade"}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>学年</FormLabel>
-              <FormControl>
+          <FormField
+            control={form.control}
+            name={"grade"}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>学年</FormLabel>
                 <Select
+                  disabled={!form.getValues("schoolId")}
                   onValueChange={(value) => {
                     field.onChange(Number(value));
+                    form.resetField("classId");
 
                     const now = new Date();
                     const year = getYear(now);
@@ -218,9 +247,11 @@ const StudentCreateForm = ({
                     });
                   }}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="学年を選択してください" />
-                  </SelectTrigger>
+                  <FormControl>
+                    <SelectTrigger onBlur={field.onBlur}>
+                      <SelectValue placeholder="学年を選択してください" />
+                    </SelectTrigger>
+                  </FormControl>
                   <SelectContent>
                     {[1, 2, 3, 4, 5, 6].map((grade) => (
                       <SelectItem key={grade} value={grade.toString()}>
@@ -229,28 +260,31 @@ const StudentCreateForm = ({
                     ))}
                   </SelectContent>
                 </Select>
-              </FormControl>
-              <FormMessage />
-              {field.value && (
-                <p>
-                  入学年度: {calculateEnrollmentAcademicYear(field.value)}年
-                </p>
-              )}
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+                {field.value && (
+                  <p>
+                    入学年度: {calculateEnrollmentAcademicYear(field.value)}年
+                  </p>
+                )}
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name={"classId"}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>クラス</FormLabel>
-              <FormControl>
-                <Select onValueChange={field.onChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="クラスを選択してください" />
-                  </SelectTrigger>
+          <FormField
+            control={form.control}
+            name={"classId"}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>クラス</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  disabled={classes.length === 0 || isPending}
+                >
+                  <FormControl>
+                    <SelectTrigger onBlur={field.onBlur}>
+                      <SelectValue placeholder="クラスを選択してください" />
+                    </SelectTrigger>
+                  </FormControl>
                   <SelectContent>
                     {classes.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
@@ -259,24 +293,33 @@ const StudentCreateForm = ({
                     ))}
                   </SelectContent>
                 </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={!form.formState.isValid || form.formState.isLoading}
-        >
-          {form.formState.isLoading && (
-            <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
-          )}
-          登録
-        </Button>
-      </form>
-    </Form>
+          <FixedUsageDayOfWeeksFormField form={form} />
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={
+              !form.formState.isValid ||
+              form.formState.isLoading ||
+              form.formState.isSubmitting
+            }
+          >
+            {form.formState.isLoading ||
+              (form.formState.isSubmitting && (
+                <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
+              ))}
+            登録
+          </Button>
+        </form>
+      </Form>
+
+      {/* <DevTool control={form.control} /> */}
+    </>
   );
 };
 

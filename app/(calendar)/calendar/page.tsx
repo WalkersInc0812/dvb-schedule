@@ -6,6 +6,7 @@ import { getStudentsByParentId } from "@/lib/students";
 import { notFound } from "next/navigation";
 import { UpcomingSection } from "./_components/upcoming-section";
 import { getFacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementById } from "@/lib/facilities";
+import { getFixedUsageDayOfWeeksWithProgramsByStudentId } from "@/lib/fixedUsageDayOfWeeks";
 
 type Props = {};
 const CalendarPage = async (props: Props) => {
@@ -28,6 +29,9 @@ const CalendarPage = async (props: Props) => {
 
   const schedules = await getSchedulesByStudentId({ studentId: student.id });
 
+  const fixedUsageDayOfWeeks =
+    await getFixedUsageDayOfWeeksWithProgramsByStudentId(student.id);
+
   return (
     <>
       <div className="divide-y">
@@ -36,6 +40,7 @@ const CalendarPage = async (props: Props) => {
             studentId={student.id}
             facility={facility}
             schedules={schedules}
+            fixedUsageDayOfWeeks={fixedUsageDayOfWeeks}
           />
         )}
         <UpcomingSection schedules={schedules} />

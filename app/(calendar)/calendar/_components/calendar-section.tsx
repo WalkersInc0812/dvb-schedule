@@ -14,8 +14,6 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import {
-  addDays,
-  addHours,
   endOfDay,
   endOfMonth,
   format,
@@ -23,7 +21,6 @@ import {
   parse,
   startOfDay,
   startOfMonth,
-  subHours,
 } from "date-fns";
 import { Schedule, ScheduleEditablePeriod } from "@prisma/client";
 import { ScheduleCreateForm } from "@/components/schedules/schedule-create-form";
@@ -57,6 +54,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { FixedUsageDayOfWeekWithPrograms } from "@/lib/fixedUsageDayOfWeeks";
 
 type Mode = "single" | "multiple";
 type DialogType = "create" | "multi-create" | "read" | "update" | "delete";
@@ -65,8 +63,14 @@ type Props = {
   studentId: string;
   facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement;
   schedules: Schedule[];
+  fixedUsageDayOfWeeks: FixedUsageDayOfWeekWithPrograms[];
 };
-export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
+export const CalendarSection = ({
+  studentId,
+  facility,
+  schedules,
+  fixedUsageDayOfWeeks,
+}: Props) => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [clickedDate, setClickedDate] = React.useState<Date | undefined>();
   const [isMonthEditable, setIsMonthEditable] = React.useState(false);
@@ -102,6 +106,21 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
           startOfDay(parse(s.activeToDate, "yyyy-MM-dd", new Date()))
       )
   );
+  {
+    /* TODO: improve performance */
+  }
+  const fixedUsageDayOfWeeksInMonth = fixedUsageDayOfWeeks.filter(
+    (f) =>
+      startOfMonth(month) <= parse(f.month, "yyyy-MM", new Date()) &&
+      parse(f.month, "yyyy-MM", new Date()) <= endOfMonth(month)
+  );
+  const fixedUsageDayOfWeeksByDay = {
+    1: fixedUsageDayOfWeeksInMonth.find((f) => f.dayOfWeek === 1),
+    2: fixedUsageDayOfWeeksInMonth.find((f) => f.dayOfWeek === 2),
+    3: fixedUsageDayOfWeeksInMonth.find((f) => f.dayOfWeek === 3),
+    4: fixedUsageDayOfWeeksInMonth.find((f) => f.dayOfWeek === 4),
+    5: fixedUsageDayOfWeeksInMonth.find((f) => f.dayOfWeek === 5),
+  };
 
   const handleMonthChange = (date: Date) => {
     const targetMonth = format(date, "yyyy-MM");
@@ -228,8 +247,6 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
         {}
       </div>
 
-      {/* TODO: make dynamic */}
-      {/* TODO: refactor */}
       <div className="mb-4 space-y-1">
         <Accordion type="single" collapsible>
           <AccordionItem value="item-1" className="border-b-0">
@@ -241,61 +258,84 @@ export const CalendarSection = ({ studentId, facility, schedules }: Props) => {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-center px-2">曜日</TableHead>
-                    <TableHead className="text-center px-2">月</TableHead>
-                    <TableHead className="text-center px-2">火</TableHead>
-                    <TableHead className="text-center px-2">水</TableHead>
-                    <TableHead className="text-center px-2">木</TableHead>
-                    <TableHead className="text-center px-2">金</TableHead>
+                    <TableHead className="text-center px-2">
+                      月{fixedUsageDayOfWeeksByDay["1"] && "⚪︎"}
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      火{fixedUsageDayOfWeeksByDay["2"] && "⚪︎"}
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      水{fixedUsageDayOfWeeksByDay["3"] && "⚪︎"}
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      木{fixedUsageDayOfWeeksByDay["4"] && "⚪︎"}
+                    </TableHead>
+                    <TableHead className="text-center px-2">
+                      金{fixedUsageDayOfWeeksByDay["5"] && "⚪︎"}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody className="text-center bg-primary bg-opacity-5">
+                {/* TODO: improve performance */}
+                <TableBody className="text-center">
+                  <TableRow>
+                    <TableCell className="p-2">登園時間</TableCell>
+                    {Object.values(fixedUsageDayOfWeeksByDay).map((f) => (
+                      <TableCell className="p-2" key={f?.id}>
+                        {f?.startTime || ""}
+                      </TableCell>
+                    ))}
+                  </TableRow>
                   <TableRow className="border-dashed">
+                    <TableCell className="p-2">お迎え時間</TableCell>
+                    {Object.values(fixedUsageDayOfWeeksByDay).map((f) => (
+                      <TableCell className="p-2" key={f?.id}>
+                        {f?.endTime || ""}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="p-2">お迎えバス</TableCell>
+                    {Object.values(fixedUsageDayOfWeeksByDay).map((f) => (
+                      <TableCell className="p-2" key={f?.id}>
+                        {f?.needPickup && "⚪︎"}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  <TableRow className="border-dashed bg-primary bg-opacity-5">
                     <TableCell className="p-2">①</TableCell>
-                    <TableCell className="p-2">英語</TableCell>
-                    <TableCell className="p-2"></TableCell>
-                    <TableCell className="p-2">英語</TableCell>
-                    <TableCell className="p-2"></TableCell>
-                    <TableCell className="p-2">コ・ラボ</TableCell>
+                    {Object.values(fixedUsageDayOfWeeksByDay).map((f) => (
+                      <TableCell className="p-2" key={f?.id}>
+                        {f?.program1?.shortName || f?.program1?.name || ""}
+                      </TableCell>
+                    ))}
                   </TableRow>
-                  <TableRow>
+                  <TableRow className="bg-primary bg-opacity-5">
                     <TableCell className="p-2">時間</TableCell>
-                    <TableCell className="p-2">
-                      16:10
-                      <br />
-                      ~17:10
-                    </TableCell>
-                    <TableCell className="p-2"></TableCell>
-                    <TableCell className="p-2">
-                      16:10
-                      <br />
-                      ~17:10
-                    </TableCell>
-                    <TableCell className="p-2"></TableCell>
-                    <TableCell className="p-2">
-                      17:15
-                      <br />
-                      ~18:00
-                    </TableCell>
+                    {Object.values(fixedUsageDayOfWeeksByDay).map((f) => (
+                      <TableCell className="p-2" key={f?.id}>
+                        {f?.program1StartTime || ""}
+                        <br />
+                        {f?.program1EndTime ? `~${f?.program1EndTime}` : ""}
+                      </TableCell>
+                    ))}
                   </TableRow>
-                  <TableRow className="border-dashed">
+                  <TableRow className="border-dashed bg-primary bg-opacity-5">
                     <TableCell className="p-2">②</TableCell>
-                    <TableCell className="p-2">プログラミング初級</TableCell>
-                    <TableCell className="p-2"></TableCell>
-                    <TableCell className="p-2"></TableCell>
-                    <TableCell className="p-2"></TableCell>
-                    <TableCell className="p-2"></TableCell>
+                    {Object.values(fixedUsageDayOfWeeksByDay).map((f) => (
+                      <TableCell className="p-2" key={f?.id}>
+                        {f?.program2?.shortName || f?.program2?.name || ""}
+                      </TableCell>
+                    ))}
                   </TableRow>
-                  <TableRow>
+                  <TableRow className="bg-primary bg-opacity-5">
                     <TableCell className="p-2">時間</TableCell>
-                    <TableCell className="p-2">
-                      17:20
-                      <br />
-                      ~18:20
-                    </TableCell>
-                    <TableCell className="p-2"></TableCell>
-                    <TableCell className="p-2"></TableCell>
-                    <TableCell className="p-2"></TableCell>
-                    <TableCell className="p-2"></TableCell>
+                    {Object.values(fixedUsageDayOfWeeksByDay).map((f) => (
+                      <TableCell className="p-2" key={f?.id}>
+                        {f?.program2StartTime || ""}
+                        <br />
+                        {f?.program2EndTime ? `~${f?.program2EndTime}` : ""}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 </TableBody>
               </Table>

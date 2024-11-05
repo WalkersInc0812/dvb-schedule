@@ -58,6 +58,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@hookform/devtools": "^4.3.1",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.16.2",
     "@types/papaparse": "^5.3.14",

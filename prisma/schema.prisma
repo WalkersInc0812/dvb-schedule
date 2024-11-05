@@ -192,11 +192,12 @@ model Student {
   name                         String
   schoolEnrollmentAcademicYear Int // 学校への入学年度
 
-  parent    User       @relation(fields: [parentId], references: [id])
-  facility  Facility   @relation(fields: [facilityId], references: [id])
-  school    School     @relation(fields: [schoolId], references: [id])
-  classes   Class[] // TODO: 未確定の場合どうする？
-  schedules Schedule[]
+  parent               User                  @relation(fields: [parentId], references: [id])
+  facility             Facility              @relation(fields: [facilityId], references: [id])
+  school               School                @relation(fields: [schoolId], references: [id])
+  classes              Class[] // TODO: 未確定の場合どうする？
+  schedules            Schedule[]
+  fixedUsageDayOfWeeks FixedUsageDayOfWeek[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -239,4 +240,45 @@ model ScheduleLog {
   timestamp DateTime @default(now())
 
   @@map(name: "schedule_logs")
+}
+
+// 習い事
+model Program {
+  id        String  @id @default(cuid())
+  name      String
+  shortName String?
+
+  fixedUsageDaysOfWeek1 FixedUsageDayOfWeek[] @relation("program_fixed_usage_days_of_week_1")
+  fixedUsageDaysOfWeek2 FixedUsageDayOfWeek[] @relation("program_fixed_usage_days_of_week_2")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map(name: "programs")
+}
+
+// 月毎の固定利用曜日
+model FixedUsageDayOfWeek {
+  id                String  @id @default(cuid())
+  studentId         String
+  month             String // yyyy-MM
+  dayOfWeek         Int // 0: 日曜日, 1: 月曜日, ..., 6: 土曜日
+  startTime         String? // HH:mm
+  endTime           String? // HH:mm
+  needPickup        Boolean // 学校へのお迎えが必要かどうか
+  program1Id        String?
+  program1StartTime String? // HH:mm
+  program1EndTime   String? // HH:mm
+  program2Id        String?
+  program2StartTime String? // HH:mm
+  program2EndTime   String? // HH:mm
+
+  student  Student  @relation(fields: [studentId], references: [id])
+  program1 Program? @relation("program_fixed_usage_days_of_week_1", fields: [program1Id], references: [id])
+  program2 Program? @relation("program_fixed_usage_days_of_week_2", fields: [program2Id], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map(name: "fixed_usage_day_of_weeks")
 }

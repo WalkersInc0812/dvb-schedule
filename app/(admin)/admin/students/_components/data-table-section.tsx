@@ -52,7 +52,7 @@ const DataTableSection = ({ students, facilities, schools }: Props) => {
       />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-scroll max-w-2xl">
           <DialogHeader>
             <DialogDescription className="text-foreground">
               <StudentCreateForm
