@@ -39,7 +39,6 @@ export async function POST(req: Request) {
         start: payload.start,
         end: payload.end,
         meal: payload.meal,
-        attendance: payload.attendance,
         notes: payload.notes,
         student: {
           connect: {

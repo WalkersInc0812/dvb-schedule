@@ -27,7 +27,6 @@ export const formatAndSortForCsv = (
       学校名: row.student.school.name,
       学年: `${calculateGrade(row.student.schoolEnrollmentAcademicYear)}年`,
       給食の有無: row.meal ? "あり" : "なし",
-      出欠: row.attendance ? "出席" : "欠席",
       備考: row.notes,
     }));
 
@@ -119,18 +118,6 @@ export const makeColumns = ({
     id: "meal",
     header: "給食の有無",
     accessorFn: (info) => (info.meal ? "あり" : "なし"),
-  },
-  {
-    id: "attendance",
-    header: "出欠",
-    cell: ({ row }) => {
-      return (
-        <Checkbox
-          checked={row.original.attendance}
-          className="cursor-default"
-        />
-      );
-    },
   },
   {
     id: "notes",

@@ -54,7 +54,6 @@ export const ScheduleUpdateForm = ({
       start: schedule.start,
       end: schedule.end,
       meal: schedule.meal,
-      attendance: schedule.attendance,
       notes: schedule.notes ?? "",
     },
   });
@@ -70,7 +69,6 @@ export const ScheduleUpdateForm = ({
           start: data.start.toISOString(),
           end: data.end.toISOString(),
           meal: data.meal,
-          attendance: data.attendance,
           notes: data.notes,
         }),
       });

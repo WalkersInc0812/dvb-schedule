@@ -51,7 +51,6 @@ export const ScheduleCreateForm = ({
       start: date,
       end: date,
       meal: false,
-      attendance: false,
       notes: "",
     },
   });
@@ -68,7 +67,6 @@ export const ScheduleCreateForm = ({
           start: data.start.toISOString(),
           end: data.end.toISOString(),
           meal: data.meal,
-          attendance: data.attendance,
           notes: data.notes,
         }),
       });

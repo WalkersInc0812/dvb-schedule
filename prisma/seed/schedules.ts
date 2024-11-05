@@ -41,10 +41,6 @@ export async function seedSchedules(db: PrismaClient) {
         notes: [`備考テキスト${s_i * arrayLength + a_i + 1}`, null][
           randomInt(2)
         ],
-        attendance:
-          end <= new Date()
-            ? [true, true, true, true, true, false][randomInt(6)]
-            : false,
       });
     });
   });

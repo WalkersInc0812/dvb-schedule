@@ -1,11 +1,11 @@
-import DownloadAttendances from "./_components/download-attendances";
+import DownloadSchedules from "./_components/download-schedules";
 
 type Props = {};
 
 const AdminToolPage = async (props: Props) => {
   return (
     <div>
-      <DownloadAttendances />
+      <DownloadSchedules />
     </div>
   );
 };

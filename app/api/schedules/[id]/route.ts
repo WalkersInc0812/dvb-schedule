@@ -51,7 +51,6 @@ export async function PATCH(
         start: payload.start,
         end: payload.end,
         meal: payload.meal,
-        attendance: payload.attendance,
         notes: payload.notes,
         logs: {
           create: {

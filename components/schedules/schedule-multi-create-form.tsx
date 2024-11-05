@@ -57,7 +57,6 @@ export const ScheduleMultiCreateForm = ({
         end: date,
       })),
       meal: false,
-      attendance: false,
       notes: "",
     },
   });

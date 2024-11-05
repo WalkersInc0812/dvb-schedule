@@ -71,7 +71,6 @@ export async function POST(req: Request) {
                     date.start &&
                   date.start <= parse(s.activeToDate, "yyyy-MM-dd", new Date())
               ),
-            attendance: payload.attendance,
             notes: payload.notes,
             studentId: payload.studentId,
             logs: {

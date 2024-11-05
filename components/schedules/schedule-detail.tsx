@@ -47,11 +47,6 @@ export const ScheduleDetail = ({
       </div>
 
       <div className="space-y-1">
-        <p>出欠</p>
-        <p>{schedule.attendance ? "◯" : "×"}</p>
-      </div>
-
-      <div className="space-y-1">
         <p>備考</p>
         <p>{schedule.notes ? schedule.notes : "-"}</p>
       </div>

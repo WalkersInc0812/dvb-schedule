@@ -1,7 +1,7 @@
 "use client";
 
 import { Icons } from "@/components/icons";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import JSZip from "jszip";
 import React, { useState } from "react";
 import ReactDOMServer from "react-dom/server";
@@ -9,10 +9,11 @@ import html2canvas from "html2canvas";
 import { ComponentType } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { ja } from "date-fns/locale";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { Schedule } from "@prisma/client";
 import { DateFormatter } from "react-day-picker";
 import { getSchedulesByMonth } from "@/lib/schedules";
+import { cn } from "@/lib/utils";
 
 const formatCaption: DateFormatter = (date) => {
   return (
@@ -38,28 +39,49 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ schedules }) => {
       locale={ja}
       formatters={{ formatCaption }}
       month={schedules[0].start}
-      modifiers={{
-        present: schedules
-          .filter((schedule) => schedule.attendance)
-          .map((schedule) => schedule.start),
-        absent: schedules
-          .filter((schedule) => !schedule.attendance)
-          .map((schedule) => schedule.start),
-      }}
-      modifiersClassNames={{
-        present: "bg-green-500",
-        absent: "bg-red-500",
-      }}
+      selected={schedules.map((schedule) => schedule.start)}
       weekStartsOn={1}
       showOutsideDays={false}
       className="rounded-md border w-fit"
+      classNames={{
+        head_cell:
+          "text-muted-foreground rounded-md w-32 font-normal text-[0.8rem]",
+        cell: "h-32 w-32 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+        day: cn(
+          buttonVariants({ variant: "ghost" }),
+          "h-32 w-32 p-0 font-normal aria-selected:opacity-100 text-wrap"
+        ),
+      }}
+      components={{
+        DayContent: ({ date }) => {
+          const schedule = schedules.find((schedule) =>
+            isSameDay(schedule.start, date)
+          );
+          return (
+            <>
+              {date.getDate()}
+              <br />
+              {schedule && (
+                <>
+                  {format(schedule.start, "HH:mm")}~
+                  {format(schedule.end, "HH:mm")}
+                  <br />
+                  {schedule.meal ? "給食あり" : "給食なし"}
+                  <br />
+                  {schedule.notes}
+                </>
+              )}
+            </>
+          );
+        },
+      }}
     />
   );
 };
 
 type Props = {};
 
-const DownloadAttendances = (props: Props) => {
+const DownloadSchedules = (props: Props) => {
   const [month, setMonth] = useState(new Date());
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -152,8 +174,25 @@ const DownloadAttendances = (props: Props) => {
         {month.getFullYear()}年{month.getMonth() + 1}
         月でカレンダーを一括ダウンロード
       </Button>
+
+      {/* 表示確認用 */}
+      {/* <CalendarComponent
+        schedules={[
+          {
+            id: "adsf",
+            studentId: "asdf",
+            start: new Date(),
+            end: new Date(),
+            meal: true,
+            notes: "ほげほげほげほげほげほげほげほほげほげ",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            deletedAt: new Date(),
+          },
+        ]}
+      /> */}
     </div>
   );
 };
 
-export default DownloadAttendances;
+export default DownloadSchedules;
