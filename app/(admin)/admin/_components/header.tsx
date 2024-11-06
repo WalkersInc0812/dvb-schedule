@@ -21,7 +21,8 @@ const AdminHeader = (props: Props) => {
         <Link href="/admin/schedules">予定管理</Link>
         <Link href="/admin/students">利用者管理</Link>
         {/* <Link href="/admin/staffs">職員管理</Link> */}
-        {/* <Link href="/admin/schools">学校管理</Link> */}
+        <Link href="/admin/schools">学校管理</Link>
+        <Link href="/admin/programs">習い事管理</Link>
         <Link href="/admin/facilities">教室管理</Link>
         <Link href="/admin/tools">ツール</Link>
         <span

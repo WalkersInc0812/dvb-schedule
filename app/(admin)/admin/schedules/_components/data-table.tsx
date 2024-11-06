@@ -18,7 +18,6 @@ import { DataTableBody } from "@/components/data-table/data-table-body";
 import { DataTableHeader } from "@/components/data-table/data-table-header";
 import { DataTableToolbar } from "./data-table-toobar";
 import { ScheduleWithStudentAndFacilityAndSchool } from "@/lib/schedules";
-import { StudentWithParntAndFacilityAndSchoolAndClasses } from "@/lib/students";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
