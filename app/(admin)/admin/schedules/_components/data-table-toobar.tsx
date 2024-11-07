@@ -24,6 +24,7 @@ interface DataTableToolbarProps<TData> {
     value: string;
     label: string;
   }[];
+  onCreateClick: () => void;
   onMultiUpdateClick: (
     schedules: ScheduleWithStudentAndFacilityAndSchool[]
   ) => void;
@@ -33,6 +34,7 @@ export function DataTableToolbar({
   table,
   facilities,
   schools,
+  onCreateClick,
   onMultiUpdateClick,
 }: DataTableToolbarProps<ScheduleWithStudentAndFacilityAndSchool>) {
   const isFiltered =
@@ -139,7 +141,7 @@ export function DataTableToolbar({
         </div>
 
         <div>
-          <Button onClick={() => alert("TODO: 実装する")}>
+          <Button onClick={onCreateClick}>
             <Icons.circlePlus className="mr-2 w-4 h-4" />
             新規登録
           </Button>

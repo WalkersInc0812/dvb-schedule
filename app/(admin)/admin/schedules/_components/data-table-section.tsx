@@ -18,8 +18,9 @@ import {
   ScheduleLogWithUser,
 } from "@/lib/scheduleLogs";
 import { Logs } from "./logs";
+import ScheduleCreateForm from "./schedule-create-form";
 
-type DialogType = "read" | "update" | "multi-update" | "delete";
+type DialogType = "create" | "read" | "update" | "multi-update" | "delete";
 
 type Props = {
   schedules: ScheduleWithStudentAndFacilityAndSchool[];
@@ -37,6 +38,11 @@ const DataTableSection = ({ schedules }: Props) => {
   const [selectedSchedules, setSelectedSchedules] = React.useState<
     ScheduleWithStudentAndFacilityAndSchool[]
   >([]);
+
+  const handleCreateClick = () => {
+    setDialogType("create");
+    setDialogOpen(true);
+  };
 
   const handleEditClick = async (
     schedule: ScheduleWithStudentAndFacilityAndSchool
@@ -74,6 +80,7 @@ const DataTableSection = ({ schedules }: Props) => {
       <DataTable
         columns={columns}
         data={schedules}
+        onCreateClick={handleCreateClick}
         onMultiUpdateClick={handleMultiUpdateClick}
       />
 
@@ -81,7 +88,13 @@ const DataTableSection = ({ schedules }: Props) => {
         <DialogContent>
           <DialogHeader>
             <DialogDescription className="text-foreground">
-              {dialogType === "update" && clickedSchedule ? (
+              {dialogType === "create" ? (
+                <ScheduleCreateForm
+                  onSuccess={() => {
+                    setDialogOpen(false);
+                  }}
+                />
+              ) : dialogType === "update" && clickedSchedule ? (
                 <ScheduleUpdateForm
                   schedule={clickedSchedule}
                   mealServable={true}

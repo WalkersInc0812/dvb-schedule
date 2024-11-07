@@ -39,6 +39,9 @@ export async function getSchedulesWithStudentAndFacilityAndSchool(): Promise<
         },
       },
     },
+    orderBy: {
+      start: "desc",
+    },
   });
   return schedules;
 }

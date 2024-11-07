@@ -22,6 +22,7 @@ import { ScheduleWithStudentAndFacilityAndSchool } from "@/lib/schedules";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onCreateClick: () => void;
   onMultiUpdateClick: (
     schedules: ScheduleWithStudentAndFacilityAndSchool[]
   ) => void;
@@ -30,6 +31,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onCreateClick,
   onMultiUpdateClick,
 }: DataTableProps<ScheduleWithStudentAndFacilityAndSchool, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -86,6 +88,7 @@ export function DataTable<TData, TValue>({
             label: name,
           }))}
         onMultiUpdateClick={onMultiUpdateClick}
+        onCreateClick={onCreateClick}
       />
       <div>
         <Table>
