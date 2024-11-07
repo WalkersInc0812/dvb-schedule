@@ -31,36 +31,24 @@ export const authOptions: NextAuthOptions = {
           CredentialsProvider({
             name: "Credentials",
             credentials: {
+              id: { type: "text" },
               role: { type: "text" },
+              name: { type: "text" },
             },
             async authorize(credentials, req) {
               if (
                 !credentials ||
+                !credentials.id ||
                 !["PARENT", "STAFF", "SUPER_STAFF"].includes(credentials.role)
               ) {
                 return null;
               }
 
-              const user =
-                credentials.role === "STAFF"
-                  ? await db.user.findFirst({
-                      where: {
-                        role: credentials.role,
-                      },
-                    })
-                  : credentials.role === "PARENT"
-                  ? await db.user.findFirst({
-                      include: {
-                        students: true,
-                      },
-                      where: {
-                        role: credentials.role,
-                        students: {
-                          some: {},
-                        },
-                      },
-                    })
-                  : await db.user.findFirst();
+              const user = await db.user.findUnique({
+                where: {
+                  id: credentials.id,
+                },
+              });
 
               if (user) {
                 const token = jwt.sign(

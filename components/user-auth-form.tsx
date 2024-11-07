@@ -9,7 +9,9 @@ import { Button } from "./ui/button";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -19,20 +21,33 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "./ui/use-toast";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { Icons } from "./icons";
+import { User } from "@prisma/client";
 
 const FormSchema = z.object({
+  id: z.string().min(1),
   role: z.enum(["PARENT", "STAFF"]),
+  name: z.string(),
 });
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
-export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
+  parents: User[];
+  staffs: User[];
+}
+export function UserAuthForm({
+  className,
+  parents,
+  staffs,
+  ...props
+}: UserAuthFormProps) {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      role: "STAFF",
+      id: staffs[0].id,
+      role: staffs[0].role as "STAFF" | "PARENT",
+      name: staffs[0].name ?? undefined,
     },
   });
 
@@ -42,7 +57,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
       const result = await signIn("credentials", {
         redirect: false,
+        id: data.id,
         role: data.role,
+        name: data.name,
       });
 
       if (result && result.ok) {
@@ -51,7 +68,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         router.push(path);
         setTimeout(() => {
           toast({
-            title: `${role}としてログインしました`,
+            title: `${data.name}としてログインしました`,
           });
           setLoading(false);
         }, 1000);
@@ -76,18 +93,48 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       >
         <FormField
           control={form.control}
-          name="role"
+          name="id"
           render={({ field }) => (
             <FormItem>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={(v) => {
+                  field.onChange(v);
+                  const staff = staffs.find((staff) => staff.id === v);
+                  const parent = parents.find((parent) => parent.id === v);
+                  if (typeof staff !== "undefined") {
+                    form.setValue("role", staff.role as "STAFF" | "PARENT");
+                    form.setValue("name", staff.name ?? "");
+                  } else if (typeof parent !== "undefined") {
+                    form.setValue("role", parent.role as "STAFF" | "PARENT");
+                    form.setValue("name", parent.name ?? "");
+                  } else {
+                    return;
+                  }
+                }}
+                defaultValue={field.value}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="STAFF">職員</SelectItem>
-                  <SelectItem value="PARENT">保護者</SelectItem>
+                  <SelectGroup>
+                    <SelectLabel>職員</SelectLabel>
+                    {staffs.map((staff) => (
+                      <SelectItem key={staff.id} value={staff.id}>
+                        {staff.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel>保護者</SelectLabel>
+                    {parents.map((parent) => (
+                      <SelectItem key={parent.id} value={parent.id}>
+                        {parent.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 </SelectContent>
               </Select>
               <FormMessage />
