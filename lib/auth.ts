@@ -1,6 +1,5 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { NextAuthOptions } from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
 
 import { db } from "@/lib/db";
 import { UserRole } from "@/types/next-auth";
@@ -18,56 +17,44 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   providers: [
-    ...(process.env.NODE_ENV === "production"
-      ? [
-          GitHubProvider({
-            clientId: process.env.GITHUB_CLIENT_ID!,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-          }),
-        ]
-      : []),
-    ...(process.env.NODE_ENV === "development"
-      ? [
-          CredentialsProvider({
-            name: "Credentials",
-            credentials: {
-              id: { type: "text" },
-              role: { type: "text" },
-              name: { type: "text" },
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        id: { type: "text" },
+        role: { type: "text" },
+        name: { type: "text" },
+      },
+      async authorize(credentials, req) {
+        if (
+          !credentials ||
+          !credentials.id ||
+          !["PARENT", "STAFF", "SUPER_STAFF"].includes(credentials.role)
+        ) {
+          return null;
+        }
+
+        const user = await db.user.findUnique({
+          where: {
+            id: credentials.id,
+          },
+        });
+
+        if (user) {
+          const token = jwt.sign(
+            {
+              id: user.id,
+              name: user.name,
+              email: user.email,
             },
-            async authorize(credentials, req) {
-              if (
-                !credentials ||
-                !credentials.id ||
-                !["PARENT", "STAFF", "SUPER_STAFF"].includes(credentials.role)
-              ) {
-                return null;
-              }
+            process.env.NEXTAUTH_SECRET!
+          );
 
-              const user = await db.user.findUnique({
-                where: {
-                  id: credentials.id,
-                },
-              });
-
-              if (user) {
-                const token = jwt.sign(
-                  {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                  },
-                  process.env.NEXTAUTH_SECRET!
-                );
-
-                return { ...user, token };
-              } else {
-                return null;
-              }
-            },
-          }),
-        ]
-      : []),
+          return { ...user, token };
+        } else {
+          return null;
+        }
+      },
+    }),
   ],
   callbacks: {
     async session({ token, session }) {
