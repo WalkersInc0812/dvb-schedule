@@ -2,6 +2,8 @@ import React from "react";
 import DataTableSection from "./_components/data-table-section";
 import { getSchools } from "@/lib/schools";
 
+export const dynamic = "force-dynamic";
+
 type Props = {};
 
 const AdminSchoolPage = async (props: Props) => {

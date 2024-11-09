@@ -2,6 +2,8 @@ import { getFacilitiesWithMealSettingAndScheduleEditablePeriodAndAnnouncement } 
 import React from "react";
 import { DataTableSection } from "./_components/data-table-section";
 
+export const dynamic = "force-dynamic";
+
 type Props = {};
 
 const AdminFacilityPage = async (props: Props) => {

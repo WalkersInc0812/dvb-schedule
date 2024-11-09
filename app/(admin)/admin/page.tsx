@@ -4,6 +4,8 @@ import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
+export const dynamic = "force-dynamic";
+
 type Props = {};
 
 const AdminPage = (props: Props) => {

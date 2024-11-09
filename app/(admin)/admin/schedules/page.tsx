@@ -2,6 +2,8 @@ import { getSchedulesWithStudentAndFacilityAndSchool } from "@/lib/schedules";
 import React from "react";
 import DataTableSection from "./_components/data-table-section";
 
+export const dynamic = "force-dynamic";
+
 type Props = {};
 
 const AdminSchedulePage = async (props: Props) => {

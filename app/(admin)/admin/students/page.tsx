@@ -4,6 +4,8 @@ import DataTableSection from "./_components/data-table-section";
 import { getFacilities } from "@/lib/facilities";
 import { getSchools } from "@/lib/schools";
 
+export const dynamic = "force-dynamic";
+
 type Props = {};
 
 const AdminStudentPage = async (props: Props) => {

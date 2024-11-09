@@ -2,6 +2,8 @@ import React from "react";
 import DataTableSection from "./_components/data-table-section";
 import { getPrograms } from "@/lib/programs";
 
+export const dynamic = "force-dynamic";
+
 type Props = {};
 
 const AdminProgramPage = async (props: Props) => {
