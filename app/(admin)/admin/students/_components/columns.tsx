@@ -53,16 +53,16 @@ export const makeColumns = ({
       </Button>
     ),
   },
-  {
-    id: "delete",
-    cell: ({ row }) => (
-      <Button
-        size={"sm"}
-        variant="destructive"
-        onClick={() => onDeleteClick(row.original)}
-      >
-        削除
-      </Button>
-    ),
-  },
+  // {
+  //   id: "delete",
+  //   cell: ({ row }) => (
+  //     <Button
+  //       size={"sm"}
+  //       variant="destructive"
+  //       onClick={() => onDeleteClick(row.original)}
+  //     >
+  //       削除
+  //     </Button>
+  //   ),
+  // },
 ];
