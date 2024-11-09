@@ -12,7 +12,10 @@
     "prisma:db-seed": "prisma db seed",
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
-    "postinstall": "yarn prisma:generate"
+    "postinstall": "yarn prisma:generate",
+    "vercel:link": "vercel link",
+    "vercel:env:pull": "vercel env pull .env",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed/index.ts"
