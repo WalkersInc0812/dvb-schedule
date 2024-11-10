@@ -29,7 +29,7 @@ import { ScheduleUpdateForm } from "@/components/schedules/schedule-update-form"
 import { ScheduleDeleteForm } from "@/components/schedules/schedule-delete-form";
 import { ja } from "date-fns/locale";
 import { DateFormatter } from "react-day-picker";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { ScheduleMultiCreateForm } from "@/components/schedules/schedule-multi-create-form";
 import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
@@ -55,6 +55,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { FixedUsageDayOfWeekWithPrograms } from "@/lib/fixedUsageDayOfWeeks";
+import { cn } from "@/lib/utils";
 
 type Mode = "single" | "multiple";
 type DialogType = "create" | "multi-create" | "read" | "update" | "delete";
@@ -359,7 +360,17 @@ export const CalendarSection = ({
           onDayClick={handleDayClick}
           weekStartsOn={1}
           showOutsideDays={false}
-          className="rounded-md border w-fit"
+          className="rounded-md border w-full"
+          classNames={{
+            months: "flex flex-col space-y-4 sm:space-x-4 sm:space-y-0",
+            head_cell:
+              "text-muted-foreground rounded-md w-[calc(100%/7)] font-normal text-[0.8rem]",
+            cell: "h-12 w-[calc(100%/7)] text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+            day: cn(
+              buttonVariants({ variant: "ghost" }),
+              "h-12 w-full p-0 font-normal aria-selected:opacity-100 text-wrap"
+            ),
+          }}
           modifiers={{
             selectedForMultiCreate: selectedDatesForMultiCreate,
           }}
@@ -413,27 +424,33 @@ export const CalendarSection = ({
 
         {announcements.length > 0 && (
           <div className="w-full">
-            <p className="text-[14px]">
-              お知らせ: {announcements.map((a) => a.content).join(", ")}
-            </p>
+            <p className="text-base font-bold">お知らせ</p>
+            {announcements.map((a) => (
+              <p key={a.id} className="text-[14px]">
+                - {a.content}
+              </p>
+            ))}
           </div>
         )}
 
         {scheduleEditablePeriod && (
-          <p className="text-[14px] text-left w-full">
-            編集可能期間: {scheduleEditablePeriod.fromDate} ~{" "}
-            {scheduleEditablePeriod.toDate}
-          </p>
+          <div className="w-full">
+            <p className="text-base font-bold">編集可能期間</p>
+            <p className="text-[14px]">
+              {scheduleEditablePeriod.fromDate} ~{" "}
+              {scheduleEditablePeriod.toDate}
+            </p>
+          </div>
         )}
 
         {mealServablePeriods.length > 0 && (
           <div className="w-full">
-            <p className="text-[14px]">
-              給食提供期間:{" "}
-              {mealServablePeriods
-                .map((s) => `${s.activeFromDate} ~ ${s.activeToDate}`)
-                .join(", ")}
-            </p>
+            <p className="text-base font-bold">給食提供期間</p>
+            {mealServablePeriods.map((s) => (
+              <p key={s.id} className="text-[14px]">
+                - {s.activeFromDate} ~ {s.activeToDate}
+              </p>
+            ))}
           </div>
         )}
       </div>

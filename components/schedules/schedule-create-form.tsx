@@ -27,6 +27,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { hourOptions, minuteOptions } from "./utils";
 import { cn } from "@/lib/utils";
+import { Icons } from "../icons";
 
 type ScheduleCreateFormProps = {
   studentId: string;
@@ -253,7 +254,18 @@ export const ScheduleCreateForm = ({
           )}
         />
 
-        <Button type="submit" className="w-full">
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={
+            !form.formState.isValid ||
+            form.formState.isLoading ||
+            form.formState.isSubmitting
+          }
+        >
+          {(form.formState.isLoading || form.formState.isSubmitting) && (
+            <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
+          )}
           この内容で予定を登録する
         </Button>
       </form>

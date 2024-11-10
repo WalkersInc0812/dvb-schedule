@@ -25,6 +25,7 @@ import {
 } from "../ui/select";
 import { hourOptions, minuteOptions } from "./utils";
 import { Button } from "../ui/button";
+import { Icons } from "../icons";
 
 type Props = {
   schedules: Schedule[];
@@ -140,7 +141,18 @@ const ScheduleMultiUpdateForm = ({ schedules, onSuccess, onError }: Props) => {
           )}
         />
 
-        <Button type="submit" className="w-full">
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={
+            !form.formState.isValid ||
+            form.formState.isLoading ||
+            form.formState.isSubmitting
+          }
+        >
+          {(form.formState.isLoading || form.formState.isSubmitting) && (
+            <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
+          )}
           この内容で予定を変更する
         </Button>
       </form>

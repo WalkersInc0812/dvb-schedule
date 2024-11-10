@@ -45,14 +45,14 @@ export const makeColumns = ({
       `${calculateGrade(info.schoolEnrollmentAcademicYear)}年生`,
     filterFn: filterFns.arrIncludesSome,
   },
-  {
-    id: "edit",
-    cell: ({ row }) => (
-      <Button size={"sm"} onClick={() => onEditClick(row.original)}>
-        編集
-      </Button>
-    ),
-  },
+  // {
+  //   id: "edit",
+  //   cell: ({ row }) => (
+  //     <Button size={"sm"} onClick={() => onEditClick(row.original)}>
+  //       編集
+  //     </Button>
+  //   ),
+  // },
   // {
   //   id: "delete",
   //   cell: ({ row }) => (

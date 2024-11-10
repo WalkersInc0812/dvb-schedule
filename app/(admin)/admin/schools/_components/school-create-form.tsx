@@ -93,10 +93,9 @@ export const SchoolCreateForm = ({ onSuccess, onError }: Props) => {
             form.formState.isSubmitting
           }
         >
-          {form.formState.isLoading ||
-            (form.formState.isSubmitting && (
-              <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
-            ))}
+          {(form.formState.isLoading || form.formState.isSubmitting) && (
+            <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
+          )}
           この内容で学校情報を登録する
         </Button>
       </form>

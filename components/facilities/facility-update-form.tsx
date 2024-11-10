@@ -245,10 +245,14 @@ export const FacilityUpdateForm = ({ facility, onSuccess, onError }: Props) => {
         <Button
           type="submit"
           className="w-full"
-          disabled={!form.formState.isValid || form.formState.isLoading}
+          disabled={
+            !form.formState.isValid ||
+            form.formState.isLoading ||
+            form.formState.isSubmitting
+          }
         >
-          {form.formState.isLoading && (
-            <Icons.spinner className="mr-2 w-4 h-4 animate-spin" />
+          {(form.formState.isLoading || form.formState.isSubmitting) && (
+            <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
           )}
           この内容で教室情報を変更する
         </Button>

@@ -11,8 +11,9 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import StudentCreateForm from "@/components/students/student-create-form";
-import { Facility, School } from "@prisma/client";
+import { Facility, FixedUsageDayOfWeek, School } from "@prisma/client";
 import StudentEditForm from "@/components/students/student-edit-form";
+import { getFixedUsageDayOfWeeksWithProgramsByStudentId } from "@/lib/fixedUsageDayOfWeeks";
 
 type DialogType = "create" | "detail" | "edit" | "delete";
 
@@ -27,11 +28,20 @@ const DataTableSection = ({ students, facilities, schools }: Props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] =
     useState<StudentWithParntAndFacilityAndSchoolAndClasses | null>();
+  const [
+    selectedStudentfixedUsageDayOfWeeks,
+    setSelectedStudentfixedUsageDayOfWeeks,
+  ] = useState<FixedUsageDayOfWeek[]>();
 
-  const handleEditClick = (
+  const handleEditClick = async (
     student: StudentWithParntAndFacilityAndSchoolAndClasses
   ) => {
+    alert("TODO: 未実装");
+    return;
     setSelectedStudent(student);
+    const fixedUsageDayOfWeeks =
+      await getFixedUsageDayOfWeeksWithProgramsByStudentId(student.id);
+    setSelectedStudentfixedUsageDayOfWeeks(fixedUsageDayOfWeeks);
     setDialogType("edit");
     setDialogOpen(true);
   };
@@ -39,7 +49,7 @@ const DataTableSection = ({ students, facilities, schools }: Props) => {
   const handleDeleteClick = (
     student: StudentWithParntAndFacilityAndSchoolAndClasses
   ) => {
-    alert("TODO: 実装する");
+    alert("TODO: 未実装");
   };
 
   const handleCreateClick = () => {
@@ -72,16 +82,21 @@ const DataTableSection = ({ students, facilities, schools }: Props) => {
                   }}
                 />
               )}
-              {dialogType === "edit" && selectedStudent && (
-                <StudentEditForm
-                  student={selectedStudent}
-                  facilities={facilities}
-                  schools={schools}
-                  onSuccess={() => {
-                    setDialogOpen(false);
-                  }}
-                />
-              )}
+              {dialogType === "edit" &&
+                selectedStudent &&
+                selectedStudentfixedUsageDayOfWeeks && (
+                  <StudentEditForm
+                    student={selectedStudent}
+                    studentFixedUsageDayOfWeeks={
+                      selectedStudentfixedUsageDayOfWeeks
+                    }
+                    facilities={facilities}
+                    schools={schools}
+                    onSuccess={() => {
+                      setDialogOpen(false);
+                    }}
+                  />
+                )}
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

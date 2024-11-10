@@ -1,3 +1,5 @@
+"use server"; // TODO: 使い方あってる？
+
 import { Prisma } from "@prisma/client";
 import { db } from "./db";
 

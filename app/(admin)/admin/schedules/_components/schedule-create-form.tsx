@@ -152,7 +152,7 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
             name="start"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>開始日時</FormLabel>
+                <FormLabel>日付</FormLabel>
                 <FormControl>
                   <div className="flex gap-1">
                     <Popover>
