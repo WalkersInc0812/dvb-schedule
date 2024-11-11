@@ -224,8 +224,8 @@ export const CalendarSection = ({
     <div className="p-[16px]">
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-[22px] font-bold">カレンダー</h2>
-        {isMonthEditable &&
-          (mode === "single" ? (
+        {isMonthEditable ? (
+          mode === "single" ? (
             <Button
               size={"sm"}
               className="flex items-center"
@@ -244,8 +244,13 @@ export const CalendarSection = ({
             </Button>
           ) : (
             <></>
-          ))}
-        {}
+          )
+        ) : (
+          <Button size={"sm"} className="flex items-center" disabled>
+            <Icons.circlePlus className="w-4 h-4 mr-2" />
+            予定を登録する
+          </Button>
+        )}
       </div>
 
       <div className="mb-4 space-y-1">
@@ -371,14 +376,67 @@ export const CalendarSection = ({
               "h-12 w-full p-0 font-normal aria-selected:opacity-100 text-wrap"
             ),
           }}
+          // TODO: refactor
           modifiers={{
             selectedForMultiCreate: selectedDatesForMultiCreate,
+            nothing: (day: Date) => {
+              const targetMonth = format(day, "yyyy-MM");
+              const targetScheduleEditablePeriod =
+                facility.scheduleEditablePeriods.find(
+                  (p) => p.targetMonth === targetMonth
+                );
+              const editable =
+                !!targetScheduleEditablePeriod &&
+                startOfDay(
+                  parse(
+                    targetScheduleEditablePeriod.fromDate,
+                    "yyyy-MM-dd",
+                    new Date()
+                  )
+                ) <= new Date() &&
+                new Date() <=
+                  endOfDay(
+                    parse(
+                      targetScheduleEditablePeriod.toDate,
+                      "yyyy-MM-dd",
+                      new Date()
+                    )
+                  );
+
+              const notExist = !schedules.find((s) => isSameDay(s.start, day));
+
+              return !editable && notExist;
+            },
+            dayOff: [
+              {
+                dayOfWeek: [0, 6],
+              },
+              (day: Date) => {
+                const closed = [
+                  "12/26",
+                  "12/27",
+                  "12/28",
+                  "12/29",
+                  "12/30",
+                  "12/31",
+                  "01/01",
+                  "01/02",
+                  "01/03",
+                  "01/04",
+                ];
+
+                return closed.includes(format(day, "MM/dd"));
+              },
+            ],
           }}
           modifiersClassNames={{
             selectedForMultiCreate: "border border-primary",
-            disabled: "text-red-700",
+            nothing: "text-gray-400",
+            dayOff: "text-red-700",
           }}
+          // TODO: refactor
           disabled={[
+            // day off
             {
               dayOfWeek: [0, 6],
             },
@@ -398,6 +456,35 @@ export const CalendarSection = ({
               ];
 
               return closed.includes(format(day, "MM/dd"));
+            },
+            // noting
+            (day: Date) => {
+              const targetMonth = format(day, "yyyy-MM");
+              const targetScheduleEditablePeriod =
+                facility.scheduleEditablePeriods.find(
+                  (p) => p.targetMonth === targetMonth
+                );
+              const editable =
+                !!targetScheduleEditablePeriod &&
+                startOfDay(
+                  parse(
+                    targetScheduleEditablePeriod.fromDate,
+                    "yyyy-MM-dd",
+                    new Date()
+                  )
+                ) <= new Date() &&
+                new Date() <=
+                  endOfDay(
+                    parse(
+                      targetScheduleEditablePeriod.toDate,
+                      "yyyy-MM-dd",
+                      new Date()
+                    )
+                  );
+
+              const notExist = !schedules.find((s) => isSameDay(s.start, day));
+
+              return !editable && notExist;
             },
           ]}
         />
