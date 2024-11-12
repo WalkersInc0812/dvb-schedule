@@ -114,7 +114,7 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
    */
   useEffect(() => {
     // なぜか来年の3学期が2回追加されてしまうので、削除する
-    // remove(Array.from({ length: 5 })); // TODO: 検証中
+    remove(Array.from({ length: 5 }));
 
     Array.from({ length: 3 }).forEach((_, yearI) => {
       // 去年と今年と来年
