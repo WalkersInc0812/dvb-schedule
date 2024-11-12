@@ -24,6 +24,8 @@ import { Calendar } from "../ui/calendar";
 import { addDays, isSameMonth, isSameYear, parse } from "date-fns";
 import ScheduleEditablePeriodsFormControlContent from "./schedule-editable-periods-form-control-content";
 import { AnnouncementsFormControlContent } from "./announcements-form-control-content";
+import { ja } from "date-fns/locale";
+import { formatCaption } from "../format-caption";
 
 type Props = {
   facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement;
@@ -230,6 +232,9 @@ export const FacilityUpdateForm = ({ facility, onSuccess, onError }: Props) => {
               <FormLabel>給食の受付</FormLabel>
               <FormControl>
                 <Calendar
+                  locale={ja}
+                  formatters={{ formatCaption: formatCaption }}
+                  weekStartsOn={1}
                   mode="multiple"
                   className="rounded-md border w-fit"
                   selected={field.value}

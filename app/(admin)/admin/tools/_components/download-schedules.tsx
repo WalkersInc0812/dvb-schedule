@@ -11,17 +11,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { ja } from "date-fns/locale";
 import { format, isSameDay } from "date-fns";
 import { Schedule } from "@prisma/client";
-import { DateFormatter } from "react-day-picker";
 import { getSchedulesByMonth } from "@/lib/schedules";
 import { cn } from "@/lib/utils";
-
-const formatCaption: DateFormatter = (date) => {
-  return (
-    <p className="text-[18px] font-medium">
-      {format(date, "yyyy年MM月", { locale: ja })}
-    </p>
-  );
-};
+import { formatCaption } from "@/components/format-caption";
 
 interface ComponentData<T> {
   component: ComponentType<T>;
@@ -38,10 +30,10 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ schedules }) => {
     <Calendar
       locale={ja}
       formatters={{ formatCaption }}
-      month={schedules[0].start}
-      selected={schedules.map((schedule) => schedule.start)}
       weekStartsOn={1}
       showOutsideDays={false}
+      month={schedules[0].start}
+      selected={schedules.map((schedule) => schedule.start)}
       className="rounded-md border w-fit"
       classNames={{
         head_cell:

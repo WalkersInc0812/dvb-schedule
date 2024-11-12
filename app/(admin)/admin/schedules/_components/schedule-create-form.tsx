@@ -42,6 +42,8 @@ import { DevTool } from "@hookform/devtools";
 import { useEffect, useState, useTransition } from "react";
 import { Student } from "@prisma/client";
 import { getStudents } from "@/lib/students2";
+import { ja } from "date-fns/locale";
+import { formatCaption } from "@/components/format-caption";
 
 type Props = {
   onSuccess?: () => void;
@@ -174,6 +176,10 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
+                          locale={ja}
+                          formatters={{ formatCaption: formatCaption }}
+                          weekStartsOn={1}
+                          showOutsideDays={false}
                           mode="single"
                           selected={field.value}
                           onSelect={(date) => {

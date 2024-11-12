@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { Calendar } from "../ui/calendar";
 import { format, isSameMonth, isSameYear, subMonths } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { ja } from "date-fns/locale";
+import { formatCaption } from "../format-caption";
 
 type Props = {
   scheduleEditablePeriods: {
@@ -55,6 +57,8 @@ const ScheduleEditablePeriodsFormControlContent = ({
   return (
     <div className="flex flex-col gap-2">
       <Calendar
+        locale={ja}
+        formatters={{ formatCaption: formatCaption }}
         className="rounded-md border w-fit"
         month={month}
         onMonthChange={handleMonthChange}
@@ -67,6 +71,9 @@ const ScheduleEditablePeriodsFormControlContent = ({
       />
 
       <Calendar
+        locale={ja}
+        formatters={{ formatCaption: formatCaption }}
+        weekStartsOn={1}
         mode="range"
         className="rounded-md border w-fit"
         selected={{

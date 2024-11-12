@@ -1,11 +1,13 @@
 "use client";
 
+import { formatCaption } from "@/components/format-caption";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
 import { Announcement } from "@prisma/client";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { format, parse, subMonths } from "date-fns";
+import { ja } from "date-fns/locale";
 import React, { useEffect } from "react";
 
 const AnnouncementCell = ({
@@ -37,6 +39,9 @@ const AnnouncementCell = ({
   return (
     <div className="flex flex-col items-center gap-2">
       <Calendar
+        locale={ja}
+        formatters={{ formatCaption: formatCaption }}
+        weekStartsOn={1}
         className="rounded-md border w-fit"
         month={month}
         onMonthChange={handleMonthChange}
@@ -109,6 +114,9 @@ const ScheduleEditablePeriodCell = ({
   return (
     <div className="flex flex-col items-center gap-2 justify-start">
       <Calendar
+        locale={ja}
+        formatters={{ formatCaption: formatCaption }}
+        weekStartsOn={1}
         className="rounded-md border w-fit"
         month={month}
         onMonthChange={handleMonthChange}
@@ -121,6 +129,9 @@ const ScheduleEditablePeriodCell = ({
       />
 
       <Calendar
+        locale={ja}
+        formatters={{ formatCaption: formatCaption }}
+        weekStartsOn={1}
         mode="range"
         className="rounded-md border w-fit"
         selected={{
@@ -162,6 +173,9 @@ export const makeColumns = ({
     header: "給食の受付",
     cell: ({ row }) => (
       <Calendar
+        locale={ja}
+        formatters={{ formatCaption: formatCaption }}
+        weekStartsOn={1}
         className="rounded-md border w-fit"
         modifiers={{
           mealActive: row.original.mealSettings.map((mealSetting) => ({

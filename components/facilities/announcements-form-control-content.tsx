@@ -12,6 +12,8 @@ import {
 } from "../ui/select";
 import { cn } from "@/lib/utils";
 import { DebouncedInput } from "../debounce-input";
+import { ja } from "date-fns/locale";
+import { formatCaption } from "../format-caption";
 
 type Announcement = {
   content: string;
@@ -33,6 +35,8 @@ export const AnnouncementsFormControlContent = ({
   return (
     <div className="flex flex-col gap-2">
       <Calendar
+        locale={ja}
+        formatters={{ formatCaption: formatCaption }}
         month={month}
         onMonthChange={setMonth}
         className="rounded-md border w-fit"
