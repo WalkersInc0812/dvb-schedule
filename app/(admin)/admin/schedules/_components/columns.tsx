@@ -111,7 +111,7 @@ export const makeColumns = ({
     id: "grade",
     header: "学年",
     accessorFn: (info) =>
-      `${calculateGrade(info.student.schoolEnrollmentAcademicYear)}年`,
+      `${calculateGrade(info.student.schoolEnrollmentAcademicYear)}年生`,
     filterFn: filterFns.arrIncludesSome,
   },
   {
