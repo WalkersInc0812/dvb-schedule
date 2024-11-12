@@ -22,14 +22,24 @@ interface ComponentData<T> {
 }
 
 interface CalendarComponentProps {
+  studentName: string;
   schedules: Schedule[];
 }
 // TODO: refactor with app/(calendar)/calendar/_components/calendar-section.tsx
-const CalendarComponent: React.FC<CalendarComponentProps> = ({ schedules }) => {
+const CalendarComponent: React.FC<CalendarComponentProps> = ({
+  studentName,
+  schedules,
+}) => {
   return (
     <Calendar
       locale={ja}
-      formatters={{ formatCaption }}
+      formatters={{
+        formatCaption: (date) => (
+          <p className="text-[18px] font-medium">
+            {format(date, "yyyy年MM月", { locale: ja })} ({studentName})
+          </p>
+        ),
+      }}
       weekStartsOn={1}
       showOutsideDays={false}
       month={schedules[0].start}
@@ -99,6 +109,7 @@ const DownloadSchedules = (props: Props) => {
             id: studentName,
             component: CalendarComponent,
             props: {
+              studentName,
               schedules,
             },
           };
@@ -169,6 +180,7 @@ const DownloadSchedules = (props: Props) => {
 
       {/* 表示確認用 */}
       {/* <CalendarComponent
+        studentName="山田太郎"
         schedules={[
           {
             id: "adsf",
