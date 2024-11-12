@@ -29,6 +29,7 @@ export const FacilityCreateForm = ({ onSuccess, onError }: Props) => {
   const router = useRouter();
 
   const form = useForm<FacilityCreateSchemaType>({
+    mode: "onBlur",
     resolver: zodResolver(facilityCreateSchema),
   });
 

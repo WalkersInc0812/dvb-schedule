@@ -46,6 +46,7 @@ export const ScheduleCreateForm = ({
   const router = useRouter();
 
   const form = useForm<ScheduleSchemaType>({
+    mode: "onBlur",
     resolver: zodResolver(scheduleSchema),
     defaultValues: {
       studentId,
@@ -118,7 +119,7 @@ export const ScheduleCreateForm = ({
                   defaultValue={field.value.getHours().toString()}
                 >
                   <FormControl className="min-w-16">
-                    <SelectTrigger>
+                    <SelectTrigger onBlur={field.onBlur}>
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
@@ -140,7 +141,7 @@ export const ScheduleCreateForm = ({
                   defaultValue={field.value.getMinutes().toString()}
                 >
                   <FormControl className="min-w-16">
-                    <SelectTrigger>
+                    <SelectTrigger onBlur={field.onBlur}>
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
@@ -175,7 +176,7 @@ export const ScheduleCreateForm = ({
                   defaultValue={field.value.getHours().toString()}
                 >
                   <FormControl className="min-w-16">
-                    <SelectTrigger>
+                    <SelectTrigger onBlur={field.onBlur}>
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
@@ -197,7 +198,7 @@ export const ScheduleCreateForm = ({
                   defaultValue={field.value.getMinutes().toString()}
                 >
                   <FormControl className="min-w-16">
-                    <SelectTrigger>
+                    <SelectTrigger onBlur={field.onBlur}>
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>

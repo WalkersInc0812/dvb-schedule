@@ -57,6 +57,7 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
   const router = useRouter();
 
   const form = useForm<ScheduleSchemaType>({
+    mode: "onBlur",
     resolver: zodResolver(scheduleSchema),
     defaultValues: {
       start: setMilliseconds(
@@ -133,7 +134,7 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger onBlur={field.onBlur}>
                       <SelectValue />
                     </SelectTrigger>
                   </FormControl>
@@ -248,7 +249,7 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                     defaultValue={field.value?.getHours().toString()}
                   >
                     <FormControl className="min-w-16">
-                      <SelectTrigger>
+                      <SelectTrigger onBlur={field.onBlur}>
                         <SelectValue className="w-10" />
                       </SelectTrigger>
                     </FormControl>
@@ -270,7 +271,7 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                     defaultValue={field.value?.getMinutes().toString()}
                   >
                     <FormControl className="min-w-16">
-                      <SelectTrigger>
+                      <SelectTrigger onBlur={field.onBlur}>
                         <SelectValue className="w-10" />
                       </SelectTrigger>
                     </FormControl>
@@ -305,7 +306,7 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                     defaultValue={field.value?.getHours().toString()}
                   >
                     <FormControl className="min-w-16">
-                      <SelectTrigger>
+                      <SelectTrigger onBlur={field.onBlur}>
                         <SelectValue className="w-10" />
                       </SelectTrigger>
                     </FormControl>
@@ -327,7 +328,7 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                     defaultValue={field.value?.getMinutes().toString()}
                   >
                     <FormControl className="min-w-16">
-                      <SelectTrigger>
+                      <SelectTrigger onBlur={field.onBlur}>
                         <SelectValue className="w-10" />
                       </SelectTrigger>
                     </FormControl>

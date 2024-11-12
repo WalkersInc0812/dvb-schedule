@@ -50,6 +50,7 @@ export const ScheduleMultiCreateForm = ({
   const router = useRouter();
 
   const form = useForm<ScheduleMultiCreateSchemaType>({
+    mode: "onBlur",
     resolver: zodResolver(scheduleMultiCreateSchema),
     defaultValues: {
       studentId,
@@ -137,7 +138,7 @@ export const ScheduleMultiCreateForm = ({
                   defaultValue={field.value[0].start.getHours().toString()}
                 >
                   <FormControl className="min-w-16">
-                    <SelectTrigger>
+                    <SelectTrigger onBlur={field.onBlur}>
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
@@ -159,7 +160,7 @@ export const ScheduleMultiCreateForm = ({
                   defaultValue={field.value[0].start.getMinutes().toString()}
                 >
                   <FormControl className="min-w-16">
-                    <SelectTrigger>
+                    <SelectTrigger onBlur={field.onBlur}>
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
@@ -194,7 +195,7 @@ export const ScheduleMultiCreateForm = ({
                   defaultValue={field.value[0].end.getHours().toString()}
                 >
                   <FormControl className="min-w-16">
-                    <SelectTrigger>
+                    <SelectTrigger onBlur={field.onBlur}>
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
@@ -216,7 +217,7 @@ export const ScheduleMultiCreateForm = ({
                   defaultValue={field.value[0].end.getMinutes().toString()}
                 >
                   <FormControl className="min-w-16">
-                    <SelectTrigger>
+                    <SelectTrigger onBlur={field.onBlur}>
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>

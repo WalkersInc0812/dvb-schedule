@@ -37,6 +37,7 @@ export const FacilityUpdateForm = ({ facility, onSuccess, onError }: Props) => {
   const router = useRouter();
 
   const form = useForm<FacilityUpdateSchemaType>({
+    mode: "onBlur",
     resolver: zodResolver(facilityUpdateSchema),
     defaultValues: {
       name: facility.name,

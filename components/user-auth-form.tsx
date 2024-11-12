@@ -43,6 +43,7 @@ export function UserAuthForm({
   const [loading, setLoading] = React.useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
+    mode: "onBlur",
     resolver: zodResolver(FormSchema),
     defaultValues: {
       id: staffs[0].id,
@@ -114,7 +115,7 @@ export function UserAuthForm({
                 defaultValue={field.value}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger onBlur={field.onBlur}>
                     <SelectValue />
                   </SelectTrigger>
                 </FormControl>

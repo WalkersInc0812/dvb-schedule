@@ -36,6 +36,7 @@ const ScheduleMultiUpdateForm = ({ schedules, onSuccess, onError }: Props) => {
   const router = useRouter();
 
   const form = useForm<ScheduleMultiUpdateSchemaType>({
+    mode: "onBlur",
     resolver: zodResolver(scheduleMultiUpdateSchema),
     defaultValues: {
       ids: schedules.map((schedule) => schedule.id),
@@ -100,7 +101,7 @@ const ScheduleMultiUpdateForm = ({ schedules, onSuccess, onError }: Props) => {
                   defaultValue={field.value.getHours().toString()}
                 >
                   <FormControl className="min-w-16">
-                    <SelectTrigger>
+                    <SelectTrigger onBlur={field.onBlur}>
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
@@ -122,7 +123,7 @@ const ScheduleMultiUpdateForm = ({ schedules, onSuccess, onError }: Props) => {
                   defaultValue={field.value.getMinutes().toString()}
                 >
                   <FormControl className="min-w-16">
-                    <SelectTrigger>
+                    <SelectTrigger onBlur={field.onBlur}>
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
