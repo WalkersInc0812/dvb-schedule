@@ -232,7 +232,7 @@ export const CalendarSection = ({
               onClick={() => setMode("multiple")}
             >
               <Icons.circlePlus className="w-4 h-4 mr-2" />
-              予定を登録する
+              複数の予定を登録する
             </Button>
           ) : mode === "multiple" ? (
             <Button
@@ -248,7 +248,7 @@ export const CalendarSection = ({
         ) : (
           <Button size={"sm"} className="flex items-center" disabled>
             <Icons.circlePlus className="w-4 h-4 mr-2" />
-            予定を登録する
+            複数の予定を登録する
           </Button>
         )}
       </div>
