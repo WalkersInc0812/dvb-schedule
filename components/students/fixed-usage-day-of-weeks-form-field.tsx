@@ -293,7 +293,7 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
           </TableRow>
 
           <TableRow>
-            <TableCell className="p-2">お迎えバス</TableCell>
+            <TableCell className="p-2">学校へのお迎え</TableCell>
             {currentFields.map((field) => (
               <TableCell key={field.id} className="p-2">
                 <FormField

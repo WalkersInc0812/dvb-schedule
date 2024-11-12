@@ -300,10 +300,14 @@ export const CalendarSection = ({
                     ))}
                   </TableRow>
                   <TableRow>
-                    <TableCell className="p-2">お迎えバス</TableCell>
+                    <TableCell className="p-2">学校へのお迎え</TableCell>
                     {Object.values(fixedUsageDayOfWeeksByDay).map((f) => (
                       <TableCell className="p-2" key={f?.id}>
-                        {f?.needPickup && "⚪︎"}
+                        {f?.needPickup === true
+                          ? "⚪︎"
+                          : f?.needPickup === false
+                          ? "自立"
+                          : ""}
                       </TableCell>
                     ))}
                   </TableRow>
