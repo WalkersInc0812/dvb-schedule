@@ -20,7 +20,9 @@ import { toast } from "@/components/ui/use-toast";
 type Props = {};
 
 const FormSchema = z.object({
-  email: z.string().email("メールアドレスを正しい形式で入力してください"),
+  email: z
+    .string({ required_error: "メールアドレスを入力してください" })
+    .email("メールアドレスを正しい形式で入力してください"),
 });
 
 const SignIn = (props: Props) => {
@@ -59,6 +61,7 @@ const SignIn = (props: Props) => {
             </FormItem>
           )}
         />
+        <p>で</p>
         <Button
           type="submit"
           disabled={
