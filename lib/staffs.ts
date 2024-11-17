@@ -6,6 +6,10 @@ export async function getStaffs() {
       role: {
         in: ["STAFF", "SUPER_STAFF"],
       },
+      deletedAt: null,
+    },
+    orderBy: {
+      updatedAt: "desc",
     },
   });
   return staffs;

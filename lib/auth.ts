@@ -88,6 +88,7 @@ export const authOptions: NextAuthOptions = {
       const dbUser = await db.user.findFirst({
         where: {
           email: token.email,
+          deletedAt: null, // TODO: 動作確認
         },
       });
 
