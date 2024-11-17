@@ -36,8 +36,6 @@ const DataTableSection = ({ students, facilities, schools }: Props) => {
   const handleEditClick = async (
     student: StudentWithParntAndFacilityAndSchoolAndClasses
   ) => {
-    alert("TODO: 未実装");
-    return;
     setSelectedStudent(student);
     const fixedUsageDayOfWeeks =
       await getFixedUsageDayOfWeeksWithProgramsByStudentId(student.id);
@@ -53,6 +51,7 @@ const DataTableSection = ({ students, facilities, schools }: Props) => {
   };
 
   const handleCreateClick = () => {
+    setDialogType("create");
     setDialogOpen(true);
   };
 

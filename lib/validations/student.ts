@@ -48,6 +48,7 @@ export const studentCreateSchema = z.object({
 });
 export type StudentCreateSchemaType = z.infer<typeof studentCreateSchema>;
 
+// TODO: 動作確認
 export const studentEditSchema = z.object({
   parent: z.object({
     name: z.string().min(1, "保護者氏名を入力してください"),
@@ -65,7 +66,10 @@ export const studentEditSchema = z.object({
     .lte(6, "学年を1~6年で選択してください"),
   classes: z.array(
     z.object({
-      id: z.string().min(1, "クラスを選択してください"),
+      id: z.string().optional(),
+      academicYear: z.number().int(),
+      grade: z.number().int().gte(1).lte(6),
+      name: z.string(),
     })
   ),
   name: z.string().min(1, "児童氏名を入力してください"),

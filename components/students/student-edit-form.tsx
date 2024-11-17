@@ -46,6 +46,7 @@ import {
 } from "@/lib/students";
 import FixedUsageDayOfWeeksFormField from "./fixed-usage-day-of-weeks-form-field";
 import ClassesFormField from "./classes-form-field";
+import { DevTool } from "@hookform/devtools";
 
 type Props = {
   student: StudentWithParntAndFacilityAndSchoolAndClasses;
@@ -67,6 +68,8 @@ const StudentEditForm = ({
   const [classes, setClasses] = useState<Class[]>([]);
   const [isPending, startTransition] = useTransition();
 
+  console.log(student);
+
   const router = useRouter();
 
   const form = useForm<StudentEditSchemaType>({
@@ -80,11 +83,10 @@ const StudentEditForm = ({
       name: student.name,
       facilityId: student.facilityId,
       schoolId: student.schoolId,
-      // grade: calculateGrade(student.schoolEnrollmentAcademicYear),
-      grade: 1,
-      classes: student.classes.map((c) => ({
-        id: c.id,
-      })),
+      grade: calculateGrade(student.schoolEnrollmentAcademicYear),
+      classes: [1, 2, 3, 4, 5, 6].map((grade) =>
+        student.classes.find((c) => c.grade === grade)
+      ),
       fixedUsageDayOfWeeks: studentFixedUsageDayOfWeeks.map((f) => ({
         year: f.month.split("-")[0],
         month: f.month.split("-")[1],
@@ -257,59 +259,65 @@ const StudentEditForm = ({
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name={"grade"}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>学年</FormLabel>
+                <Select
+                  disabled={!form.getValues("schoolId")}
+                  defaultValue={field.value.toString()}
+                  onValueChange={(value) => {
+                    field.onChange(Number(value));
+                    form.resetField("classes");
+                  }}
+                >
+                  <FormControl>
+                    <SelectTrigger onBlur={field.onBlur}>
+                      <SelectValue placeholder="学年を選択してください" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6].map((grade) => (
+                      <SelectItem key={grade} value={grade.toString()}>
+                        {grade}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+                {field.value && (
+                  <p>
+                    入学年度: {calculateEnrollmentAcademicYear(field.value)}年
+                  </p>
+                )}
+              </FormItem>
+            )}
+          />
+
+          <ClassesFormField form={form} />
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={
+              !form.formState.isValid ||
+              form.formState.isLoading ||
+              form.formState.isSubmitting
+            }
+          >
+            {form.formState.isLoading ||
+              (form.formState.isSubmitting && (
+                <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
+              ))}
+            更新
+          </Button>
         </form>
       </Form>
 
-      {/* <FormField
-        control={form.control}
-        name={"grade"}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>学年</FormLabel>
-            <Select
-              disabled={!form.getValues("schoolId")}
-              onValueChange={(value) => {
-                field.onChange(Number(value));
-                form.resetField("classes");
-
-                const now = new Date();
-                const year = getYear(now);
-                const month = getMonth(now);
-                const academicYear = year - (month + 1 <= 3 ? 1 : 0);
-                startTransition(async () => {
-                  const newClasses = await searchClasses({
-                    schoolId: form.getValues("schoolId"),
-                    academicYear,
-                    grade: Number(value),
-                  });
-                  setClasses(newClasses);
-                });
-              }}
-            >
-              <FormControl>
-                <SelectTrigger onBlur={field.onBlur}>
-                  <SelectValue placeholder="学年を選択してください" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {[1, 2, 3, 4, 5, 6].map((grade) => (
-                  <SelectItem key={grade} value={grade.toString()}>
-                    {grade}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-            {field.value && (
-              <p>入学年度: {calculateEnrollmentAcademicYear(field.value)}年</p>
-            )}
-          </FormItem>
-        )}
-      /> */}
-
-      <ClassesFormField form={form} />
-
-      {/* <DevTool control={form.control} /> */}
+      <DevTool control={form.control} />
     </>
   );
 };

@@ -25,6 +25,7 @@ import { StudentCreateSchemaType } from "@/lib/validations/student";
 import { Input } from "../ui/input";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormMessage } from "../ui/form";
+import { Label } from "../ui/label";
 
 type Props = {
   form: UseFormReturn<StudentCreateSchemaType>;
@@ -173,6 +174,8 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
 
   return (
     <div className="space-y-2">
+      <Label>固定利用曜日</Label>
+
       <div className="flex gap-2 items-center">
         <div className="flex gap-1 items-center">
           <Select

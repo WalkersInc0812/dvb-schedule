@@ -130,10 +130,10 @@ const StudentCreateForm = ({
             name="parent.email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>メールアドレス</FormLabel>
+                <FormLabel>保護者メールアドレス</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="メールアドレスを入力してください"
+                    placeholder="保護者メールアドレスを入力してください"
                     {...field}
                     onBlur={field.onBlur}
                   />
