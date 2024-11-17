@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { UserAuthForm } from "@/components/user-auth-form";
 import { db } from "@/lib/db";
+import SignIn from "./_components/sign-in";
 
 export const metadata: Metadata = {
   title: "Login",
@@ -16,7 +17,6 @@ async function getAllUsersByRole(role: string) {
 }
 
 export default async function LoginPage() {
-  // TODO: remove when v1.0 release
   const parents = await getAllUsersByRole("PARENT");
   const staffs = await getAllUsersByRole("STAFF");
 
@@ -26,6 +26,8 @@ export default async function LoginPage() {
         <div className="flex flex-col space-y-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">ログイン</h1>
         </div>
+        <SignIn />
+        {/* TODO: only local after v1.0 */}
         <UserAuthForm parents={parents} staffs={staffs} />
       </div>
     </div>

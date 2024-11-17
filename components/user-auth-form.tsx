@@ -143,7 +143,7 @@ export function UserAuthForm({
           )}
         />
         <p>として</p>
-        <Button type="submit">
+        <Button type="submit" disabled={loading}>
           {loading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
           ログイン
         </Button>

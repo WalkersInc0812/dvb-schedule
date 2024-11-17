@@ -5,7 +5,9 @@ import { db } from "@/lib/db";
 import { UserRole } from "@/types/next-auth";
 
 import CredentialsProvider from "next-auth/providers/credentials";
+import EmailProvider from "next-auth/providers/email";
 import jwt from "jsonwebtoken";
+import { sendVerificationRequest } from "./resend";
 
 export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV !== "production",
@@ -15,8 +17,13 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
+    verifyRequest: "/verify-request",
   },
   providers: [
+    EmailProvider({
+      from: process.env.EMAIL_FROM,
+      sendVerificationRequest,
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
