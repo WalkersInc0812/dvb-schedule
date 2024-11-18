@@ -298,7 +298,7 @@ const StudentCreateForm = ({
             )}
           />
 
-          <FixedUsageDayOfWeeksFormField form={form} />
+          {/* <FixedUsageDayOfWeeksFormField form={form} /> */}
 
           <Button
             type="submit"
