@@ -19,10 +19,12 @@ import {
 } from "@/lib/validations/school";
 import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
-import { School } from "@prisma/client";
+import { SchoolWithClassesAndStudentsCount } from "@/lib/schools";
+import { DevTool } from "@hookform/devtools";
+import ClassesFormField from "./classes-form-field";
 
 type Props = {
-  school: School;
+  school: SchoolWithClassesAndStudentsCount;
   onSuccess?: () => void;
   onError?: () => void;
 };
@@ -35,6 +37,7 @@ export const SchoolUpdateForm = ({ school, onSuccess, onError }: Props) => {
     resolver: zodResolver(schoolUpdateSchema),
     defaultValues: {
       name: school.name,
+      classes: school.classes,
     },
   });
 
@@ -73,37 +76,43 @@ export const SchoolUpdateForm = ({ school, onSuccess, onError }: Props) => {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>学校名</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="学校名を入力してください" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>学校名</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="学校名を入力してください" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={
-            !form.formState.isValid ||
-            form.formState.isLoading ||
-            form.formState.isSubmitting
-          }
-        >
-          {(form.formState.isLoading || form.formState.isSubmitting) && (
-            <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
-          )}
-          この内容で学校情報を変更する
-        </Button>
-      </form>
-    </Form>
+          <ClassesFormField form={form} />
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={
+              !form.formState.isValid ||
+              form.formState.isLoading ||
+              form.formState.isSubmitting
+            }
+          >
+            {(form.formState.isLoading || form.formState.isSubmitting) && (
+              <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
+            )}
+            この内容で学校情報を変更する
+          </Button>
+        </form>
+      </Form>
+
+      <DevTool control={form.control} />
+    </>
   );
 };

@@ -9,22 +9,24 @@ import {
   DialogDescription,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { School } from "@prisma/client";
 import { SchoolCreateForm } from "./school-create-form";
 import { SchoolUpdateForm } from "./school-update-form";
+import { SchoolWithClassesAndStudentsCount } from "@/lib/schools";
 
 type DialogType = "create" | "update";
 
 type Props = {
-  schools: School[];
+  schools: SchoolWithClassesAndStudentsCount[];
 };
 
 const DataTableSection = ({ schools }: Props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<DialogType>("create");
-  const [clickedSchool, setClickedSchool] = useState<School | undefined>();
+  const [clickedSchool, setClickedSchool] = useState<
+    SchoolWithClassesAndStudentsCount | undefined
+  >();
 
-  const handleEditClick = (school: School) => {
+  const handleEditClick = (school: SchoolWithClassesAndStudentsCount) => {
     setClickedSchool(school);
     setDialogType("update");
     setDialogOpen(true);
@@ -49,7 +51,7 @@ const DataTableSection = ({ schools }: Props) => {
       />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-scroll max-w-2xl">
           <DialogHeader>
             <DialogDescription className="text-foreground">
               {dialogType === "create" ? (

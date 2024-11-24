@@ -1,13 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { School } from "@prisma/client";
+import { SchoolWithClassesAndStudentsCount } from "@/lib/schools";
 import { ColumnDef } from "@tanstack/react-table";
 
 type Props = {
-  onEditClick: (school: School) => void;
+  onEditClick: (school: SchoolWithClassesAndStudentsCount) => void;
 };
-export const makeColumns = ({ onEditClick }: Props): ColumnDef<School>[] => [
+export const makeColumns = ({
+  onEditClick,
+}: Props): ColumnDef<SchoolWithClassesAndStudentsCount>[] => [
   {
     id: "name",
     header: "学校名",
