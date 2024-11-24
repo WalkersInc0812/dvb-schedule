@@ -1,5 +1,3 @@
-// TODO: 動作確認
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -23,13 +21,7 @@ import { useRouter } from "next/navigation";
 import React, { useState, useTransition } from "react";
 import { Input } from "../ui/input";
 import { Icons } from "../icons";
-import {
-  Class,
-  Facility,
-  FixedUsageDayOfWeek,
-  School,
-  Student,
-} from "@prisma/client";
+import { Class, Facility, FixedUsageDayOfWeek, School } from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -37,14 +29,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { searchClasses } from "../../lib/classes";
-import { getMonth, getYear } from "date-fns";
 import {
   calculateEnrollmentAcademicYear,
   calculateGrade,
   StudentWithParntAndFacilityAndSchoolAndClasses,
 } from "@/lib/students";
-import FixedUsageDayOfWeeksFormField from "./fixed-usage-day-of-weeks-form-field";
 import ClassesFormField from "./classes-form-field";
 import { DevTool } from "@hookform/devtools";
 
@@ -65,11 +54,6 @@ const StudentEditForm = ({
   onSuccess,
   onError,
 }: Props) => {
-  const [classes, setClasses] = useState<Class[]>([]);
-  const [isPending, startTransition] = useTransition();
-
-  console.log(student);
-
   const router = useRouter();
 
   const form = useForm<StudentEditSchemaType>({
@@ -110,7 +94,7 @@ const StudentEditForm = ({
 
   const onSubmit = async (data: StudentEditSchemaType) => {
     try {
-      const response = await fetch("/api/students/${student.id}", {
+      const response = await fetch(`/api/students/${student.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

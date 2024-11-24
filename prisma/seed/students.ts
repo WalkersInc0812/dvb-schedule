@@ -15,7 +15,6 @@ export async function seedStudents(db: PrismaClient) {
   parents.forEach((parent, index) => {
     const facility = facilities[randomInt(facilities.length)];
     const school = schools[randomInt(schools.length)];
-    // TODO: schoolEnrollmentAcademicYear と classes の整合性をとる
     const classesBySchool = classes.filter((c) => c.schoolId === school.id);
     const class_ = classesBySchool[randomInt(classesBySchool.length)];
     students.push({

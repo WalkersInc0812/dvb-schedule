@@ -48,12 +48,10 @@ const ClassesFormField = ({ form }: Props) => {
     fields: classFields,
     append,
     remove,
-    update,
   } = useFieldArray({
     control: form.control,
     name: "classes",
   });
-  console.log(classFields);
 
   return (
     <div className="space-y-1">

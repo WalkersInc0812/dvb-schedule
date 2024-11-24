@@ -1,21 +1,10 @@
-// TODO: 動作確認
-
 import { StudentEditSchemaType } from "@/lib/validations/student";
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useTransition } from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { Label } from "../ui/label";
 import { searchClasses } from "@/lib/classes";
 import { Class } from "@prisma/client";
 import { calculateEnrollmentAcademicYear } from "@/lib/students";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import { FormControl, FormField, FormItem } from "../ui/form";
 import {
   Select,
   SelectContent,
@@ -25,6 +14,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Button } from "../ui/button";
+import { Icons } from "../icons";
 
 type Props = {
   form: UseFormReturn<StudentEditSchemaType>;
@@ -33,31 +23,31 @@ type Props = {
 const ClassesFormField = ({ form }: Props) => {
   const {
     fields: classes,
-    update,
+    append,
     remove,
   } = useFieldArray({
     control: form.control,
     name: "classes",
+    keyName: "key",
   });
-
-  console.log(classes);
 
   const [isPending, startTransition] = useTransition();
 
   const schoolId = form.watch("schoolId");
   const grade = form.watch("grade");
-  const enrollmentAcademicYear = calculateEnrollmentAcademicYear(grade);
   const currentAcademicYear = calculateEnrollmentAcademicYear(1);
-  const [classes1st, setClasses1st] = useState<Class[]>([]);
-  const [classes2nd, setClasses2nd] = useState<Class[]>([]);
-  const [classes3rd, setClasses3rd] = useState<Class[]>([]);
-  const [classes4th, setClasses4th] = useState<Class[]>([]);
-  const [classes5th, setClasses5th] = useState<Class[]>([]);
-  const [classes6th, setClasses6th] = useState<Class[]>([]);
 
-  useEffect(() => {
-    console.log("hogehoge-");
-  }, [schoolId]);
+  // gradeForAdd
+  const gradeOptions = Array.from({ length: 6 }).map((_, i) => i + 1);
+  const [gradeForAdd, setGradeForAdd] = React.useState<number | undefined>(
+    undefined
+  );
+
+  // classForAdd
+  const [classOptions, setClassOptions] = React.useState<Class[][]>([]);
+  const [classIdForAdd, setClassIdForAdd] = React.useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     startTransition(async () => {
@@ -65,123 +55,136 @@ const ClassesFormField = ({ form }: Props) => {
        * TODO: refactor
        * - [ ] schoolIdだけでとってきて、ここで整形する
        */
-      const _classes1st = await searchClasses({
-        schoolId,
-        academicYear: currentAcademicYear - grade + 1, // 2024 - 3 + 1 = 2022
-        grade: 1,
-      });
-      setClasses1st(_classes1st);
-      const _classes2nd = await searchClasses({
-        schoolId,
-        academicYear: currentAcademicYear - grade + 2, // 2024 - 3 + 2 = 2023
-        grade: 2,
-      });
-      setClasses2nd(_classes2nd);
-      const _classes3rd = await searchClasses({
-        schoolId,
-        academicYear: currentAcademicYear - grade + 3, // 2024 - 3 + 3 = 2024
-        grade: 3,
-      });
-      setClasses3rd(_classes3rd);
-      const _classes4th = await searchClasses({
-        schoolId,
-        academicYear: currentAcademicYear - grade + 4, // 2024 - 3 + 4 = 2025
-        grade: 4,
-      });
-      setClasses4th(_classes4th);
-      const _classes5th = await searchClasses({
-        schoolId,
-        academicYear: currentAcademicYear - grade + 5, // 2024 - 3 + 5 = 2026
-        grade: 5,
-      });
-      setClasses5th(_classes5th);
-      const _classes6th = await searchClasses({
-        schoolId,
-        academicYear: currentAcademicYear - grade + 6, // 2024 - 3 + 6 = 2027
-        grade: 6,
-      });
-      setClasses6th(_classes6th);
+      const classDataPromises = Array.from({ length: 6 }, (_, index) =>
+        searchClasses({
+          schoolId,
+          academicYear: currentAcademicYear - grade + (index + 1), // 2024 - 3 + (0 + 1) = 2022
+          grade: index + 1,
+        })
+      );
+
+      const classData = await Promise.all(classDataPromises);
+
+      setClassOptions(classData);
     });
-  }, [schoolId, grade]);
+  }, []);
 
   return (
-    <>
+    <div className="space-y-1">
       <Label>クラス</Label>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-center px-2">学年</TableHead>
-            <TableHead className="text-center px-2">クラス</TableHead>
-          </TableRow>
-        </TableHeader>
+      <div className="space-y-1">
+        {classes.map((class_, i) => (
+          <div key={class_.key} className="flex gap-1 items-center">
+            <p>
+              {class_.grade}年次: {class_.name}
+            </p>
 
-        <TableBody className="text-center">
-          {Array.from({ length: 6 }).map((_, i) => {
-            const grade = i + 1;
-            const class_ = classes.find((class_) => class_.grade === grade);
-            return (
-              <div key={i}>
-                <TableCell>{grade}年</TableCell>
-                <TableCell>
-                  <FormField
-                    control={form.control}
-                    name={`classes.${i}.id`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <Select
-                          onValueChange={field.onChange}
-                          disabled={classes.length === 0 || isPending}
-                          defaultValue={class_?.id}
-                        >
-                          <FormControl>
-                            <SelectTrigger onBlur={field.onBlur}>
-                              <SelectValue placeholder="クラスを選択してください" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {classes1st.map((c) => (
-                              <SelectItem key={c.id} value={c.id}>
-                                {c.name}
-                              </SelectItem>
-                            ))}
-                            <SelectSeparator />
-                            {/* TODO: 追加ボタン */}
-                            {/* TODO: リセットボタン */}
-                            <Button
-                              className="w-full py-1.5"
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => remove(i)}
-                            >
-                              リセット
-                            </Button>
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-                </TableCell>
-              </div>
-            );
-          })}
-        </TableBody>
-      </Table>
-      {Array.from({ length: 6 }).map((_, i) => {
-        const _grade = i + 1;
-        const class_ = classes.find((class_) => class_.grade === _grade);
-        return (
-          <div key={i}>
-            {class_ && (
-              <>
-                <p>{class_.grade}年</p>
-                <p>{class_.name}</p>
-              </>
-            )}
+            <Button
+              type="button"
+              variant={"outline"}
+              size={"sm"}
+              onClick={() => remove(i)}
+            >
+              <Icons.trash className="mr-2 w-4 h-4" />
+              削除
+            </Button>
           </div>
-        );
-      })}
-    </>
+        ))}
+      </div>
+
+      <div className="flex gap-1 items-center">
+        <div className="flex gap-0.5 items-center">
+          <Select
+            value={gradeForAdd?.toString()}
+            disabled={classOptions.length === 0 || isPending}
+            onValueChange={(value) => setGradeForAdd(Number(value))}
+          >
+            <SelectTrigger className="h-8 w-fit">
+              {isPending ? (
+                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <SelectValue placeholder="学年" />
+              )}
+            </SelectTrigger>
+            <SelectContent>
+              {gradeOptions
+                .filter((grade) => classes.every((c) => c.grade !== grade))
+                .map((grade) => (
+                  <SelectItem key={grade} value={grade.toString()}>
+                    {grade}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+          <p>年</p>
+        </div>
+
+        <Select
+          onValueChange={(value) => setClassIdForAdd(value)}
+          disabled={classOptions.length === 0 || isPending}
+        >
+          <SelectTrigger className="w-fit">
+            {isPending ? (
+              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <SelectValue placeholder="クラス" />
+            )}
+          </SelectTrigger>
+          <SelectContent>
+            {gradeForAdd &&
+              classOptions[gradeForAdd - 1].map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            <SelectSeparator />
+            <p className="text-xs">
+              クラスが無い場合は、学校管理からクラスを追加してください
+            </p>
+          </SelectContent>
+        </Select>
+
+        <Button
+          type="button"
+          variant={"outline"}
+          size={"sm"}
+          disabled={
+            typeof gradeForAdd === "undefined" ||
+            typeof classIdForAdd === "undefined" ||
+            isPending
+          }
+          onClick={() => {
+            if (
+              typeof gradeForAdd === "undefined" ||
+              typeof classIdForAdd === "undefined"
+            ) {
+              return;
+            }
+
+            const classForAdd = classOptions[gradeForAdd - 1].find(
+              (c) => c.id === classIdForAdd
+            );
+            if (typeof classForAdd === "undefined") {
+              return;
+            }
+
+            append({
+              id: classForAdd.id,
+              name: classForAdd.name,
+              academicYear: classForAdd.academicYear,
+              grade: classForAdd.grade,
+            });
+
+            setGradeForAdd(undefined);
+            setClassIdForAdd(undefined);
+          }}
+        >
+          <Icons.circlePlus className="mr-2 w-4 h-4" />
+          追加
+        </Button>
+      </div>
+    </div>
   );
 };
 
