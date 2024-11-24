@@ -19,7 +19,11 @@ export async function getStudents(): Promise<
       parent: true,
       facility: true,
       school: true,
-      classes: true,
+      classes: {
+        orderBy: {
+          name: "asc",
+        },
+      },
     },
   });
   return students;

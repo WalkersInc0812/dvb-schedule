@@ -1,6 +1,10 @@
 import { StudentEditSchemaType } from "@/lib/validations/student";
 import React, { useEffect, useTransition } from "react";
-import { useFieldArray, UseFormReturn } from "react-hook-form";
+import {
+  useFieldArray,
+  UseFieldArrayReturn,
+  UseFormReturn,
+} from "react-hook-form";
 import { Label } from "../ui/label";
 import { searchClasses } from "@/lib/classes";
 import { Class } from "@prisma/client";
@@ -18,18 +22,11 @@ import { Icons } from "../icons";
 
 type Props = {
   form: UseFormReturn<StudentEditSchemaType>;
+  classFieldArray: UseFieldArrayReturn<StudentEditSchemaType, "classes", "key">;
 };
 
-const ClassesFormField = ({ form }: Props) => {
-  const {
-    fields: classes,
-    append,
-    remove,
-  } = useFieldArray({
-    control: form.control,
-    name: "classes",
-    keyName: "key",
-  });
+const ClassesFormField = ({ form, classFieldArray }: Props) => {
+  const { fields: classes, append, remove } = classFieldArray;
 
   const [isPending, startTransition] = useTransition();
 
@@ -85,6 +82,7 @@ const ClassesFormField = ({ form }: Props) => {
               variant={"outline"}
               size={"sm"}
               onClick={() => remove(i)}
+              className="h-8"
             >
               <Icons.trash className="mr-2 w-4 h-4" />
               削除
@@ -124,7 +122,7 @@ const ClassesFormField = ({ form }: Props) => {
           onValueChange={(value) => setClassIdForAdd(value)}
           disabled={classOptions.length === 0 || isPending}
         >
-          <SelectTrigger className="w-fit">
+          <SelectTrigger className="h-8 w-fit">
             {isPending ? (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             ) : (
@@ -149,6 +147,7 @@ const ClassesFormField = ({ form }: Props) => {
           type="button"
           variant={"outline"}
           size={"sm"}
+          className="h-8"
           disabled={
             typeof gradeForAdd === "undefined" ||
             typeof classIdForAdd === "undefined" ||

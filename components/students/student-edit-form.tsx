@@ -5,7 +5,7 @@ import {
   studentEditSchema,
   StudentEditSchemaType,
 } from "@/lib/validations/student";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -36,6 +36,7 @@ import {
 } from "@/lib/students";
 import ClassesFormField from "./classes-form-field";
 import { DevTool } from "@hookform/devtools";
+import FixedUsageDayOfWeeksFormField from "./fixed-usage-day-of-weeks-form-field-2";
 
 type Props = {
   student: StudentWithParntAndFacilityAndSchoolAndClasses;
@@ -68,9 +69,7 @@ const StudentEditForm = ({
       facilityId: student.facilityId,
       schoolId: student.schoolId,
       grade: calculateGrade(student.schoolEnrollmentAcademicYear),
-      classes: [1, 2, 3, 4, 5, 6].map((grade) =>
-        student.classes.find((c) => c.grade === grade)
-      ),
+      classes: student.classes,
       fixedUsageDayOfWeeks: studentFixedUsageDayOfWeeks.map((f) => ({
         year: f.month.split("-")[0],
         month: f.month.split("-")[1],
@@ -90,6 +89,12 @@ const StudentEditForm = ({
         },
       })),
     },
+  });
+
+  const classFieldArray = useFieldArray({
+    control: form.control,
+    name: "classes",
+    keyName: "key",
   });
 
   const onSubmit = async (data: StudentEditSchemaType) => {
@@ -217,12 +222,14 @@ const StudentEditForm = ({
             name={"schoolId"}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>学校</FormLabel>
+                <FormLabel>
+                  学校{" "}
+                  <small>※学校を変更すると、クラス情報がリセットされます</small>
+                </FormLabel>
                 <Select
                   onValueChange={(value) => {
                     field.onChange(value);
-                    form.resetField("grade");
-                    form.resetField("classes");
+                    classFieldArray.replace([]);
                   }}
                   defaultValue={field.value}
                 >
@@ -249,13 +256,16 @@ const StudentEditForm = ({
             name={"grade"}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>学年</FormLabel>
+                <FormLabel>
+                  学年{" "}
+                  <small>※学年を変更すると、クラス情報がリセットされます</small>
+                </FormLabel>
                 <Select
                   disabled={!form.getValues("schoolId")}
                   defaultValue={field.value.toString()}
                   onValueChange={(value) => {
                     field.onChange(Number(value));
-                    form.resetField("classes");
+                    classFieldArray.replace([]);
                   }}
                 >
                   <FormControl>
@@ -281,7 +291,9 @@ const StudentEditForm = ({
             )}
           />
 
-          <ClassesFormField form={form} />
+          <ClassesFormField form={form} classFieldArray={classFieldArray} />
+
+          <FixedUsageDayOfWeeksFormField form={form} />
 
           <Button
             type="submit"
