@@ -265,19 +265,19 @@ export const CalendarSection = ({
                   <TableRow>
                     <TableHead className="text-center px-2">曜日</TableHead>
                     <TableHead className="text-center px-2">
-                      月{fixedUsageDayOfWeeksByDay["1"] && "⚪︎"}
+                      月{fixedUsageDayOfWeeksByDay["1"]?.startTime && "⚪︎"}
                     </TableHead>
                     <TableHead className="text-center px-2">
-                      火{fixedUsageDayOfWeeksByDay["2"] && "⚪︎"}
+                      火{fixedUsageDayOfWeeksByDay["2"]?.startTime && "⚪︎"}
                     </TableHead>
                     <TableHead className="text-center px-2">
-                      水{fixedUsageDayOfWeeksByDay["3"] && "⚪︎"}
+                      水{fixedUsageDayOfWeeksByDay["3"]?.startTime && "⚪︎"}
                     </TableHead>
                     <TableHead className="text-center px-2">
-                      木{fixedUsageDayOfWeeksByDay["4"] && "⚪︎"}
+                      木{fixedUsageDayOfWeeksByDay["4"]?.startTime && "⚪︎"}
                     </TableHead>
                     <TableHead className="text-center px-2">
-                      金{fixedUsageDayOfWeeksByDay["5"] && "⚪︎"}
+                      金{fixedUsageDayOfWeeksByDay["5"]?.startTime && "⚪︎"}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -305,7 +305,7 @@ export const CalendarSection = ({
                       <TableCell className="p-2" key={f?.id}>
                         {f?.needPickup === true
                           ? "⚪︎"
-                          : f?.needPickup === false
+                          : f?.startTime && f?.needPickup === false
                           ? "自立"
                           : ""}
                       </TableCell>
