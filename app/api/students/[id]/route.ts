@@ -1,5 +1,3 @@
-// TODO: 動作確認
-
 import { db } from "@/lib/db";
 import { checkIsStaff, getCurrentUser } from "@/lib/session";
 import { calculateEnrollmentAcademicYear } from "@/lib/students";
@@ -30,64 +28,70 @@ export async function PATCH(
     const body = await req.json();
     const payload = studentEditSchema.parse(body);
 
-    await db.$transaction(async (tx) => {
-      const parent = await tx.user.findFirstOrThrow({
-        where: { students: { some: { id: context.params.id } } },
-        include: { facilities: true },
-      });
+    const parent = await db.user.findFirstOrThrow({
+      where: { students: { some: { id: context.params.id } } },
+      include: { facilities: true },
+    });
 
-      await tx.user.update({
-        where: { id: parent.id },
-        data: {
-          name: payload.parent.name,
-          email: payload.parent.email,
-          facilities: {
-            set: [{ id: payload.facilityId }],
-          },
-        },
-      });
-
-      await tx.student.update({
-        where: { id: context.params.id },
-        data: {
-          name: payload.name,
-          schoolId: payload.schoolId,
-          facilityId: payload.facilityId,
-          schoolEnrollmentAcademicYear: calculateEnrollmentAcademicYear(
-            payload.grade
-          ),
-          classes: {
-            set: payload.classes.map((class_) => ({ id: class_.id })),
-          },
-        },
-      });
-
-      await tx.fixedUsageDayOfWeek.deleteMany({
-        where: { studentId: context.params.id },
-      });
-
-      for (let i = 0; i < payload.fixedUsageDayOfWeeks.length; i++) {
-        const fixedUsageDayOfWeek = payload.fixedUsageDayOfWeeks[i];
-        const month = `${fixedUsageDayOfWeek.year}-${fixedUsageDayOfWeek.month}`;
-
-        await tx.fixedUsageDayOfWeek.create({
+    await db.$transaction(
+      async (tx) => {
+        await tx.user.update({
+          where: { id: parent.id },
           data: {
-            studentId: context.params.id,
-            month,
-            dayOfWeek: fixedUsageDayOfWeek.dayOfWeek,
-            startTime: fixedUsageDayOfWeek.startTime,
-            endTime: fixedUsageDayOfWeek.endTime,
-            needPickup: fixedUsageDayOfWeek.needPickup,
-            program1Id: fixedUsageDayOfWeek.program1?.programId,
-            program1StartTime: fixedUsageDayOfWeek.program1?.startTime,
-            program1EndTime: fixedUsageDayOfWeek.program1?.endTime,
-            program2Id: fixedUsageDayOfWeek.program2?.programId,
-            program2StartTime: fixedUsageDayOfWeek.program2?.startTime,
-            program2EndTime: fixedUsageDayOfWeek.program2?.endTime,
+            name: payload.parent.name,
+            email: payload.parent.email,
+            facilities: {
+              set: [{ id: payload.facilityId }],
+            },
           },
         });
+
+        await tx.student.update({
+          where: { id: context.params.id },
+          data: {
+            name: payload.name,
+            schoolId: payload.schoolId,
+            facilityId: payload.facilityId,
+            schoolEnrollmentAcademicYear: calculateEnrollmentAcademicYear(
+              payload.grade
+            ),
+            classes: {
+              set: payload.classes.map((class_) => ({ id: class_.id })),
+            },
+          },
+        });
+
+        await tx.fixedUsageDayOfWeek.deleteMany({
+          where: { studentId: context.params.id },
+        });
+
+        for (let i = 0; i < payload.fixedUsageDayOfWeeks.length; i++) {
+          const fixedUsageDayOfWeek = payload.fixedUsageDayOfWeeks[i];
+          const month = `${fixedUsageDayOfWeek.year}-${fixedUsageDayOfWeek.month}`;
+
+          await tx.fixedUsageDayOfWeek.create({
+            data: {
+              studentId: context.params.id,
+              month,
+              dayOfWeek: fixedUsageDayOfWeek.dayOfWeek,
+              startTime: fixedUsageDayOfWeek.startTime,
+              endTime: fixedUsageDayOfWeek.endTime,
+              needPickup: fixedUsageDayOfWeek.needPickup,
+              program1Id: fixedUsageDayOfWeek.program1?.programId,
+              program1StartTime: fixedUsageDayOfWeek.program1?.startTime,
+              program1EndTime: fixedUsageDayOfWeek.program1?.endTime,
+              program2Id: fixedUsageDayOfWeek.program2?.programId,
+              program2StartTime: fixedUsageDayOfWeek.program2?.startTime,
+              program2EndTime: fixedUsageDayOfWeek.program2?.endTime,
+            },
+          });
+        }
+      },
+      {
+        maxWait: 5000,
+        timeout: 10000,
       }
-    });
+    );
 
     return new Response(null, { status: 200 });
   } catch (e) {
