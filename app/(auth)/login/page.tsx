@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { UserAuthForm } from "@/components/user-auth-form";
 import { db } from "@/lib/db";
 import SignIn from "./_components/sign-in";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Login",
@@ -21,14 +22,20 @@ export default async function LoginPage() {
   const staffs = await getAllUsersByRole("STAFF");
 
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center">
+    <div className="container flex h-screen w-screen flex-col items-center justify-center gap-10">
+      <Image
+        src="/logo@4x.png"
+        alt=""
+        width={1200}
+        height={480}
+        className="max-w-[300px] w-full"
+      />
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-        <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">ログイン</h1>
-        </div>
         <SignIn />
-        {/* TODO: only local after v1.0 */}
-        <UserAuthForm parents={parents} staffs={staffs} />
+
+        {process.env.NODE_ENV !== "development" && (
+          <UserAuthForm parents={parents} staffs={staffs} />
+        )}
       </div>
     </div>
   );

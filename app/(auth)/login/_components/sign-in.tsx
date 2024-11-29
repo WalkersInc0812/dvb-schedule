@@ -47,7 +47,7 @@ const SignIn = (props: Props) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 justify-center"
       >
         <FormField
           control={form.control}
