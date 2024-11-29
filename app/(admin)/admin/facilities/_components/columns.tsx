@@ -1,6 +1,7 @@
 "use client";
 
 import { formatCaption } from "@/components/format-caption";
+import { LinkifyText } from "@/components/linkify-text";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
@@ -67,7 +68,7 @@ const AnnouncementCell = ({
                   parse(announcement.displayEndMonth, "yyyy-MM", new Date()),
                   "yyyy年M月"
                 )}
-                : {announcement.content}
+                : <LinkifyText text={announcement.content} />
               </li>
             ))}
           </ul>

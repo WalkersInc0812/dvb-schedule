@@ -56,6 +56,7 @@ import {
 } from "@/components/ui/accordion";
 import { FixedUsageDayOfWeekWithPrograms } from "@/lib/fixedUsageDayOfWeeks";
 import { cn } from "@/lib/utils";
+import { LinkifyText } from "@/components/linkify-text";
 
 type Mode = "single" | "multiple";
 type DialogType = "create" | "multi-create" | "read" | "update" | "delete";
@@ -509,7 +510,7 @@ export const CalendarSection = ({
             <p className="text-base font-bold">お知らせ</p>
             {announcements.map((a) => (
               <p key={a.id} className="text-[14px]">
-                - {a.content}
+                - <LinkifyText text={a.content} />
               </p>
             ))}
           </div>
