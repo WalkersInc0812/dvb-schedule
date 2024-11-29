@@ -58,6 +58,8 @@ import { FixedUsageDayOfWeekWithPrograms } from "@/lib/fixedUsageDayOfWeeks";
 import { cn } from "@/lib/utils";
 import { LinkifyText } from "@/components/linkify-text";
 
+import holidayJp from "@holiday-jp/holiday_jp";
+
 type Mode = "single" | "multiple";
 type DialogType = "create" | "multi-create" | "read" | "update" | "delete";
 
@@ -428,6 +430,7 @@ export const CalendarSection = ({
 
                 return closed.includes(format(day, "MM/dd"));
               },
+              (day: Date) => holidayJp.isHoliday(day),
             ],
           }}
           modifiersClassNames={{
@@ -453,6 +456,7 @@ export const CalendarSection = ({
 
               return closed.includes(format(day, "MM/dd"));
             },
+            (day: Date) => holidayJp.isHoliday(day),
             // noting
             (day: Date) => {
               const targetMonth = format(day, "yyyy-MM");
