@@ -27,6 +27,9 @@ export async function getFacilitiesWithMealSettingAndScheduleEditablePeriodAndAn
       scheduleEditablePeriods: true,
       announcements: true,
     },
+    orderBy: {
+      name: "asc",
+    },
   });
 
   return facilities;
