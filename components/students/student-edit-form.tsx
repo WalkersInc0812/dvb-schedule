@@ -18,10 +18,10 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 
-import React, { useState, useTransition } from "react";
+import React from "react";
 import { Input } from "../ui/input";
 import { Icons } from "../icons";
-import { Class, Facility, FixedUsageDayOfWeek, School } from "@prisma/client";
+import { Facility, FixedUsageDayOfWeek, School } from "@prisma/client";
 import {
   Select,
   SelectContent,

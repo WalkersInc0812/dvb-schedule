@@ -350,6 +350,30 @@ export const CalendarSection = ({
                       </TableCell>
                     ))}
                   </TableRow>
+                  {Object.values(fixedUsageDayOfWeeksByDay).some(
+                    (f) => f?.program3
+                  ) && (
+                    <>
+                      <TableRow className="border-dashed bg-primary bg-opacity-5">
+                        <TableCell className="p-2">③</TableCell>
+                        {Object.values(fixedUsageDayOfWeeksByDay).map((f) => (
+                          <TableCell className="p-2" key={f?.id}>
+                            {f?.program3?.shortName || f?.program3?.name || ""}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                      <TableRow className="bg-primary bg-opacity-5">
+                        <TableCell className="p-2">時間</TableCell>
+                        {Object.values(fixedUsageDayOfWeeksByDay).map((f) => (
+                          <TableCell className="p-2" key={f?.id}>
+                            {f?.program3StartTime || ""}
+                            <br />
+                            {f?.program3EndTime ? `~${f?.program3EndTime}` : ""}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </>
+                  )}
                 </TableBody>
               </Table>
             </AccordionContent>

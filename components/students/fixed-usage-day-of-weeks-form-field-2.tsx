@@ -80,6 +80,7 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
       needPickup: defaultValue("needPickup"),
       program1: defaultValue("program"),
       program2: defaultValue("program"),
+      program3: defaultValue("program"),
     };
   };
 
@@ -90,7 +91,7 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
 
   const [programs, setPrograms] = React.useState<Program[]>([]);
 
-  const { fields, append, remove, update } = useFieldArray({
+  const { fields, append, update } = useFieldArray({
     control: form.control,
     name: "fixedUsageDayOfWeeks",
   });
@@ -498,6 +499,104 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
                 <FormField
                   control={form.control}
                   name={`fixedUsageDayOfWeeks.${field.index}.program2.endTime`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          type="time"
+                          list="time-options"
+                          min="11:00"
+                          max="22:00"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TableCell>
+            ))}
+          </TableRow>
+
+          <TableRow className="border-dashed bg-primary bg-opacity-5">
+            <TableCell className="p-2">③</TableCell>
+            {currentFields.map((field) => (
+              <TableCell key={field.id} className="p-2">
+                <FormField
+                  control={form.control}
+                  name={`fixedUsageDayOfWeeks.${field.index}.program3.programId`}
+                  render={({ field: f }) => (
+                    <FormItem>
+                      <Select onValueChange={f.onChange} defaultValue={f.value}>
+                        <FormControl>
+                          <SelectTrigger onBlur={f.onBlur}>
+                            <SelectValue className="w-10" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {programs.map((program) => (
+                            <SelectItem key={program.id} value={program.id}>
+                              {program.shortName || program.name}
+                            </SelectItem>
+                          ))}
+                          <SelectSeparator />
+                          <Button
+                            className="w-full py-1.5"
+                            variant="secondary"
+                            size="sm"
+                            onClick={() =>
+                              update(field.index, {
+                                ...form.getValues(
+                                  `fixedUsageDayOfWeeks.${field.index}`
+                                ),
+                                program3: defaultValue("program"),
+                              })
+                            }
+                          >
+                            リセット
+                          </Button>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+              </TableCell>
+            ))}
+          </TableRow>
+
+          <TableRow className="bg-primary bg-opacity-5">
+            <TableCell className="p-2">開始時間</TableCell>
+            {currentFields.map((field) => (
+              <TableCell key={field.id} className="p-2">
+                <FormField
+                  control={form.control}
+                  name={`fixedUsageDayOfWeeks.${field.index}.program3.startTime`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          type="time"
+                          list="time-options"
+                          min="11:00"
+                          max="22:00"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TableCell>
+            ))}
+          </TableRow>
+
+          <TableRow className="bg-primary bg-opacity-5">
+            <TableCell className="p-2">終了時間</TableCell>
+            {currentFields.map((field) => (
+              <TableCell key={field.id} className="p-2">
+                <FormField
+                  control={form.control}
+                  name={`fixedUsageDayOfWeeks.${field.index}.program3.endTime`}
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>

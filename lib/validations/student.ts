@@ -43,6 +43,13 @@ export const studentCreateSchema = z.object({
           endTime: z.string().optional(),
         })
         .optional(),
+      program3: z
+        .object({
+          programId: z.string().optional(),
+          startTime: z.string().optional(),
+          endTime: z.string().optional(),
+        })
+        .optional(),
     })
   ),
 });
@@ -89,6 +96,13 @@ export const studentEditSchema = z.object({
         })
         .optional(),
       program2: z
+        .object({
+          programId: z.string().optional(),
+          startTime: z.string().optional(),
+          endTime: z.string().optional(),
+        })
+        .optional(),
+      program3: z
         .object({
           programId: z.string().optional(),
           startTime: z.string().optional(),

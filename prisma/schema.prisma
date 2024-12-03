@@ -262,6 +262,7 @@ model Program {
 
   fixedUsageDaysOfWeek1 FixedUsageDayOfWeek[] @relation("program_fixed_usage_days_of_week_1")
   fixedUsageDaysOfWeek2 FixedUsageDayOfWeek[] @relation("program_fixed_usage_days_of_week_2")
+  fixedUsageDaysOfWeek3 FixedUsageDayOfWeek[] @relation("program_fixed_usage_days_of_week_3")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -284,10 +285,14 @@ model FixedUsageDayOfWeek {
   program2Id        String?
   program2StartTime String? // HH:mm
   program2EndTime   String? // HH:mm
+  program3Id        String?
+  program3StartTime String? // HH:mm
+  program3EndTime   String? // HH:mm
 
   student  Student  @relation(fields: [studentId], references: [id])
   program1 Program? @relation("program_fixed_usage_days_of_week_1", fields: [program1Id], references: [id])
   program2 Program? @relation("program_fixed_usage_days_of_week_2", fields: [program2Id], references: [id])
+  program3 Program? @relation("program_fixed_usage_days_of_week_3", fields: [program3Id], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

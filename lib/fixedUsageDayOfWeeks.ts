@@ -8,6 +8,7 @@ export type FixedUsageDayOfWeekWithPrograms =
     include: {
       program1: true;
       program2: true;
+      program3: true;
     };
   }>;
 
@@ -22,6 +23,7 @@ export async function getFixedUsageDayOfWeeksWithProgramsByStudentId(
     include: {
       program1: true,
       program2: true,
+      program3: true,
     },
   });
 

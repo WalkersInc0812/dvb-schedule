@@ -83,6 +83,9 @@ export async function PATCH(
               program2Id: fixedUsageDayOfWeek.program2?.programId,
               program2StartTime: fixedUsageDayOfWeek.program2?.startTime,
               program2EndTime: fixedUsageDayOfWeek.program2?.endTime,
+              program3Id: fixedUsageDayOfWeek.program3?.programId,
+              program3StartTime: fixedUsageDayOfWeek.program3?.startTime,
+              program3EndTime: fixedUsageDayOfWeek.program3?.endTime,
             },
           });
         }
