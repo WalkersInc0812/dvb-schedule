@@ -32,7 +32,6 @@ import {
 import { searchClasses } from "../../lib/classes";
 import { getMonth, getYear } from "date-fns";
 import { calculateEnrollmentAcademicYear } from "@/lib/students";
-import FixedUsageDayOfWeeksFormField from "./fixed-usage-day-of-weeks-form-field";
 
 type Props = {
   facilities: Facility[];
@@ -64,8 +63,6 @@ const StudentCreateForm = ({
       facilityId: "",
       schoolId: "",
       grade: undefined,
-      classId: "",
-      fixedUsageDayOfWeeks: [],
     },
   });
 
@@ -199,7 +196,6 @@ const StudentCreateForm = ({
                   onValueChange={(value) => {
                     field.onChange(value);
                     form.resetField("grade");
-                    form.resetField("classId");
                   }}
                   defaultValue={field.value}
                 >
@@ -231,7 +227,6 @@ const StudentCreateForm = ({
                   disabled={!form.getValues("schoolId")}
                   onValueChange={(value) => {
                     field.onChange(Number(value));
-                    form.resetField("classId");
 
                     const now = new Date();
                     const year = getYear(now);
@@ -269,36 +264,6 @@ const StudentCreateForm = ({
               </FormItem>
             )}
           />
-
-          <FormField
-            control={form.control}
-            name={"classId"}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>クラス</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  disabled={classes.length === 0 || isPending}
-                >
-                  <FormControl>
-                    <SelectTrigger onBlur={field.onBlur}>
-                      <SelectValue placeholder="クラスを選択してください" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {classes.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* <FixedUsageDayOfWeeksFormField form={form} /> */}
 
           <Button
             type="submit"

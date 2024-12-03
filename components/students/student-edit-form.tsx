@@ -36,7 +36,7 @@ import {
 } from "@/lib/students";
 import ClassesFormField from "./classes-form-field";
 import { DevTool } from "@hookform/devtools";
-import FixedUsageDayOfWeeksFormField from "./fixed-usage-day-of-weeks-form-field-2";
+import FixedUsageDayOfWeeksFormField from "./fixed-usage-day-of-weeks-form-field";
 
 type Props = {
   student: StudentWithParntAndFacilityAndSchoolAndClasses;

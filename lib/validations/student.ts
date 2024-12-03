@@ -1,10 +1,5 @@
 import z from "zod";
 
-const regex = {
-  term: /^\d{4}-\d{1}$/,
-  time: /^\d{2}:\d{2}$/,
-};
-
 export const studentCreateSchema = z.object({
   parent: z.object({
     name: z.string().min(1, "保護者氏名を入力してください"),
@@ -20,42 +15,10 @@ export const studentCreateSchema = z.object({
     .int()
     .gte(1, "学年を1~6年で選択してください")
     .lte(6, "学年を1~6年で選択してください"),
-  classId: z.string().min(1, "クラスを選択してください"),
   name: z.string().min(1, "児童氏名を入力してください"),
-  fixedUsageDayOfWeeks: z.array(
-    z.object({
-      term: z.string().regex(regex.term),
-      dayOfWeek: z.number().int().gte(1).lte(5),
-      startTime: z.string().optional(),
-      endTime: z.string().optional(),
-      needPickup: z.boolean().default(false),
-      program1: z
-        .object({
-          programId: z.string().optional(),
-          startTime: z.string().optional(),
-          endTime: z.string().optional(),
-        })
-        .optional(),
-      program2: z
-        .object({
-          programId: z.string().optional(),
-          startTime: z.string().optional(),
-          endTime: z.string().optional(),
-        })
-        .optional(),
-      program3: z
-        .object({
-          programId: z.string().optional(),
-          startTime: z.string().optional(),
-          endTime: z.string().optional(),
-        })
-        .optional(),
-    })
-  ),
 });
 export type StudentCreateSchemaType = z.infer<typeof studentCreateSchema>;
 
-// TODO: 動作確認
 export const studentEditSchema = z.object({
   parent: z.object({
     name: z.string().min(1, "保護者氏名を入力してください"),

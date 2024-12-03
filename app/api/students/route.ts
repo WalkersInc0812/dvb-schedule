@@ -25,11 +25,6 @@ export async function POST(req: Request) {
           name: payload.parent.name,
           email: payload.parent.email,
           role: "PARENT",
-          facilities: {
-            connect: {
-              id: payload.facilityId,
-            },
-          },
         },
       });
 
@@ -42,45 +37,8 @@ export async function POST(req: Request) {
           schoolEnrollmentAcademicYear: calculateEnrollmentAcademicYear(
             payload.grade
           ),
-          classes: {
-            connect: {
-              id: payload.classId,
-            },
-          },
         },
       });
-
-      for (let i = 0; i < payload.fixedUsageDayOfWeeks.length; i++) {
-        const fixedUsageDayOfWeek = payload.fixedUsageDayOfWeeks[i];
-        const [year, term] = fixedUsageDayOfWeek.term.split("-");
-        const months =
-          term === "1"
-            ? ["04", "05", "06", "07"]
-            : term === "2"
-            ? ["08", "09", "10", "11", "12"]
-            : term === "3"
-            ? ["01", "02", "03"]
-            : [];
-        for (let j = 0; j < months.length; j++) {
-          const month = months[j];
-          await tx.fixedUsageDayOfWeek.create({
-            data: {
-              month: `${year}-${month}`,
-              dayOfWeek: fixedUsageDayOfWeek.dayOfWeek,
-              startTime: fixedUsageDayOfWeek.startTime,
-              endTime: fixedUsageDayOfWeek.endTime,
-              needPickup: fixedUsageDayOfWeek.needPickup,
-              program1Id: fixedUsageDayOfWeek.program1?.programId,
-              program1StartTime: fixedUsageDayOfWeek.program1?.startTime,
-              program1EndTime: fixedUsageDayOfWeek.program1?.endTime,
-              program2Id: fixedUsageDayOfWeek.program2?.programId,
-              program2StartTime: fixedUsageDayOfWeek.program2?.startTime,
-              program2EndTime: fixedUsageDayOfWeek.program2?.endTime,
-              studentId: createdStudent.id,
-            },
-          });
-        }
-      }
     });
 
     return new Response(null, { status: 200 });
