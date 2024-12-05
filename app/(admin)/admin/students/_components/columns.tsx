@@ -7,6 +7,12 @@ import {
   StudentWithParntAndFacilityAndSchoolAndClasses,
 } from "@/lib/students";
 import { ColumnDef } from "@tanstack/react-table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Props = {
   onEditClick: (student: any) => void;
@@ -48,21 +54,39 @@ export const makeColumns = ({
   {
     id: "edit",
     cell: ({ row }) => (
-      <Button size={"sm"} onClick={() => onEditClick(row.original)}>
-        編集
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button size={"sm"} onClick={() => onEditClick(row.original)}>
+              編集
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>クリックするとモーダルが表示されます</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     ),
   },
-  // {
-  //   id: "delete",
-  //   cell: ({ row }) => (
-  //     <Button
-  //       size={"sm"}
-  //       variant="destructive"
-  //       onClick={() => onDeleteClick(row.original)}
-  //     >
-  //       削除
-  //     </Button>
-  //   ),
-  // },
+  {
+    id: "delete",
+    cell: ({ row }) => (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size={"sm"}
+              variant="destructive"
+              onClick={() => onDeleteClick(row.original)}
+            >
+              削除
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>クリックするとモーダルが表示されます</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    ),
+  },
 ];

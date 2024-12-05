@@ -76,3 +76,6 @@ export const studentEditSchema = z.object({
   ),
 });
 export type StudentEditSchemaType = z.infer<typeof studentEditSchema>;
+
+export const studentDeleteSchema = z.object({});
+export type StudentDeleteSchemaType = z.infer<typeof studentDeleteSchema>;

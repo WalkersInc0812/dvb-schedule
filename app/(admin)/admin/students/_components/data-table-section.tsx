@@ -14,6 +14,7 @@ import StudentCreateForm from "@/components/students/student-create-form";
 import { Facility, FixedUsageDayOfWeek, School } from "@prisma/client";
 import StudentEditForm from "@/components/students/student-edit-form";
 import { getFixedUsageDayOfWeeksWithProgramsByStudentId } from "@/lib/fixedUsageDayOfWeeks";
+import StudentDeleteForm from "./student-delete-form";
 
 type DialogType = "create" | "detail" | "edit" | "delete";
 
@@ -47,7 +48,9 @@ const DataTableSection = ({ students, facilities, schools }: Props) => {
   const handleDeleteClick = (
     student: StudentWithParntAndFacilityAndSchoolAndClasses
   ) => {
-    alert("TODO: 未実装");
+    setSelectedStudent(student);
+    setDialogType("delete");
+    setDialogOpen(true);
   };
 
   const handleCreateClick = () => {
@@ -96,6 +99,15 @@ const DataTableSection = ({ students, facilities, schools }: Props) => {
                     }}
                   />
                 )}
+              {dialogType === "delete" && selectedStudent && (
+                <StudentDeleteForm
+                  student={selectedStudent}
+                  onSuccess={() => {
+                    setDialogOpen(false);
+                    setSelectedStudent(null);
+                  }}
+                />
+              )}
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

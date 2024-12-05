@@ -49,6 +49,8 @@ function html(params: SendVerificationRequestParams) {
 export const sendVerificationRequest = async (
   params: SendVerificationRequestParams
 ) => {
+  // TODO: DBにメアドが無い場合は、エラーを返す
+
   let {
     identifier: email,
     url,

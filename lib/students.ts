@@ -25,6 +25,9 @@ export async function getStudents(): Promise<
         },
       },
     },
+    where: {
+      deletedAt: null,
+    },
   });
   return students;
 }
