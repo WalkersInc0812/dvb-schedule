@@ -189,3 +189,40 @@ export async function PATCH(
     return new Response(null, { status: 500 });
   }
 }
+
+// 論理削除
+export async function DELETE(
+  req: Request,
+  context: z.infer<typeof routeContextSchema>
+) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return new Response(null, { status: 403 });
+    }
+
+    const isStaff = await checkIsStaff();
+    if (!isStaff) {
+      return new Response(null, { status: 400 });
+    }
+
+    await db.facility.update({
+      where: {
+        id: context.params.id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    return new Response(null, { status: 200 });
+  } catch (error) {
+    console.error(error);
+
+    if (error instanceof z.ZodError) {
+      return new Response(JSON.stringify(error.issues), { status: 422 });
+    }
+
+    return new Response(null, { status: 500 });
+  }
+}

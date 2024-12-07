@@ -24,3 +24,6 @@ export const facilityUpdateSchema = z.object({
   mealSettingActiveDates: z.array(z.date()),
 });
 export type FacilityUpdateSchemaType = z.infer<typeof facilityUpdateSchema>;
+
+export const facilityDeleteSchema = z.object({});
+export type FacilityDeleteSchemaType = z.infer<typeof facilityDeleteSchema>;

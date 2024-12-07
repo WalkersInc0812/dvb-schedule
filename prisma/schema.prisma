@@ -109,8 +109,9 @@ model Facility {
   scheduleEditablePeriods ScheduleEditablePeriod[]
   announcements           Announcement[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@map(name: "facilities")
 }

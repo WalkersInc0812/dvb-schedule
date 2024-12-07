@@ -10,24 +10,26 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { FacilityUpdateForm } from "@/components/facilities/facility-update-form";
-import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
+import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount } from "@/lib/facilities";
 import { FacilityCreateForm } from "@/components/facilities/facility-create-form";
+import FacilityDeleteForm from "./facility-delete-form";
 
-type DialogType = "update" | "create";
+type DialogType = "update" | "create" | "delete";
 
 type Props = {
-  facilities: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement[];
+  facilities: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount[];
 };
 
 export const DataTableSection = ({ facilities }: Props) => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [dialogType, setDialogType] = React.useState<DialogType>("create");
   const [clickedFacility, setClickedFacility] = React.useState<
-    FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement | undefined
+    | FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount
+    | undefined
   >();
 
   const handleEditClick = (
-    facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement
+    facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount
   ) => {
     setClickedFacility(facility);
     setDialogType("update");
@@ -40,8 +42,17 @@ export const DataTableSection = ({ facilities }: Props) => {
     setDialogOpen(true);
   };
 
+  const handleDeleteClick = (
+    school: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount
+  ) => {
+    setClickedFacility(school);
+    setDialogType("delete");
+    setDialogOpen(true);
+  };
+
   const columns = makeColumns({
     onEditClick: handleEditClick,
+    onDeleteClick: handleDeleteClick,
   });
 
   return (
@@ -53,17 +64,18 @@ export const DataTableSection = ({ facilities }: Props) => {
       />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="h-[90vh] overflow-scroll">
+        <DialogContent className="max-h-[90vh] overflow-scroll">
           <DialogHeader>
             <DialogDescription className="text-foreground">
-              {dialogType === "create" ? (
+              {dialogType === "create" && (
                 <FacilityCreateForm
                   onSuccess={() => {
                     setDialogOpen(false);
                     setClickedFacility(undefined);
                   }}
                 />
-              ) : dialogType === "update" && clickedFacility ? (
+              )}
+              {dialogType === "update" && clickedFacility && (
                 <FacilityUpdateForm
                   facility={clickedFacility}
                   onSuccess={() => {
@@ -71,7 +83,16 @@ export const DataTableSection = ({ facilities }: Props) => {
                     setClickedFacility(undefined);
                   }}
                 />
-              ) : null}
+              )}
+              {dialogType === "delete" && clickedFacility && (
+                <FacilityDeleteForm
+                  facility={clickedFacility}
+                  onSuccess={() => {
+                    setDialogOpen(false);
+                    setClickedFacility(undefined);
+                  }}
+                />
+              )}
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

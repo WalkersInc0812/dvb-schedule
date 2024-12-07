@@ -5,42 +5,42 @@ import { Button } from "@/components/ui/button";
 import { Form, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
-import { SchoolWithClassesAndStudentsCount } from "@/lib/schools";
+import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount } from "@/lib/facilities";
 import {
-  schoolDeleteSchema,
-  SchoolDeleteSchemaType,
-} from "@/lib/validations/school";
+  facilityDeleteSchema,
+  FacilityDeleteSchemaType,
+} from "@/lib/validations/facility";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 
 type Props = {
-  school: SchoolWithClassesAndStudentsCount;
+  facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount;
   onSuccess?: () => void;
   onError?: () => void;
 };
 
-const SchoolDeleteForm = ({ school, onSuccess, onError }: Props) => {
+const FacilityDeleteForm = ({ facility, onSuccess, onError }: Props) => {
   const router = useRouter();
 
-  const form = useForm<SchoolDeleteSchemaType>({
+  const form = useForm<FacilityDeleteSchemaType>({
     mode: "onBlur",
-    resolver: zodResolver(schoolDeleteSchema),
+    resolver: zodResolver(facilityDeleteSchema),
   });
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch(`/api/schools/${school.id}`, {
+      const response = await fetch(`/api/facilities/${facility.id}`, {
         method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete school");
+        throw new Error("Failed to delete facility");
       }
 
       toast({
-        title: "学校を削除しました",
+        title: "教室を削除しました",
         description: "テーブルから削除されます",
       });
 
@@ -52,7 +52,7 @@ const SchoolDeleteForm = ({ school, onSuccess, onError }: Props) => {
 
       console.error(error);
       toast({
-        title: "学校の削除に失敗しました",
+        title: "教室の削除に失敗しました",
         description: "もう一度お試しください。",
         variant: "destructive",
       });
@@ -63,28 +63,27 @@ const SchoolDeleteForm = ({ school, onSuccess, onError }: Props) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormItem>
-          <FormLabel>学校名</FormLabel>
-          <Input disabled value={school.name} />
-        </FormItem>
-
-        <FormItem>
-          <FormLabel>学校のクラス数</FormLabel>
-          <Input disabled value={school.classes.length} />
-        </FormItem>
-
-        <FormItem>
-          <FormLabel>学校の生徒数</FormLabel>
+          <FormLabel>教室名</FormLabel>
           <Input
+            type="text"
+            value={facility.name}
             disabled
-            value={school.classes.reduce(
-              (acc, curr) => acc + curr._count.students,
-              0
-            )}
+            className="w-full"
+          />
+        </FormItem>
+
+        <FormItem>
+          <FormLabel>生徒数</FormLabel>
+          <Input
+            type="number"
+            value={facility._count.students}
+            disabled
+            className="w-full"
           />
         </FormItem>
 
         <p className="text-[20px] font-bold text-center">
-          本当にこの学校を削除しますか？
+          本当にこの教室を削除しますか？
         </p>
 
         <Button
@@ -100,11 +99,11 @@ const SchoolDeleteForm = ({ school, onSuccess, onError }: Props) => {
           {(form.formState.isLoading || form.formState.isSubmitting) && (
             <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
           )}
-          学校を削除する
+          教室を削除する
         </Button>
       </form>
     </Form>
   );
 };
 
-export default SchoolDeleteForm;
+export default FacilityDeleteForm;

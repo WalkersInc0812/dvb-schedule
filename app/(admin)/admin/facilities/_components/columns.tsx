@@ -4,17 +4,23 @@ import { formatCaption } from "@/components/format-caption";
 import { LinkifyText } from "@/components/linkify-text";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement } from "@/lib/facilities";
+import { FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount } from "@/lib/facilities";
 import { Announcement } from "@prisma/client";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { format, parse, subMonths } from "date-fns";
 import { ja } from "date-fns/locale";
 import React, { useEffect } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const AnnouncementCell = ({
   row,
 }: {
-  row: Row<FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement>;
+  row: Row<FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount>;
 }) => {
   const [month, setMonth] = React.useState(new Date());
   const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
@@ -83,12 +89,12 @@ const AnnouncementCell = ({
 const ScheduleEditablePeriodCell = ({
   row,
 }: {
-  row: Row<FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement>;
+  row: Row<FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount>;
 }) => {
   const [month, setMonth] = React.useState(new Date());
   const [month2, setMonth2] = React.useState(new Date());
   const [period, setPeriod] = React.useState<
-    | FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement["scheduleEditablePeriods"][0]
+    | FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount["scheduleEditablePeriods"][0]
     | undefined
   >();
 
@@ -148,12 +154,16 @@ const ScheduleEditablePeriodCell = ({
 
 type Props = {
   onEditClick: (
-    facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement
+    facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount
+  ) => void;
+  onDeleteClick: (
+    facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount
   ) => void;
 };
 export const makeColumns = ({
   onEditClick,
-}: Props): ColumnDef<FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement>[] => [
+  onDeleteClick,
+}: Props): ColumnDef<FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementAndStudentsCount>[] => [
   {
     id: "name",
     header: "教室名",
@@ -192,11 +202,63 @@ export const makeColumns = ({
     ),
   },
   {
+    id: "studentsCount",
+    header: "児童数",
+    accessorFn: (info) => info._count.students,
+    cell: ({ row }) => (
+      <p className="min-w-12 text-center">{row.original._count.students}人</p>
+    ),
+  },
+  {
     id: "edit",
     cell: ({ row }) => (
-      <Button onClick={() => onEditClick(row.original)} size="sm">
-        編集
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button size={"sm"} onClick={() => onEditClick(row.original)}>
+              編集
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>クリックするとモーダルが表示されます</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    ),
+  },
+  {
+    id: "delete",
+    cell: ({ row }) => (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {row.getValue("studentsCount") === 0 ? (
+              <Button
+                size={"sm"}
+                variant="destructive"
+                onClick={() => onDeleteClick(row.original)}
+              >
+                削除
+              </Button>
+            ) : (
+              <Button
+                size={"sm"}
+                variant="destructive"
+                className="cursor-default opacity-50"
+              >
+                削除
+              </Button>
+            )}
+          </TooltipTrigger>
+          <TooltipContent>
+            {row.getValue("studentsCount") === 0 ? (
+              <p>クリックするとモーダルが表示されます</p>
+            ) : (
+              <p>児童がいる教室は削除できません</p>
+            )}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     ),
   },
 ];
