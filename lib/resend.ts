@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { SendVerificationRequestParams } from "next-auth/providers/email";
+import { db } from "@/lib/db";
 
 function html(params: SendVerificationRequestParams) {
   const { url } = params;
@@ -49,14 +50,24 @@ function html(params: SendVerificationRequestParams) {
 export const sendVerificationRequest = async (
   params: SendVerificationRequestParams
 ) => {
-  // TODO: DBにメアドが無い場合は、エラーを返す
-
   let {
     identifier: email,
     url,
     provider: { from },
   } = params;
+
   try {
+    // DBにメアドが無い場合は、エラーを返す
+    const user = await db.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
     const resend = new Resend(process.env.AUTH_RESEND_KEY!);
     await resend.emails.send({
       from: from,
@@ -66,5 +77,7 @@ export const sendVerificationRequest = async (
     });
   } catch (error) {
     console.log({ error });
+
+    throw error;
   }
 };
