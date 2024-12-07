@@ -171,8 +171,9 @@ model School {
   classes  Class[]
   students Student[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@map(name: "schools")
 }

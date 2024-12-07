@@ -12,8 +12,9 @@ import {
 import { SchoolCreateForm } from "./school-create-form";
 import { SchoolUpdateForm } from "./school-update-form";
 import { SchoolWithClassesAndStudentsCount } from "@/lib/schools";
+import SchoolDeleteForm from "./school-delete-form";
 
-type DialogType = "create" | "update";
+type DialogType = "create" | "update" | "delete";
 
 type Props = {
   schools: SchoolWithClassesAndStudentsCount[];
@@ -38,8 +39,15 @@ const DataTableSection = ({ schools }: Props) => {
     setDialogOpen(true);
   };
 
+  const handleDeleteClick = (school: SchoolWithClassesAndStudentsCount) => {
+    setClickedSchool(school);
+    setDialogType("delete");
+    setDialogOpen(true);
+  };
+
   const columns = makeColumns({
     onEditClick: handleEditClick,
+    onDeleteClick: handleDeleteClick,
   });
 
   return (
@@ -54,14 +62,15 @@ const DataTableSection = ({ schools }: Props) => {
         <DialogContent className="max-h-[90vh] overflow-y-scroll max-w-2xl">
           <DialogHeader>
             <DialogDescription className="text-foreground">
-              {dialogType === "create" ? (
+              {dialogType === "create" && (
                 <SchoolCreateForm
                   onSuccess={() => {
                     setDialogOpen(false);
                     setClickedSchool(undefined);
                   }}
                 />
-              ) : dialogType === "update" && clickedSchool ? (
+              )}
+              {dialogType === "update" && clickedSchool && (
                 <SchoolUpdateForm
                   school={clickedSchool}
                   onSuccess={() => {
@@ -69,7 +78,16 @@ const DataTableSection = ({ schools }: Props) => {
                     setClickedSchool(undefined);
                   }}
                 />
-              ) : null}
+              )}
+              {dialogType === "delete" && clickedSchool && (
+                <SchoolDeleteForm
+                  school={clickedSchool}
+                  onSuccess={() => {
+                    setDialogOpen(false);
+                    setClickedSchool(undefined);
+                  }}
+                />
+              )}
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

@@ -18,6 +18,9 @@ export async function getSchoolsWithClasses(): Promise<
   SchoolWithClassesAndStudentsCount[]
 > {
   const schools = await db.school.findMany({
+    where: {
+      deletedAt: null,
+    },
     include: {
       classes: {
         where: {
@@ -26,7 +29,11 @@ export async function getSchoolsWithClasses(): Promise<
         include: {
           _count: {
             select: {
-              students: true,
+              students: {
+                where: {
+                  deletedAt: null,
+                },
+              },
             },
           },
         },
@@ -44,7 +51,14 @@ export async function getSchoolsWithClasses(): Promise<
 }
 
 export async function getSchools() {
-  const schools = await db.school.findMany();
+  const schools = await db.school.findMany({
+    where: {
+      deletedAt: null,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
 
   return schools;
 }

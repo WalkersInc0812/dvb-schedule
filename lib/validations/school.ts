@@ -23,3 +23,6 @@ export const schoolUpdateSchema = z.object({
   ),
 });
 export type SchoolUpdateSchemaType = z.infer<typeof schoolUpdateSchema>;
+
+export const schoolDeleteSchema = z.object({});
+export type SchoolDeleteSchemaType = z.infer<typeof schoolDeleteSchema>;
