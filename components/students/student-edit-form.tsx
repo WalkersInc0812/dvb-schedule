@@ -313,7 +313,7 @@ const StudentEditForm = ({
         </form>
       </Form>
 
-      <DevTool control={form.control} />
+      {/* <DevTool control={form.control} /> */}
     </>
   );
 };

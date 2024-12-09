@@ -91,8 +91,8 @@ export async function PATCH(
         }
       },
       {
-        maxWait: 5000,
-        timeout: 10000,
+        maxWait: 2000 * 2.5 * 2,
+        timeout: 10000 * 2 * 2,
       }
     );
 

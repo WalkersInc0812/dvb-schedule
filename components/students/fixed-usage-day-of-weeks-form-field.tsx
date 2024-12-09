@@ -27,6 +27,7 @@ import { timeOptions } from "../schedules/utils";
 import { Program } from "@prisma/client";
 import { getPrograms } from "@/lib/programs";
 import { padZero } from "@/lib/utils";
+import { toast } from "../ui/use-toast";
 
 type Props = {
   form: UseFormReturn<StudentEditSchemaType>;
@@ -84,14 +85,32 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
     };
   };
 
+  // formType
+  type FormType = "month" | "period";
+  const [formType, setFormType] = React.useState<FormType>("month");
+  // formType: month
   const [year, setYear] = React.useState<string | undefined>();
   const [month, setMonth] = React.useState<string | undefined>();
+  // formType: period
+  const [periodUpdateLoading, setPeriodUpdateLoading] = React.useState(false);
+  const [startPeriodYear, setStartPeriodYear] = React.useState<
+    string | undefined
+  >();
+  const [startPeriodMonth, setStartPeriodMonth] = React.useState<
+    string | undefined
+  >();
+  const [endPeriodYear, setEndPeriodYear] = React.useState<
+    string | undefined
+  >();
+  const [endPeriodMonth, setEndPeriodMonth] = React.useState<
+    string | undefined
+  >();
 
   const [isPending, startTransition] = useTransition();
 
   const [programs, setPrograms] = React.useState<Program[]>([]);
 
-  const { fields, append, update } = useFieldArray({
+  const { fields, append, update, replace } = useFieldArray({
     control: form.control,
     name: "fixedUsageDayOfWeeks",
   });
@@ -112,9 +131,13 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
   }, []);
 
   /**
-   * currentFieldsを更新する
+   * currentFieldsを更新する (formType=month)
    */
   useEffect(() => {
+    if (formType !== "month") {
+      return;
+    }
+
     if (typeof year === "undefined" || typeof month === "undefined") {
       return;
     }
@@ -176,56 +199,328 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
     fields, // 例えばfieldsが追加された場合に発火する
     year, // 年が変更された場合に発火する
     month, // 月が変更された場合に発火する
+    formType, // formTypeが変更された場合に発火する
   ]);
+
+  /**
+   * 「期間で一括設定」に切り替わったら、
+   * 1. もしなければ、fixedUsageDayOfWeeks に year=0000, month=00, dayOfWeek=1~5 を追加する
+   * 2. currentFields を year=0000, month=00, dayOfWeek=1~5 で更新する
+   */
+  useEffect(() => {
+    if (formType !== "period") {
+      return;
+    }
+
+    const newCurrentFields = fields
+      .map((f, index) => ({ ...f, index }))
+      .filter((f) => f.year === "0000" && f.month === "00");
+
+    if (newCurrentFields.length === 0) {
+      for (let dayOfWeek = 1; dayOfWeek <= 5; dayOfWeek++) {
+        append(defaultFixedUsageDay("0000", "00", dayOfWeek));
+      }
+    }
+
+    const newCurrentFields_ = fields
+      .map((f, index) => ({ ...f, index }))
+      .filter((f) => f.year === "0000" && f.month === "00");
+
+    const newCurrentField1_ = newCurrentFields_.find((f) => f.dayOfWeek === 1);
+    const newCurrentField2_ = newCurrentFields_.find((f) => f.dayOfWeek === 2);
+    const newCurrentField3_ = newCurrentFields_.find((f) => f.dayOfWeek === 3);
+    const newCurrentField4_ = newCurrentFields_.find((f) => f.dayOfWeek === 4);
+    const newCurrentField5_ = newCurrentFields_.find((f) => f.dayOfWeek === 5);
+
+    if (
+      typeof newCurrentField1_ === "undefined" ||
+      typeof newCurrentField2_ === "undefined" ||
+      typeof newCurrentField3_ === "undefined" ||
+      typeof newCurrentField4_ === "undefined" ||
+      typeof newCurrentField5_ === "undefined"
+    ) {
+      return;
+    }
+
+    setCurrentFields([
+      newCurrentField1_,
+      newCurrentField2_,
+      newCurrentField3_,
+      newCurrentField4_,
+      newCurrentField5_,
+    ]);
+  }, [formType, fields]);
 
   return (
     <div className="space-y-2">
       <Label>固定利用曜日</Label>
 
       <div className="flex gap-2 items-center">
-        <div className="flex gap-1 items-center">
-          <Select value={year} onValueChange={(value) => setYear(value)}>
-            <SelectTrigger className="h-8 w-[84px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {/* 去年と今年と来年 */}
-              {Array.from({ length: 3 }).map((_, i) => {
-                const year = (
-                  Number(getCurrentAcademicYear()) +
-                  i -
-                  1
-                ).toString();
-                return (
-                  <SelectItem key={i} value={year}>
-                    {year}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-          <span>年</span>
-        </div>
+        <Select
+          value={formType}
+          onValueChange={(value) => setFormType(value as FormType)}
+        >
+          <SelectTrigger className="h-8 w-fit">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="month">月ごとの編集</SelectItem>
+            <SelectItem value="period">期間で一括設定</SelectItem>
+          </SelectContent>
+        </Select>
 
-        <div className="flex gap-1 items-center">
-          <Select value={month} onValueChange={(value) => setMonth(value)}>
-            <SelectTrigger className="h-8 w-[60px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {/* 1~12月 */}
-              {Array.from({ length: 12 }).map((_, i) => {
-                const month = padZero(i + 1, 2);
-                return (
-                  <SelectItem key={i} value={month}>
-                    {month}
-                  </SelectItem>
+        {formType === "month" && (
+          <>
+            <div className="flex gap-1 items-center">
+              <Select value={year} onValueChange={(value) => setYear(value)}>
+                <SelectTrigger className="h-8 w-[84px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* 去年と今年と来年 */}
+                  {Array.from({ length: 3 }).map((_, i) => {
+                    const year = (
+                      Number(getCurrentAcademicYear()) +
+                      i -
+                      1
+                    ).toString();
+                    return (
+                      <SelectItem key={i} value={year}>
+                        {year}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+              <span>年</span>
+            </div>
+
+            <div className="flex gap-1 items-center">
+              <Select value={month} onValueChange={(value) => setMonth(value)}>
+                <SelectTrigger className="h-8 w-[60px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* 1~12月 */}
+                  {Array.from({ length: 12 }).map((_, i) => {
+                    const month = padZero(i + 1, 2);
+                    return (
+                      <SelectItem key={i} value={month}>
+                        {month}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+              <span>月</span>
+            </div>
+          </>
+        )}
+
+        {formType === "period" && (
+          <>
+            <div className="flex gap-1 items-center">
+              <Select
+                value={startPeriodYear}
+                onValueChange={(value) => setStartPeriodYear(value)}
+              >
+                <SelectTrigger className="h-8 w-[84px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* 去年と今年と来年 */}
+                  {Array.from({ length: 3 }).map((_, i) => {
+                    const startPeriodYear = (
+                      Number(getCurrentAcademicYear()) +
+                      i -
+                      1
+                    ).toString();
+                    return (
+                      <SelectItem key={i} value={startPeriodYear}>
+                        {startPeriodYear}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+              <span>年</span>
+            </div>
+
+            <div className="flex gap-1 items-center">
+              <Select
+                value={startPeriodMonth}
+                onValueChange={(value) => setStartPeriodMonth(value)}
+              >
+                <SelectTrigger className="h-8 w-[60px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* 1~12月 */}
+                  {Array.from({ length: 12 }).map((_, i) => {
+                    const startPeriodMonth = padZero(i + 1, 2);
+                    return (
+                      <SelectItem key={i} value={startPeriodMonth}>
+                        {startPeriodMonth}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+              <span>月</span>
+            </div>
+
+            <p>〜</p>
+
+            <div className="flex gap-1 items-center">
+              <Select
+                value={endPeriodYear}
+                onValueChange={(value) => setEndPeriodYear(value)}
+              >
+                <SelectTrigger className="h-8 w-[84px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* 去年と今年と来年 */}
+                  {Array.from({ length: 3 }).map((_, i) => {
+                    const endPeriodYear = (
+                      Number(getCurrentAcademicYear()) +
+                      i -
+                      1
+                    ).toString();
+                    return (
+                      <SelectItem key={i} value={endPeriodYear}>
+                        {endPeriodYear}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+              <span>年</span>
+            </div>
+
+            <div className="flex gap-1 items-center">
+              <Select
+                value={endPeriodMonth}
+                onValueChange={(value) => setEndPeriodMonth(value)}
+              >
+                <SelectTrigger className="h-8 w-[60px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* 1~12月 */}
+                  {Array.from({ length: 12 }).map((_, i) => {
+                    const endPeriodMonth = padZero(i + 1, 2);
+                    return (
+                      <SelectItem key={i} value={endPeriodMonth}>
+                        {endPeriodMonth}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+              <span>月</span>
+            </div>
+
+            <Button
+              type="button"
+              variant={"outline"}
+              size={"sm"}
+              className="h-8"
+              disabled={
+                isPending ||
+                typeof startPeriodYear === "undefined" ||
+                typeof startPeriodMonth === "undefined" ||
+                typeof endPeriodYear === "undefined" ||
+                typeof endPeriodMonth === "undefined" ||
+                periodUpdateLoading
+              }
+              onClick={() => {
+                setPeriodUpdateLoading(true);
+
+                // 0. バリデーションチェック
+                // 0-1. 期間が設定されていない場合は何もしない
+                if (
+                  typeof startPeriodYear === "undefined" ||
+                  typeof startPeriodMonth === "undefined" ||
+                  typeof endPeriodYear === "undefined" ||
+                  typeof endPeriodMonth === "undefined"
+                ) {
+                  return;
+                }
+
+                const startYear = Number(startPeriodYear);
+                const startMonth = Number(startPeriodMonth);
+                const endYear = Number(endPeriodYear);
+                const endMonth = Number(endPeriodMonth);
+
+                // 0-2. 終了年月が開始年月よりも前になっている場合はエラー
+                if (
+                  startYear > endYear ||
+                  (startYear === endYear && startMonth > endMonth)
+                ) {
+                  toast({
+                    title: "終了年月は開始年月よりも後にしてください",
+                    variant: "destructive",
+                  });
+                  return;
+                }
+
+                // 1. get values
+                let fixedUsageDayOfWeeks = form.getValues(
+                  "fixedUsageDayOfWeeks"
                 );
-              })}
-            </SelectContent>
-          </Select>
-          <span>月</span>
-        </div>
+
+                // 1. remove values of startPeriod~endPeriod
+                fixedUsageDayOfWeeks = fixedUsageDayOfWeeks.filter((f) => {
+                  const year = Number(f.year);
+                  const month = Number(f.month);
+                  return !(
+                    (year > startYear ||
+                      (year === startYear && month >= startMonth)) &&
+                    (year < endYear || (year === endYear && month <= endMonth))
+                  );
+                });
+
+                // 2. add values with year=0000, month=00, dayOfWeek=1~5 for startPeriod~endPeriod
+                const formValuesForAppend = fixedUsageDayOfWeeks.filter((f) => {
+                  return f.year === "0000" && f.month === "00";
+                });
+                for (let year = startYear; year <= endYear; year++) {
+                  for (
+                    let month = year === startYear ? startMonth : 1;
+                    month <= (year === endYear ? endMonth : 12);
+                    month++
+                  ) {
+                    for (const formValue of formValuesForAppend) {
+                      fixedUsageDayOfWeeks.push({
+                        ...formValue,
+                        year: year.toString(),
+                        month: padZero(month, 2),
+                      });
+                    }
+                  }
+                }
+
+                // 3. replace
+                replace(fixedUsageDayOfWeeks);
+
+                // 4. 「月ごとの編集」に切り替える
+                setFormType("month");
+
+                // 5. stateを更新する
+                setYear(startPeriodYear);
+                setMonth(startPeriodMonth);
+
+                setPeriodUpdateLoading(false);
+              }}
+            >
+              {periodUpdateLoading && (
+                <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
+              )}
+              一括設定
+            </Button>
+          </>
+        )}
       </div>
 
       <Table className="text-[12px] mb-2">
