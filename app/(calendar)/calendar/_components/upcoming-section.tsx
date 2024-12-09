@@ -23,6 +23,7 @@ export const UpcomingSection = ({ schedules }: Props) => {
           .map((s) => (
             <Card className="p-[14px]" key={s.id}>
               <p className="text-[16px] font-medium">
+                {s.start.toString()}
                 {format(s.start, "PPP(E)", { locale: ja })}{" "}
                 {format(s.start, "p", { locale: ja })}~
                 {format(s.end, "p", { locale: ja })}
