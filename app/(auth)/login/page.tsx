@@ -33,9 +33,9 @@ export default async function LoginPage() {
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <SignIn />
 
-        {process.env.NODE_ENV === "development" && (
-          <UserAuthForm parents={parents} staffs={staffs} />
-        )}
+        {/* {process.env.NODE_ENV === "development" && ( */}
+        <UserAuthForm parents={parents} staffs={staffs} />
+        {/* )} */}
       </div>
     </div>
   );
