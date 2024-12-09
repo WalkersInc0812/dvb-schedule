@@ -142,7 +142,7 @@ export const ScheduleMultiCreateForm = ({
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="max-h-40">
                     {hourOptions.map((hour, i) => (
                       <SelectItem key={`${i}-${hour}`} value={hour}>
                         {hour}
@@ -164,7 +164,7 @@ export const ScheduleMultiCreateForm = ({
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="max-h-40">
                     {minuteOptions.map((minute, i) => (
                       <SelectItem key={`${i}-${minute}`} value={minute}>
                         {minute}
@@ -199,7 +199,7 @@ export const ScheduleMultiCreateForm = ({
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="max-h-40">
                     {hourOptions.map((hour, i) => (
                       <SelectItem key={`${i}-${hour}`} value={hour}>
                         {hour}
@@ -221,7 +221,7 @@ export const ScheduleMultiCreateForm = ({
                       <SelectValue className="w-10" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="max-h-40">
                     {minuteOptions.map((minute, i) => (
                       <SelectItem key={`${i}-${minute}`} value={minute}>
                         {minute}
