@@ -26,9 +26,6 @@ export const UpcomingSection = ({ schedules }: Props) => {
           .map((s) => (
             <Card className="p-[14px]" key={s.id}>
               <p className="text-[16px] font-medium">
-                {/* FIXME: */}
-                {s.start.toString()}
-                {toZonedTime(s.start, timeZone).toString()}
                 {format(toZonedTime(s.start, timeZone), "PPP(E)", {
                   locale: ja,
                 })}{" "}
