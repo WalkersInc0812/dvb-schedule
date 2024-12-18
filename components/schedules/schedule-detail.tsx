@@ -32,12 +32,12 @@ export const ScheduleDetail = ({
       </p>
 
       <div className="space-y-1">
-        <p>開始時間</p>
+        <p>登園時間</p>
         <p>{format(schedule.start, "p", { locale: ja })}</p>
       </div>
 
       <div className="space-y-1">
-        <p>終了時間</p>
+        <p>お迎え時間</p>
         <p>{format(schedule.end, "p", { locale: ja })}</p>
       </div>
 

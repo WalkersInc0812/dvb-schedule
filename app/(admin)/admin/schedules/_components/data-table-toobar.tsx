@@ -121,7 +121,7 @@ export function DataTableToolbar({
             }
           >
             <Icons.pencil className="mr-2 w-4 h-4" />
-            開始時間を一括変更する ({table.getSelectedRowModel().rows.length}件)
+            登園時間を一括変更する ({table.getSelectedRowModel().rows.length}件)
           </Button>
 
           <TooltipProvider>
@@ -134,7 +134,7 @@ export function DataTableToolbar({
                 今の条件でcsvをダウンロードする
               </TooltipTrigger>
               <TooltipContent>
-                <p>学校、学年、開始時間でソートされます</p>
+                <p>学校、学年、登園時間でソートされます</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

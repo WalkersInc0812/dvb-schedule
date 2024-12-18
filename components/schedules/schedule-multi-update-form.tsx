@@ -90,7 +90,7 @@ const ScheduleMultiUpdateForm = ({ schedules, onSuccess, onError }: Props) => {
           render={({ field, fieldState }) => (
             <FormItem className="flex flex-col items-start">
               <p>{fieldState.error?.message}</p>
-              <FormLabel>開始時間</FormLabel>
+              <FormLabel>登園時間</FormLabel>
               <div className="flex gap-1 items-center">
                 <Select
                   onValueChange={(value) => {

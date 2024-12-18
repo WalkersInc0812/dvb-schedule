@@ -22,19 +22,19 @@ export const formatAndSortForCsv = (
       日付: format(row.start, "P", { locale: ja }),
       教室名: row.student.facility.name,
       児童氏名: row.student.name,
-      開始時間: format(row.start, "p", { locale: ja }),
-      終了時間: format(row.end, "p", { locale: ja }),
+      登園時間: format(row.start, "p", { locale: ja }),
+      お迎え時間: format(row.end, "p", { locale: ja }),
       学校名: row.student.school.name,
       学年: `${calculateGrade(row.student.schoolEnrollmentAcademicYear)}年`,
       給食の有無: row.meal ? "あり" : "なし",
       備考: row.notes,
     }));
 
-  // 学校、学年、開始時間でソートする
+  // 学校、学年、登園時間でソートする
   const sorted = formatted.sort((a, b) => {
     if (a.学校名 === b.学校名) {
       if (a.学年 === b.学年) {
-        return a.開始時間.localeCompare(b.開始時間);
+        return a.登園時間.localeCompare(b.登園時間);
       }
       return a.学年.localeCompare(b.学年);
     }
@@ -93,12 +93,12 @@ export const makeColumns = ({
   },
   {
     id: "startTime",
-    header: "開始時間",
+    header: "登園時間",
     accessorFn: (info) => format(info.start, "p", { locale: ja }),
   },
   {
     id: "endTime",
-    header: "終了時間",
+    header: "お迎え時間",
     accessorFn: (info) => format(info.end, "p", { locale: ja }),
   },
   {

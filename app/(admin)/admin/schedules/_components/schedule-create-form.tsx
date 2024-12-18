@@ -238,7 +238,7 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
             name="start"
             render={({ field }) => (
               <FormItem className="flex flex-col items-start">
-                <FormLabel>開始時間</FormLabel>
+                <FormLabel>登園時間</FormLabel>
                 <div className="flex gap-1 items-center">
                   <Select
                     onValueChange={(value) => {
@@ -295,7 +295,7 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
             name="end"
             render={({ field }) => (
               <FormItem className="flex flex-col items-start">
-                <FormLabel>終了時間</FormLabel>
+                <FormLabel>お迎え時間</FormLabel>
                 <div className="flex gap-1 items-center">
                   <Select
                     onValueChange={(value) => {

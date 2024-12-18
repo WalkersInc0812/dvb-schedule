@@ -127,7 +127,7 @@ export const ScheduleMultiCreateForm = ({
           name="dates"
           render={({ field }) => (
             <FormItem className="flex flex-col items-start">
-              <FormLabel>開始時間</FormLabel>
+              <FormLabel>登園時間</FormLabel>
               <div className="flex gap-1 items-center">
                 <Select
                   onValueChange={(value) => {
@@ -184,7 +184,7 @@ export const ScheduleMultiCreateForm = ({
           name="dates"
           render={({ field }) => (
             <FormItem className="flex flex-col items-start">
-              <FormLabel>終了時間</FormLabel>
+              <FormLabel>お迎え時間</FormLabel>
               <div className="flex gap-1 items-center">
                 <Select
                   onValueChange={(value) => {
@@ -273,7 +273,7 @@ export const ScheduleMultiCreateForm = ({
               <FormLabel>備考</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="先生に伝えたいことを入力してください。"
+                  placeholder="職員へのご連絡事項がある場合内容を入力してください"
                   className="resize-none"
                   {...field}
                 />
