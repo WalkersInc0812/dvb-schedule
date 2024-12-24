@@ -25,9 +25,11 @@ import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { hourOptions, minuteOptions } from "./utils";
+import { hourOptions, minuteOptions, timeOptions } from "./utils";
 import { cn } from "@/lib/utils";
 import { Icons } from "../icons";
+import { Input } from "../ui/input";
+import { DevTool } from "@hookform/devtools";
 
 type ScheduleCreateFormProps = {
   studentId: string;
@@ -98,178 +100,132 @@ export const ScheduleCreateForm = ({
   };
 
   return (
-    <Form {...form}>
-      <p className="text-[20px] font-bold">
-        {format(date, "PPP(E)", { locale: ja })}
-      </p>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="start"
-          render={({ field }) => (
-            <FormItem className="flex flex-col items-start">
-              <FormLabel>登園時間</FormLabel>
-              <div className="flex gap-1 items-center">
-                <Select
-                  onValueChange={(value) => {
-                    const date = field.value;
-                    date.setHours(parseInt(value));
-                    field.onChange(date);
-                  }}
-                  defaultValue={field.value.getHours().toString()}
-                >
-                  <FormControl className="min-w-16">
-                    <SelectTrigger onBlur={field.onBlur}>
-                      <SelectValue className="w-10" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {hourOptions.map((hour, i) => (
-                      <SelectItem key={`${i}-${hour}`} value={hour}>
-                        {hour}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                時
-                <Select
-                  onValueChange={(value) => {
-                    const date = field.value;
-                    date.setMinutes(parseInt(value));
-                    field.onChange(date);
-                  }}
-                  defaultValue={field.value.getMinutes().toString()}
-                >
-                  <FormControl className="min-w-16">
-                    <SelectTrigger onBlur={field.onBlur}>
-                      <SelectValue className="w-10" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {minuteOptions.map((minute, i) => (
-                      <SelectItem key={`${i}-${minute}`} value={minute}>
-                        {minute}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                分
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <>
+      <Form {...form}>
+        <p className="text-[20px] font-bold">
+          {format(date, "PPP(E)", { locale: ja })}
+        </p>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <datalist id="time-options">
+            {timeOptions.map((time) => (
+              <option key={time} value={time} />
+            ))}
+          </datalist>
 
-        <FormField
-          control={form.control}
-          name="end"
-          render={({ field }) => (
-            <FormItem className="flex flex-col items-start">
-              <FormLabel>お迎え時間</FormLabel>
-              <div className="flex gap-1 items-center">
-                <Select
-                  onValueChange={(value) => {
-                    const date = field.value;
-                    date.setHours(parseInt(value));
-                    field.onChange(date);
-                  }}
-                  defaultValue={field.value.getHours().toString()}
-                >
-                  <FormControl className="min-w-16">
-                    <SelectTrigger onBlur={field.onBlur}>
-                      <SelectValue className="w-10" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {hourOptions.map((hour, i) => (
-                      <SelectItem key={`${i}-${hour}`} value={hour}>
-                        {hour}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                時
-                <Select
-                  onValueChange={(value) => {
-                    const date = field.value;
-                    date.setMinutes(parseInt(value));
-                    field.onChange(date);
-                  }}
-                  defaultValue={field.value.getMinutes().toString()}
-                >
-                  <FormControl className="min-w-16">
-                    <SelectTrigger onBlur={field.onBlur}>
-                      <SelectValue className="w-10" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {minuteOptions.map((minute, i) => (
-                      <SelectItem key={`${i}-${minute}`} value={minute}>
-                        {minute}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                分
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="start"
+            render={({ field }) => (
+              <FormItem className="flex flex-col items-start">
+                <FormLabel>登園時間</FormLabel>
+                <FormControl>
+                  <Input
+                    className="w-fit"
+                    type="time"
+                    list="time-options"
+                    min="07:45"
+                    max="19:30"
+                    {...field}
+                    value={format(field.value, "HH:mm")}
+                    onChange={(e: any) => {
+                      const date = field.value;
+                      const [hours, minutes] = e.target.value.split(":");
+                      date.setHours(parseInt(hours));
+                      date.setMinutes(parseInt(minutes));
+                      field.onChange(date);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="meal"
-          render={({ field }) => (
-            <FormItem className="flex flex-col items-start">
-              <FormLabel className={cn(!mealServable && "text-gray-400")}>
-                給食の有無 {!mealServable && "※この日は給食はありません"}
-              </FormLabel>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  disabled={!mealServable}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="end"
+            render={({ field }) => (
+              <FormItem className="flex flex-col items-start">
+                <FormLabel>お迎え時間</FormLabel>
+                <FormControl>
+                  <Input
+                    className="w-fit"
+                    type="time"
+                    list="time-options"
+                    min="07:45"
+                    max="19:30"
+                    {...field}
+                    value={format(field.value, "HH:mm")}
+                    onChange={(e: any) => {
+                      const date = field.value;
+                      const [hours, minutes] = e.target.value.split(":");
+                      date.setHours(parseInt(hours));
+                      date.setMinutes(parseInt(minutes));
+                      field.onChange(date);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem className="flex flex-col items-start">
-              <FormLabel>備考</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="職員へのご連絡事項がある場合内容を入力してください"
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="meal"
+            render={({ field }) => (
+              <FormItem className="flex flex-col items-start">
+                <FormLabel className={cn(!mealServable && "text-gray-400")}>
+                  給食の有無 {!mealServable && "※この日は給食はありません"}
+                </FormLabel>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={!mealServable}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={
-            !form.formState.isValid ||
-            form.formState.isLoading ||
-            form.formState.isSubmitting
-          }
-        >
-          {(form.formState.isLoading || form.formState.isSubmitting) && (
-            <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
-          )}
-          この内容で予定を登録する
-        </Button>
-      </form>
-    </Form>
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem className="flex flex-col items-start">
+                <FormLabel>備考</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="職員へのご連絡事項がある場合内容を入力してください"
+                    className="resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={
+              !form.formState.isValid ||
+              form.formState.isLoading ||
+              form.formState.isSubmitting
+            }
+          >
+            {(form.formState.isLoading || form.formState.isSubmitting) && (
+              <Icons.spinner className="animate-spin mr-2 w-4 h-4" />
+            )}
+            この内容で予定を登録する
+          </Button>
+        </form>
+      </Form>
+
+      {/* <DevTool control={form.control} /> */}
+    </>
   );
 };
