@@ -19,6 +19,7 @@ import {
 } from "@/lib/scheduleLogs";
 import { Logs } from "./logs";
 import ScheduleCreateForm from "./schedule-create-form";
+import { toast } from "@/components/ui/use-toast";
 
 type DialogType = "create" | "read" | "update" | "multi-update" | "delete";
 
@@ -65,6 +66,16 @@ const DataTableSection = ({ schedules }: Props) => {
   const handleMultiUpdateClick = (
     schedules: ScheduleWithStudentAndFacilityAndSchool[]
   ) => {
+    // 日付が異なる場合は、エラーメッセージを表示する
+    const dates = schedules.map((schedule) => schedule.start.toDateString());
+    if (new Set(dates).size !== 1) {
+      toast({
+        title: "日付が異なる予定は一括更新できません",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSelectedSchedules(schedules);
     setDialogType("multi-update");
     setDialogOpen(true);

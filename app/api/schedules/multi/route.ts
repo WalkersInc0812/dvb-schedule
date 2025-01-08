@@ -6,7 +6,7 @@ import {
   scheduleMultiCreateSchema,
   scheduleMultiUpdateSchema,
 } from "@/lib/validations/schedule";
-import { parse, setHours, setMinutes } from "date-fns";
+import { parse } from "date-fns";
 import { z } from "zod";
 
 export async function POST(req: Request) {
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
 
 /**
  * スタッフのみ更新できる
- * 開始時間のみ更新できる
+ * 開始日時のみ更新できる
  */
 export async function PATCH(req: Request) {
   try {
@@ -116,28 +116,14 @@ export async function PATCH(req: Request) {
       return new Response(null, { status: 400 });
     }
 
-    await db.$transaction(async (tx) => {
-      for (const id of payload.ids) {
-        // TODO: timezoneのチェック
-        const schedule = await tx.schedule.findFirst({
-          where: {
-            id,
-          },
-        });
-        if (!schedule) {
-          throw new Error("Schedule not found");
-        }
-
-        const start = setMinutes(
-          setHours(schedule.start, payload.start.getHours()),
-          payload.start.getMinutes()
-        );
-        await tx.schedule.update({
+    await db.$transaction(
+      payload.ids.map((id) =>
+        db.schedule.update({
           where: {
             id,
           },
           data: {
-            start,
+            start: payload.start,
             logs: {
               create: {
                 userId: user.id,
@@ -145,9 +131,9 @@ export async function PATCH(req: Request) {
               },
             },
           },
-        });
-      }
-    });
+        })
+      )
+    );
 
     return new Response(null, { status: 200 });
   } catch (error) {
