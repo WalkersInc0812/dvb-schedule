@@ -29,7 +29,6 @@ import {
   setMinutes,
   setSeconds,
 } from "date-fns";
-import { hourOptions, minuteOptions } from "@/components/schedules/utils";
 import { cn } from "@/lib/utils";
 import {
   Popover,
@@ -44,6 +43,7 @@ import { Student } from "@prisma/client";
 import { getStudents } from "@/lib/students2";
 import { ja } from "date-fns/locale";
 import { formatCaption } from "@/components/format-caption";
+import { useTime } from "@/components/schedules/use-time";
 
 type Props = {
   onSuccess?: () => void;
@@ -61,11 +61,11 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
     resolver: zodResolver(scheduleSchema),
     defaultValues: {
       start: setMilliseconds(
-        setSeconds(setMinutes(setHours(new Date(), 0), 0), 0),
+        setSeconds(setMinutes(setHours(new Date(), 7), 45), 0),
         0
       ),
       end: setMilliseconds(
-        setSeconds(setMinutes(setHours(new Date(), 0), 0), 0),
+        setSeconds(setMinutes(setHours(new Date(), 7), 45), 0),
         0
       ),
       meal: false,
@@ -118,6 +118,32 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
       setStudents(students);
     });
   }, []);
+
+  const {
+    hourOptions: startHourOptions,
+    hour: startHour,
+    changeHour: changeStartHour,
+    minuteOptions: startMinuteOptions,
+    minute: startMinute,
+    changeMinute: changeStartMinute,
+    minuteOptionClassValue: startMinuteOptionClassValue,
+  } = useTime(
+    () => form.getValues("start"),
+    (value: Date) => form.setValue("start", value)
+  );
+
+  const {
+    hourOptions: endHourOptions,
+    hour: endHour,
+    changeHour: changeEndHour,
+    minuteOptions: endMinuteOptions,
+    minute: endMinute,
+    changeMinute: changeEndMinute,
+    minuteOptionClassValue: endMinuteOptionClassValue,
+  } = useTime(
+    () => form.getValues("end"),
+    (value: Date) => form.setValue("end", value)
+  );
 
   return (
     <>
@@ -241,12 +267,8 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                 <FormLabel>登園時間</FormLabel>
                 <div className="flex gap-1 items-center">
                   <Select
-                    onValueChange={(value) => {
-                      const date = field.value ?? new Date();
-                      date.setHours(parseInt(value));
-                      field.onChange(date);
-                    }}
-                    defaultValue={field.value?.getHours().toString()}
+                    onValueChange={changeStartHour}
+                    value={startHour.toString()}
                   >
                     <FormControl className="min-w-16">
                       <SelectTrigger onBlur={field.onBlur}>
@@ -254,7 +276,7 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {hourOptions.map((hour, i) => (
+                      {startHourOptions.map((hour, i) => (
                         <SelectItem key={`${i}-${hour}`} value={hour}>
                           {hour}
                         </SelectItem>
@@ -263,12 +285,8 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                   </Select>
                   時
                   <Select
-                    onValueChange={(value) => {
-                      const date = field.value ?? new Date();
-                      date.setMinutes(parseInt(value));
-                      field.onChange(date);
-                    }}
-                    defaultValue={field.value?.getMinutes().toString()}
+                    onValueChange={changeStartMinute}
+                    value={startMinute.toString()}
                   >
                     <FormControl className="min-w-16">
                       <SelectTrigger onBlur={field.onBlur}>
@@ -276,8 +294,12 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {minuteOptions.map((minute, i) => (
-                        <SelectItem key={`${i}-${minute}`} value={minute}>
+                      {startMinuteOptions.map((minute, i) => (
+                        <SelectItem
+                          key={`${i}-${minute}`}
+                          value={minute}
+                          className={cn(startMinuteOptionClassValue(minute))}
+                        >
                           {minute}
                         </SelectItem>
                       ))}
@@ -298,12 +320,8 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                 <FormLabel>お迎え時間</FormLabel>
                 <div className="flex gap-1 items-center">
                   <Select
-                    onValueChange={(value) => {
-                      const date = field.value ?? new Date();
-                      date.setHours(parseInt(value));
-                      field.onChange(date);
-                    }}
-                    defaultValue={field.value?.getHours().toString()}
+                    onValueChange={changeEndHour}
+                    value={endHour.toString()}
                   >
                     <FormControl className="min-w-16">
                       <SelectTrigger onBlur={field.onBlur}>
@@ -311,7 +329,7 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {hourOptions.map((hour, i) => (
+                      {endHourOptions.map((hour, i) => (
                         <SelectItem key={`${i}-${hour}`} value={hour}>
                           {hour}
                         </SelectItem>
@@ -320,12 +338,8 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                   </Select>
                   時
                   <Select
-                    onValueChange={(value) => {
-                      const date = field.value ?? new Date();
-                      date.setMinutes(parseInt(value));
-                      field.onChange(date);
-                    }}
-                    defaultValue={field.value?.getMinutes().toString()}
+                    onValueChange={changeEndMinute}
+                    value={endMinute.toString()}
                   >
                     <FormControl className="min-w-16">
                       <SelectTrigger onBlur={field.onBlur}>
@@ -333,8 +347,12 @@ const ScheduleCreateForm = ({ onError, onSuccess }: Props) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {minuteOptions.map((minute, i) => (
-                        <SelectItem key={`${i}-${minute}`} value={minute}>
+                      {endMinuteOptions.map((minute, i) => (
+                        <SelectItem
+                          key={`${i}-${minute}`}
+                          value={minute}
+                          className={cn(endMinuteOptionClassValue(minute))}
+                        >
                           {minute}
                         </SelectItem>
                       ))}

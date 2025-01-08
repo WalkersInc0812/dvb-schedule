@@ -555,8 +555,8 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
                         <Input
                           type="time"
                           list="time-options"
-                          min="11:00"
-                          max="22:00"
+                          min="07:45"
+                          max="19:30"
                           {...field}
                         />
                       </FormControl>
@@ -581,8 +581,8 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
                         <Input
                           type="time"
                           list="time-options"
-                          min="11:00"
-                          max="22:00"
+                          min="07:45"
+                          max="19:30"
                           {...field}
                         />
                       </FormControl>
@@ -676,8 +676,8 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
                         <Input
                           type="time"
                           list="time-options"
-                          min="11:00"
-                          max="22:00"
+                          min="07:45"
+                          max="19:30"
                           {...field}
                         />
                       </FormControl>
@@ -702,8 +702,8 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
                         <Input
                           type="time"
                           list="time-options"
-                          min="11:00"
-                          max="22:00"
+                          min="07:45"
+                          max="19:30"
                           {...field}
                         />
                       </FormControl>
@@ -774,8 +774,8 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
                         <Input
                           type="time"
                           list="time-options"
-                          min="11:00"
-                          max="22:00"
+                          min="07:45"
+                          max="19:30"
                           {...field}
                         />
                       </FormControl>
@@ -800,8 +800,8 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
                         <Input
                           type="time"
                           list="time-options"
-                          min="11:00"
-                          max="22:00"
+                          min="07:45"
+                          max="19:30"
                           {...field}
                         />
                       </FormControl>
@@ -872,8 +872,8 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
                         <Input
                           type="time"
                           list="time-options"
-                          min="11:00"
-                          max="22:00"
+                          min="07:45"
+                          max="19:30"
                           {...field}
                         />
                       </FormControl>
@@ -898,8 +898,8 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
                         <Input
                           type="time"
                           list="time-options"
-                          min="11:00"
-                          max="22:00"
+                          min="07:45"
+                          max="19:30"
                           {...field}
                         />
                       </FormControl>

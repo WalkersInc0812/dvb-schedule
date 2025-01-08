@@ -14,22 +14,21 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { format, setHours, setMinutes } from "date-fns";
+import { ja } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { Icons } from "../icons";
+import { DevTool } from "@hookform/devtools";
+import { useTime } from "./use-time";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { toast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
-import { format } from "date-fns";
-import { ja } from "date-fns/locale";
-import { hourOptions, minuteOptions, timeOptions } from "./utils";
-import { cn } from "@/lib/utils";
-import { Icons } from "../icons";
-import { Input } from "../ui/input";
-import { DevTool } from "@hookform/devtools";
+} from "../ui/select";
 
 type ScheduleCreateFormProps = {
   studentId: string;
@@ -52,8 +51,8 @@ export const ScheduleCreateForm = ({
     resolver: zodResolver(scheduleSchema),
     defaultValues: {
       studentId,
-      start: date,
-      end: date,
+      start: setMinutes(setHours(date, 7), 45),
+      end: setMinutes(setHours(date, 7), 45),
       meal: false,
       notes: "",
     },
@@ -99,6 +98,32 @@ export const ScheduleCreateForm = ({
     }
   };
 
+  const {
+    hourOptions: startHourOptions,
+    hour: startHour,
+    changeHour: changeStartHour,
+    minuteOptions: startMinuteOptions,
+    minute: startMinute,
+    changeMinute: changeStartMinute,
+    minuteOptionClassValue: startMinuteOptionClassValue,
+  } = useTime(
+    () => form.getValues("start"),
+    (value: Date) => form.setValue("start", value)
+  );
+
+  const {
+    hourOptions: endHourOptions,
+    hour: endHour,
+    changeHour: changeEndHour,
+    minuteOptions: endMinuteOptions,
+    minute: endMinute,
+    changeMinute: changeEndMinute,
+    minuteOptionClassValue: endMinuteOptionClassValue,
+  } = useTime(
+    () => form.getValues("end"),
+    (value: Date) => form.setValue("end", value)
+  );
+
   return (
     <>
       <Form {...form}>
@@ -106,36 +131,54 @@ export const ScheduleCreateForm = ({
           {format(date, "PPP(E)", { locale: ja })}
         </p>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <datalist id="time-options">
-            {timeOptions.map((time) => (
-              <option key={time} value={time} />
-            ))}
-          </datalist>
-
           <FormField
             control={form.control}
             name="start"
             render={({ field }) => (
               <FormItem className="flex flex-col items-start">
                 <FormLabel>登園時間</FormLabel>
-                <FormControl>
-                  <Input
-                    className="w-fit"
-                    type="time"
-                    list="time-options"
-                    min="07:45"
-                    max="19:30"
-                    {...field}
-                    value={format(field.value, "HH:mm")}
-                    onChange={(e: any) => {
-                      const date = field.value;
-                      const [hours, minutes] = e.target.value.split(":");
-                      date.setHours(parseInt(hours));
-                      date.setMinutes(parseInt(minutes));
-                      field.onChange(date);
-                    }}
-                  />
-                </FormControl>
+                <div className="flex gap-1 items-center">
+                  <Select
+                    onValueChange={changeStartHour}
+                    value={startHour.toString()}
+                  >
+                    <FormControl className="min-w-16">
+                      <SelectTrigger onBlur={field.onBlur}>
+                        <SelectValue className="w-10" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {startHourOptions.map((hour, i) => (
+                        <SelectItem key={`${i}-${hour}`} value={hour}>
+                          {hour}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  時
+                  <Select
+                    onValueChange={changeStartMinute}
+                    value={startMinute.toString()}
+                  >
+                    <FormControl className="min-w-16">
+                      <SelectTrigger onBlur={field.onBlur}>
+                        <SelectValue className="w-10" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {startMinuteOptions.map((minute, i) => (
+                        <SelectItem
+                          key={`${i}-${minute}`}
+                          value={minute}
+                          className={cn(startMinuteOptionClassValue(minute))}
+                        >
+                          {minute}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  分
+                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -147,24 +190,48 @@ export const ScheduleCreateForm = ({
             render={({ field }) => (
               <FormItem className="flex flex-col items-start">
                 <FormLabel>お迎え時間</FormLabel>
-                <FormControl>
-                  <Input
-                    className="w-fit"
-                    type="time"
-                    list="time-options"
-                    min="07:45"
-                    max="19:30"
-                    {...field}
-                    value={format(field.value, "HH:mm")}
-                    onChange={(e: any) => {
-                      const date = field.value;
-                      const [hours, minutes] = e.target.value.split(":");
-                      date.setHours(parseInt(hours));
-                      date.setMinutes(parseInt(minutes));
-                      field.onChange(date);
-                    }}
-                  />
-                </FormControl>
+                <div className="flex gap-1 items-center">
+                  <Select
+                    onValueChange={changeEndHour}
+                    value={endHour.toString()}
+                  >
+                    <FormControl className="min-w-16">
+                      <SelectTrigger onBlur={field.onBlur}>
+                        <SelectValue className="w-10" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {endHourOptions.map((hour, i) => (
+                        <SelectItem key={`${i}-${hour}`} value={hour}>
+                          {hour}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  時
+                  <Select
+                    onValueChange={changeEndMinute}
+                    value={endMinute.toString()}
+                  >
+                    <FormControl className="min-w-16">
+                      <SelectTrigger onBlur={field.onBlur}>
+                        <SelectValue className="w-10" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {endMinuteOptions.map((minute, i) => (
+                        <SelectItem
+                          key={`${i}-${minute}`}
+                          value={minute}
+                          className={cn(endMinuteOptionClassValue(minute))}
+                        >
+                          {minute}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  分
+                </div>
                 <FormMessage />
               </FormItem>
             )}

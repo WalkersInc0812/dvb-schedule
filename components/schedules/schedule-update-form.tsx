@@ -29,9 +29,9 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Schedule } from "@prisma/client";
-import { hourOptions, minuteOptions } from "./utils";
 import { cn } from "@/lib/utils";
 import { Icons } from "../icons";
+import { useTime } from "./use-time";
 
 type ScheduleUpdateFormProps = {
   schedule: Schedule;
@@ -99,6 +99,32 @@ export const ScheduleUpdateForm = ({
     }
   };
 
+  const {
+    hourOptions: startHourOptions,
+    hour: startHour,
+    changeHour: changeStartHour,
+    minuteOptions: startMinuteOptions,
+    minute: startMinute,
+    changeMinute: changeStartMinute,
+    minuteOptionClassValue: startMinuteOptionClassValue,
+  } = useTime(
+    () => form.getValues("start"),
+    (value: Date) => form.setValue("start", value)
+  );
+
+  const {
+    hourOptions: endHourOptions,
+    hour: endHour,
+    changeHour: changeEndHour,
+    minuteOptions: endMinuteOptions,
+    minute: endMinute,
+    changeMinute: changeEndMinute,
+    minuteOptionClassValue: endMinuteOptionClassValue,
+  } = useTime(
+    () => form.getValues("end"),
+    (value: Date) => form.setValue("end", value)
+  );
+
   return (
     <Form {...form}>
       <p className="text-[20px] font-bold">
@@ -114,12 +140,8 @@ export const ScheduleUpdateForm = ({
               <FormLabel>登園時間</FormLabel>
               <div className="flex gap-1 items-center">
                 <Select
-                  onValueChange={(value) => {
-                    const date = field.value;
-                    date.setHours(parseInt(value));
-                    field.onChange(date);
-                  }}
-                  defaultValue={field.value.getHours().toString()}
+                  onValueChange={changeStartHour}
+                  value={startHour.toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger onBlur={field.onBlur}>
@@ -127,7 +149,7 @@ export const ScheduleUpdateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {hourOptions.map((hour, i) => (
+                    {startHourOptions.map((hour, i) => (
                       <SelectItem key={`${i}-${hour}`} value={hour}>
                         {hour}
                       </SelectItem>
@@ -136,12 +158,8 @@ export const ScheduleUpdateForm = ({
                 </Select>
                 時
                 <Select
-                  onValueChange={(value) => {
-                    const date = field.value;
-                    date.setMinutes(parseInt(value));
-                    field.onChange(date);
-                  }}
-                  defaultValue={field.value.getMinutes().toString()}
+                  onValueChange={changeStartMinute}
+                  value={startMinute.toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger onBlur={field.onBlur}>
@@ -149,8 +167,12 @@ export const ScheduleUpdateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {minuteOptions.map((minute, i) => (
-                      <SelectItem key={`${i}-${minute}`} value={minute}>
+                    {startMinuteOptions.map((minute, i) => (
+                      <SelectItem
+                        key={`${i}-${minute}`}
+                        value={minute}
+                        className={cn(startMinuteOptionClassValue(minute))}
+                      >
                         {minute}
                       </SelectItem>
                     ))}
@@ -172,12 +194,8 @@ export const ScheduleUpdateForm = ({
               <FormLabel>お迎え時間</FormLabel>
               <div className="flex gap-1 items-center">
                 <Select
-                  onValueChange={(value) => {
-                    const date = field.value;
-                    date.setHours(parseInt(value));
-                    field.onChange(date);
-                  }}
-                  defaultValue={field.value.getHours().toString()}
+                  onValueChange={changeEndHour}
+                  value={endHour.toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger onBlur={field.onBlur}>
@@ -185,7 +203,7 @@ export const ScheduleUpdateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {hourOptions.map((hour, i) => (
+                    {endHourOptions.map((hour, i) => (
                       <SelectItem key={`${i}-${hour}`} value={hour}>
                         {hour}
                       </SelectItem>
@@ -194,12 +212,8 @@ export const ScheduleUpdateForm = ({
                 </Select>
                 時
                 <Select
-                  onValueChange={(value) => {
-                    const date = field.value;
-                    date.setMinutes(parseInt(value));
-                    field.onChange(date);
-                  }}
-                  defaultValue={field.value.getMinutes().toString()}
+                  onValueChange={changeEndMinute}
+                  value={endMinute.toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger onBlur={field.onBlur}>
@@ -207,8 +221,12 @@ export const ScheduleUpdateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {minuteOptions.map((minute, i) => (
-                      <SelectItem key={`${i}-${minute}`} value={minute}>
+                    {endMinuteOptions.map((minute, i) => (
+                      <SelectItem
+                        key={`${i}-${minute}`}
+                        value={minute}
+                        className={cn(endMinuteOptionClassValue(minute))}
+                      >
                         {minute}
                       </SelectItem>
                     ))}

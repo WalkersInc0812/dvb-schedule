@@ -26,12 +26,12 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { format, parse } from "date-fns";
+import { format, parse, setHours, setMinutes } from "date-fns";
 import { ja } from "date-fns/locale";
-import { hourOptions, minuteOptions } from "./utils";
 import { MealSetting } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { Icons } from "../icons";
+import { useTime } from "./use-time";
 
 type Props = {
   studentId: string;
@@ -55,8 +55,8 @@ export const ScheduleMultiCreateForm = ({
     defaultValues: {
       studentId,
       dates: dates.map((date) => ({
-        start: date,
-        end: date,
+        start: setMinutes(setHours(date, 7), 45),
+        end: setMinutes(setHours(date, 7), 45),
       })),
       meal: false,
       notes: "",
@@ -109,6 +109,46 @@ export const ScheduleMultiCreateForm = ({
     return servable;
   });
 
+  const {
+    hourOptions: startHourOptions,
+    hour: startHour,
+    changeHour: changeStartHour,
+    minuteOptions: startMinuteOptions,
+    minute: startMinute,
+    changeMinute: changeStartMinute,
+    minuteOptionClassValue: startMinuteOptionClassValue,
+  } = useTime(
+    () => form.getValues("dates")[0].start,
+    (value: Date) => {
+      form.getValues("dates").forEach((date) => {
+        let newDate = date.start;
+        newDate.setHours(value.getHours());
+        newDate.setMinutes(value.getMinutes());
+        date.start = newDate;
+      });
+    }
+  );
+
+  const {
+    hourOptions: endHourOptions,
+    hour: endHour,
+    changeHour: changeEndHour,
+    minuteOptions: endMinuteOptions,
+    minute: endMinute,
+    changeMinute: changeEndMinute,
+    minuteOptionClassValue: endMinuteOptionClassValue,
+  } = useTime(
+    () => form.getValues("dates")[0].end,
+    (value: Date) => {
+      form.getValues("dates").forEach((date) => {
+        let newDate = date.end;
+        newDate.setHours(value.getHours());
+        newDate.setMinutes(value.getMinutes());
+        date.end = newDate;
+      });
+    }
+  );
+
   return (
     <Form {...form}>
       <p className="text-[20px] font-bold mb-6">{dates.length}件の予定を追加</p>
@@ -130,12 +170,8 @@ export const ScheduleMultiCreateForm = ({
               <FormLabel>登園時間</FormLabel>
               <div className="flex gap-1 items-center">
                 <Select
-                  onValueChange={(value) => {
-                    field.value.forEach((date) => {
-                      date.start.setHours(parseInt(value));
-                    });
-                  }}
-                  defaultValue={field.value[0].start.getHours().toString()}
+                  onValueChange={changeStartHour}
+                  value={startHour.toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger onBlur={field.onBlur}>
@@ -143,7 +179,7 @@ export const ScheduleMultiCreateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="max-h-40">
-                    {hourOptions.map((hour, i) => (
+                    {startHourOptions.map((hour, i) => (
                       <SelectItem key={`${i}-${hour}`} value={hour}>
                         {hour}
                       </SelectItem>
@@ -152,12 +188,8 @@ export const ScheduleMultiCreateForm = ({
                 </Select>
                 時
                 <Select
-                  onValueChange={(value) => {
-                    field.value.forEach((date) => {
-                      date.start.setMinutes(parseInt(value));
-                    });
-                  }}
-                  defaultValue={field.value[0].start.getMinutes().toString()}
+                  onValueChange={changeStartMinute}
+                  value={startMinute.toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger onBlur={field.onBlur}>
@@ -165,8 +197,12 @@ export const ScheduleMultiCreateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="max-h-40">
-                    {minuteOptions.map((minute, i) => (
-                      <SelectItem key={`${i}-${minute}`} value={minute}>
+                    {startMinuteOptions.map((minute, i) => (
+                      <SelectItem
+                        key={`${i}-${minute}`}
+                        value={minute}
+                        className={cn(startMinuteOptionClassValue(minute))}
+                      >
                         {minute}
                       </SelectItem>
                     ))}
@@ -187,12 +223,8 @@ export const ScheduleMultiCreateForm = ({
               <FormLabel>お迎え時間</FormLabel>
               <div className="flex gap-1 items-center">
                 <Select
-                  onValueChange={(value) => {
-                    field.value.forEach((date) => {
-                      date.end.setHours(parseInt(value));
-                    });
-                  }}
-                  defaultValue={field.value[0].end.getHours().toString()}
+                  onValueChange={changeEndHour}
+                  value={endHour.toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger onBlur={field.onBlur}>
@@ -200,7 +232,7 @@ export const ScheduleMultiCreateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="max-h-40">
-                    {hourOptions.map((hour, i) => (
+                    {endHourOptions.map((hour, i) => (
                       <SelectItem key={`${i}-${hour}`} value={hour}>
                         {hour}
                       </SelectItem>
@@ -209,12 +241,8 @@ export const ScheduleMultiCreateForm = ({
                 </Select>
                 時
                 <Select
-                  onValueChange={(value) => {
-                    field.value.forEach((date) => {
-                      date.end.setMinutes(parseInt(value));
-                    });
-                  }}
-                  defaultValue={field.value[0].end.getMinutes().toString()}
+                  onValueChange={changeEndMinute}
+                  value={endMinute.toString()}
                 >
                   <FormControl className="min-w-16">
                     <SelectTrigger onBlur={field.onBlur}>
@@ -222,8 +250,12 @@ export const ScheduleMultiCreateForm = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="max-h-40">
-                    {minuteOptions.map((minute, i) => (
-                      <SelectItem key={`${i}-${minute}`} value={minute}>
+                    {endMinuteOptions.map((minute, i) => (
+                      <SelectItem
+                        key={`${i}-${minute}`}
+                        value={minute}
+                        className={cn(endMinuteOptionClassValue(minute))}
+                      >
                         {minute}
                       </SelectItem>
                     ))}
