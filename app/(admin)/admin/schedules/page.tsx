@@ -4,10 +4,16 @@ import DataTableSection from "./_components/data-table-section";
 
 export const dynamic = "force-dynamic";
 
-type Props = {};
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
 
-const AdminSchedulePage = async (props: Props) => {
-  const schedules = await getSchedulesWithStudentAndFacilityAndSchool();
+const AdminSchedulePage = async ({ searchParams }: Props) => {
+  const deleted = (await searchParams).deleted === "true";
+
+  const schedules = await getSchedulesWithStudentAndFacilityAndSchool({
+    deleted,
+  });
 
   return (
     <div>

@@ -126,22 +126,28 @@ export const makeColumns = ({
   },
   {
     id: "edit",
-    cell: ({ row }) => (
-      <Button size={"sm"} onClick={() => onEditClick(row.original)}>
-        編集
-      </Button>
-    ),
+    cell: ({ row }) =>
+      row.original.deletedAt ? (
+        <></>
+      ) : (
+        <Button size={"sm"} onClick={() => onEditClick(row.original)}>
+          編集
+        </Button>
+      ),
   },
   {
     id: "delete",
-    cell: ({ row }) => (
-      <Button
-        size={"sm"}
-        variant="destructive"
-        onClick={() => onDeleteClick(row.original)}
-      >
-        削除
-      </Button>
-    ),
+    cell: ({ row }) =>
+      row.original.deletedAt ? (
+        <p className="text-center">削除済</p>
+      ) : (
+        <Button
+          size={"sm"}
+          variant="destructive"
+          onClick={() => onDeleteClick(row.original)}
+        >
+          削除
+        </Button>
+      ),
   },
 ];

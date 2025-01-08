@@ -24,12 +24,12 @@ export type ScheduleWithStudentAndFacilityAndSchool =
       };
     };
   }>;
-export async function getSchedulesWithStudentAndFacilityAndSchool(): Promise<
-  ScheduleWithStudentAndFacilityAndSchool[]
-> {
+export async function getSchedulesWithStudentAndFacilityAndSchool(options?: {
+  deleted?: boolean;
+}): Promise<ScheduleWithStudentAndFacilityAndSchool[]> {
   const schedules = await db.schedule.findMany({
     where: {
-      deletedAt: null,
+      deletedAt: options?.deleted ? undefined : null,
     },
     include: {
       student: {

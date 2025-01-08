@@ -13,6 +13,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -51,6 +55,21 @@ export function DataTableToolbar({
     link.click();
     document.body.removeChild(link);
   };
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams]
+  );
+
+  const deleted = searchParams.get("deleted") === "true";
 
   return (
     <div className="flex gap-4 flex-col-reverse">
@@ -138,6 +157,21 @@ export function DataTableToolbar({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="airplane-mode"
+              checked={deleted}
+              onCheckedChange={(value) =>
+                router.push(
+                  pathname +
+                    "?" +
+                    createQueryString("deleted", value.toString())
+                )
+              }
+            />
+            <Label htmlFor="airplane-mode">削除済を表示する</Label>
+          </div>
         </div>
 
         <div>
