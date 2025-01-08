@@ -101,6 +101,43 @@ export async function getSchedulesByStudentId({
   return schedules;
 }
 
+export type ScheduleWithLogsAndUser = Prisma.ScheduleGetPayload<{
+  include: {
+    logs: {
+      include: {
+        user: true;
+      };
+    };
+  };
+}>;
+export async function getDeletedSchedulesWithLogsAndUserByStudentId({
+  studentId,
+}: {
+  studentId: string;
+}): Promise<ScheduleWithLogsAndUser[]> {
+  const schedules = await db.schedule.findMany({
+    where: {
+      student: {
+        id: studentId,
+      },
+      deletedAt: {
+        not: null,
+      },
+    },
+    include: {
+      logs: {
+        include: {
+          user: true,
+        },
+      },
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
+  return schedules;
+}
+
 export async function getSchedulesInRecentThreeMonths() {
   const schedules = await db.schedule.findMany({
     where: {

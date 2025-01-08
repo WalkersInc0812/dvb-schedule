@@ -13,7 +13,7 @@ export const UpcomingSection = ({ schedules }: Props) => {
   return (
     <div className="p-[16px]">
       <div className="flex justify-between items-center mb-[16px]">
-        <h2 className="text-[22px] font-bold">直近の予定5件</h2>
+        <h2 className="text-[22px] font-bold">直近の予定(5件)</h2>
       </div>
 
       <div className="space-y-2">

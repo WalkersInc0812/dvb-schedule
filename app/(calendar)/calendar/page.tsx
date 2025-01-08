@@ -1,4 +1,7 @@
-import { getSchedulesByStudentId } from "@/lib/schedules";
+import {
+  getDeletedSchedulesWithLogsAndUserByStudentId,
+  getSchedulesByStudentId,
+} from "@/lib/schedules";
 import React from "react";
 import { CalendarSection } from "./_components/calendar-section";
 import { getCurrentUser } from "@/lib/session";
@@ -7,6 +10,7 @@ import { notFound } from "next/navigation";
 import { UpcomingSection } from "./_components/upcoming-section";
 import { getFacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementById } from "@/lib/facilities";
 import { getFixedUsageDayOfWeeksWithProgramsByStudentId } from "@/lib/fixedUsageDayOfWeeks";
+import { DeletedSection } from "./_components/deleted-section";
 
 type Props = {};
 const CalendarPage = async (props: Props) => {
@@ -28,6 +32,9 @@ const CalendarPage = async (props: Props) => {
     );
 
   const schedules = await getSchedulesByStudentId({ studentId: student.id });
+  const deletedSchedules = await getDeletedSchedulesWithLogsAndUserByStudentId({
+    studentId: student.id,
+  });
 
   const fixedUsageDayOfWeeks =
     await getFixedUsageDayOfWeeksWithProgramsByStudentId(student.id);
@@ -44,6 +51,9 @@ const CalendarPage = async (props: Props) => {
           />
         )}
         <UpcomingSection schedules={schedules} />
+        {deletedSchedules.length > 0 && (
+          <DeletedSection schedules={deletedSchedules} />
+        )}
       </div>
     </>
   );
