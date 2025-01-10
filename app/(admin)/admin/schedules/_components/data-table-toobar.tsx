@@ -46,11 +46,13 @@ export function DataTableToolbar({
   const handleCsvDownload = () => {
     const data = formatAndSortForCsv(table);
     const csv = unparse(data);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const bomCsv = "\uFEFF" + csv;
+    const blob = new Blob([bomCsv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "tmp.csv"); // TODO: ファイル名を決める
+    const fileName = `download-${new Date().toISOString().slice(0, 10)}.csv`; // download-${yyyymmdd}-${hhmmss}.csv
+    link.setAttribute("download", fileName);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
