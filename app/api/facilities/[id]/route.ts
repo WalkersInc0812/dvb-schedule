@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { checkIsStaff, getCurrentUser } from "@/lib/session";
 import { facilityUpdateSchema } from "@/lib/validations/facility";
 import { Prisma } from "@prisma/client";
-import { addDays, format, isSameDay, parse, subDays } from "date-fns";
+import { addDays, format, getYear, isSameDay, parse, subDays } from "date-fns";
 import { z } from "zod";
 
 const routeContextSchema = z.object({
@@ -71,18 +71,18 @@ export async function PATCH(
       ),
     });
     console.log("payload");
-    console.log(body.name);
-    console.log(body.announcements);
+    console.log(payload.name);
+    console.log(payload.announcements);
     console.log(
-      body.scheduleEditablePeriods.filter(
+      payload.scheduleEditablePeriods.filter(
         (period: any) =>
-          period.targetMonth.includes("2024-12") ||
-          period.targetMonth.includes("2025-01") ||
-          period.targetMonth.includes("2025-02") ||
-          period.targetMonth.includes("2025-03")
+          period.targetMonth.toISOString().includes("2024-12") ||
+          period.targetMonth.toISOString().includes("2025-01") ||
+          period.targetMonth.toISOString().includes("2025-02") ||
+          period.targetMonth.toISOString().includes("2025-03")
       )
     );
-    return new Response(null, { status: 200 });
+    console.log(payload.mealSettingActiveDates);
 
     // payload.activeDates を mealSettings に変換する
     let mealSettings: Prisma.MealSettingCreateManyFacilityInput[] = [];
@@ -161,6 +161,32 @@ export async function PATCH(
         });
       }
     });
+
+    console.log("before update");
+    console.log(
+      payload.announcements.map((announcement) => ({
+        content: announcement.content,
+        displayStartMonth: format(announcement.displayStartMonth, "yyyy-MM"),
+        displayEndMonth: format(announcement.displayEndMonth, "yyyy-MM"),
+      }))
+    );
+    console.log(
+      payload.scheduleEditablePeriods
+        .map((period) => ({
+          targetMonth: format(period.targetMonth, "yyyy-MM"),
+          fromDate: format(period.fromDate, "yyyy-MM-dd"),
+          toDate: format(period.toDate, "yyyy-MM-dd"),
+        }))
+        .filter(
+          (period: any) =>
+            period.targetMonth.includes("2024-12") ||
+            period.targetMonth.includes("2025-01") ||
+            period.targetMonth.includes("2025-02") ||
+            period.targetMonth.includes("2025-03")
+        )
+    );
+    console.log(mealSettings);
+    return new Response(null, { status: 200 });
 
     await db.facility.update({
       where: {
