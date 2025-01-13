@@ -16,6 +16,7 @@ export async function PATCH(
   context: z.infer<typeof routeContextSchema>
 ) {
   try {
+    console.log("in PATCH");
     const user = await getCurrentUser();
     if (!user) {
       return new Response(null, { status: 403 });
@@ -27,7 +28,7 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    console.log("in PATCH");
+    console.log("body");
     console.log(body.name);
     console.log(body.announcements);
     console.log(
@@ -40,7 +41,6 @@ export async function PATCH(
       )
     );
     console.log(body.mealSettingActiveDates);
-    return new Response(null, { status: 200 });
 
     const payload = facilityUpdateSchema.parse({
       ...body,
@@ -70,6 +70,19 @@ export async function PATCH(
         (d: string) => new Date(d)
       ),
     });
+    console.log("payload");
+    console.log(body.name);
+    console.log(body.announcements);
+    console.log(
+      body.scheduleEditablePeriods.filter(
+        (period: any) =>
+          period.targetMonth.includes("2024-12") ||
+          period.targetMonth.includes("2025-01") ||
+          period.targetMonth.includes("2025-02") ||
+          period.targetMonth.includes("2025-03")
+      )
+    );
+    return new Response(null, { status: 200 });
 
     // payload.activeDates を mealSettings に変換する
     let mealSettings: Prisma.MealSettingCreateManyFacilityInput[] = [];
