@@ -27,6 +27,21 @@ export async function PATCH(
     }
 
     const body = await req.json();
+    console.log("in PATCH");
+    console.log(body.name);
+    console.log(body.announcements);
+    console.log(
+      body.scheduleEditablePeriods.filter(
+        (period: any) =>
+          period.targetMonth.includes("2024-12") ||
+          period.targetMonth.includes("2025-01") ||
+          period.targetMonth.includes("2025-02") ||
+          period.targetMonth.includes("2025-03")
+      )
+    );
+    console.log(body.mealSettingActiveDates);
+    return new Response(null, { status: 200 });
+
     const payload = facilityUpdateSchema.parse({
       ...body,
       announcements: body.announcements.map(
