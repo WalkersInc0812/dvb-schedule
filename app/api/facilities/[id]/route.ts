@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { checkIsStaff, getCurrentUser } from "@/lib/session";
 import { facilityUpdateSchema } from "@/lib/validations/facility";
 import { Prisma } from "@prisma/client";
-import { addDays, format, getYear, isSameDay, parse, subDays } from "date-fns";
+import { addDays, format, isSameDay, parse, subDays } from "date-fns";
 import { z } from "zod";
 import { toZonedTime } from "date-fns-tz";
 
@@ -19,7 +19,6 @@ export async function PATCH(
   context: z.infer<typeof routeContextSchema>
 ) {
   try {
-    console.log("in PATCH");
     const user = await getCurrentUser();
     if (!user) {
       return new Response(null, { status: 403 });
@@ -31,19 +30,6 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    console.log("body");
-    console.log(body.name);
-    console.log(body.announcements);
-    console.log(
-      body.scheduleEditablePeriods.filter(
-        (period: any) =>
-          period.targetMonth.includes("2024-12") ||
-          period.targetMonth.includes("2025-01") ||
-          period.targetMonth.includes("2025-02") ||
-          period.targetMonth.includes("2025-03")
-      )
-    );
-    console.log(body.mealSettingActiveDates);
 
     const payload = facilityUpdateSchema.parse({
       ...body,
@@ -79,32 +65,14 @@ export async function PATCH(
         toZonedTime(new Date(d), timeZone)
       ),
     });
-    console.log("payload");
-    console.log(payload.name);
-    console.log(payload.announcements);
-    console.log(
-      payload.scheduleEditablePeriods.filter(
-        (period: any) =>
-          period.targetMonth.toISOString().includes("2024-12") ||
-          period.targetMonth.toISOString().includes("2025-01") ||
-          period.targetMonth.toISOString().includes("2025-02") ||
-          period.targetMonth.toISOString().includes("2025-03")
-      )
-    );
-    console.log(payload.mealSettingActiveDates);
 
     // payload.activeDates を mealSettings に変換する
     let mealSettings: Prisma.MealSettingCreateManyFacilityInput[] = [];
     payload.mealSettingActiveDates.forEach((activeDate) => {
-      // const zonedActiveDate = toZonedTime(activeDate, timeZone);
-
       // activeDateの前日が期間に含まれるsettingのindexを取得
       const prevDaySettingIndex = mealSettings.findIndex((mealSetting) =>
         isSameDay(
-          // activeDate は UTC なので、UIで2025-01-01を登録する場合、2024-12-31 15:00:00 が送られてくる
-          // subDays で1日引いているので、2024-12-30 15:00:00 になる
-          subDays(activeDate, 1), // TODO: ここをtoZonedTimeに変更すると良さそう
-          // mealSetting.activeToData が 2024-12-31 の場合、2024-12-31 00:00:00 になる
+          subDays(activeDate, 1),
           parse(mealSetting.activeToDate, "yyyy-MM-dd", new Date())
         )
       );
@@ -140,9 +108,6 @@ export async function PATCH(
           ),
           {
             activeFromDate: prevDaySetting.activeFromDate,
-            // mealSetting.activeToData が 2024-12-31 の場合、2024-12-31 00:00:00 になり、
-            // addDays で 2025-01-01 00:00:00 になり、
-            // format で 2025-01-01 になる
             activeToDate: format(
               addDays(
                 parse(prevDaySetting.activeToDate, "yyyy-MM-dd", new Date()),
@@ -172,51 +137,12 @@ export async function PATCH(
         ];
       } else {
         // それ以外の場合、新しくmealSettingを追加する
-        // activeDate は UTC なので、2025-01-01を登録する場合、2024-12-31 15:00:00 が送られてくる
-        // format で 2024-12-31 になる
         mealSettings.push({
-          activeFromDate: format(activeDate, "yyyy-MM-dd"), // TODO: ここをtoZonedTimeに変更すると良さそう
+          activeFromDate: format(activeDate, "yyyy-MM-dd"),
           activeToDate: format(activeDate, "yyyy-MM-dd"),
         });
       }
     });
-
-    console.log("before update");
-    console.log(
-      payload.announcements.map((announcement) => ({
-        content: announcement.content,
-        displayStartMonth: format(
-          toZonedTime(announcement.displayStartMonth, timeZone),
-          "yyyy-MM"
-        ),
-        displayEndMonth: format(
-          toZonedTime(announcement.displayEndMonth, timeZone),
-          "yyyy-MM"
-        ),
-      }))
-    );
-    console.log(
-      payload.scheduleEditablePeriods
-        .map((period) => ({
-          targetMonth: format(
-            toZonedTime(period.targetMonth, timeZone),
-            "yyyy-MM"
-          ),
-          fromDate: format(
-            toZonedTime(period.fromDate, timeZone),
-            "yyyy-MM-dd"
-          ),
-          toDate: format(toZonedTime(period.toDate, timeZone), "yyyy-MM-dd"),
-        }))
-        .filter(
-          (period: any) =>
-            period.targetMonth.includes("2024-12") ||
-            period.targetMonth.includes("2025-01") ||
-            period.targetMonth.includes("2025-02") ||
-            period.targetMonth.includes("2025-03")
-        )
-    );
-    console.log(mealSettings);
 
     await db.facility.update({
       where: {
@@ -232,15 +158,10 @@ export async function PATCH(
             data: payload.announcements.map((announcement) => ({
               content: announcement.content,
               displayStartMonth: format(
-                // toZonedTime(announcement.displayStartMonth, timeZone),
                 announcement.displayStartMonth,
                 "yyyy-MM"
               ),
-              displayEndMonth: format(
-                // toZonedTime(announcement.displayEndMonth, timeZone),
-                announcement.displayEndMonth,
-                "yyyy-MM"
-              ),
+              displayEndMonth: format(announcement.displayEndMonth, "yyyy-MM"),
             })),
           },
         },
@@ -250,21 +171,9 @@ export async function PATCH(
           },
           createMany: {
             data: payload.scheduleEditablePeriods.map((period) => ({
-              targetMonth: format(
-                // toZonedTime(period.targetMonth, timeZone),
-                period.targetMonth,
-                "yyyy-MM"
-              ),
-              fromDate: format(
-                // toZonedTime(period.fromDate, timeZone),
-                period.fromDate,
-                "yyyy-MM-dd"
-              ),
-              toDate: format(
-                // toZonedTime(period.toDate, timeZone),
-                period.toDate,
-                "yyyy-MM-dd"
-              ),
+              targetMonth: format(period.targetMonth, "yyyy-MM"),
+              fromDate: format(period.fromDate, "yyyy-MM-dd"),
+              toDate: format(period.toDate, "yyyy-MM-dd"),
             })),
           },
         },
