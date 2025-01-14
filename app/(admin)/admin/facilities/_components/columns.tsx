@@ -218,13 +218,9 @@ export const makeColumns = ({
             <Button size={"sm"} onClick={() => onEditClick(row.original)}>
               編集
             </Button>
-            {/* <Button size={"sm"} className="cursor-default opacity-50">
-              編集
-            </Button> */}
           </TooltipTrigger>
           <TooltipContent>
             <p>クリックするとモーダルが表示されます</p>
-            {/* <p>現在バグ修正につき、利用できません</p> */}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
