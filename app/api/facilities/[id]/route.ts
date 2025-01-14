@@ -90,10 +90,15 @@ export async function PATCH(
     // payload.activeDates を mealSettings に変換する
     let mealSettings: Prisma.MealSettingCreateManyFacilityInput[] = [];
     payload.mealSettingActiveDates.forEach((activeDate) => {
+      const zonedActiveDate = toZonedTime(activeDate, timeZone);
+
       // activeDateの前日が期間に含まれるsettingのindexを取得
       const prevDaySettingIndex = mealSettings.findIndex((mealSetting) =>
         isSameDay(
-          subDays(activeDate, 1),
+          // activeDate は UTC なので、UIで2025-01-01を登録する場合、2024-12-31 15:00:00 が送られてくる
+          // subDays で1日引いているので、2024-12-30 15:00:00 になる
+          subDays(zonedActiveDate, 1), // TODO: ここをtoZonedTimeに変更すると良さそう
+          // mealSetting.activeToData が 2024-12-31 の場合、2024-12-31 00:00:00 になる
           parse(mealSetting.activeToDate, "yyyy-MM-dd", new Date())
         )
       );
@@ -101,7 +106,7 @@ export async function PATCH(
       // activeDateの翌日が期間に含まれるsettingのindexを取得
       const nextDaySettingIndex = mealSettings.findIndex((mealSetting) =>
         isSameDay(
-          addDays(activeDate, 1),
+          addDays(zonedActiveDate, 1),
           parse(mealSetting.activeFromDate, "yyyy-MM-dd", new Date())
         )
       );
@@ -129,6 +134,9 @@ export async function PATCH(
           ),
           {
             activeFromDate: prevDaySetting.activeFromDate,
+            // mealSetting.activeToData が 2024-12-31 の場合、2024-12-31 00:00:00 になり、
+            // addDays で 2025-01-01 00:00:00 になり、
+            // format で 2025-01-01 になる
             activeToDate: format(
               addDays(
                 parse(prevDaySetting.activeToDate, "yyyy-MM-dd", new Date()),
@@ -158,16 +166,16 @@ export async function PATCH(
         ];
       } else {
         // それ以外の場合、新しくmealSettingを追加する
+        // activeDate は UTC なので、2025-01-01を登録する場合、2024-12-31 15:00:00 が送られてくる
+        // format で 2024-12-31 になる
         mealSettings.push({
-          activeFromDate: format(activeDate, "yyyy-MM-dd"),
-          activeToDate: format(activeDate, "yyyy-MM-dd"),
+          activeFromDate: format(zonedActiveDate, "yyyy-MM-dd"), // TODO: ここをtoZonedTimeに変更すると良さそう
+          activeToDate: format(zonedActiveDate, "yyyy-MM-dd"),
         });
       }
     });
 
     console.log("before update");
-    console.log(new Date());
-    console.log(toZonedTime(new Date(), timeZone));
     console.log(
       payload.announcements.map((announcement) => ({
         content: announcement.content,
