@@ -201,7 +201,6 @@ export async function PATCH(
         )
     );
     console.log(mealSettings);
-    return new Response(null, { status: 200 });
 
     await db.facility.update({
       where: {
@@ -209,41 +208,53 @@ export async function PATCH(
       },
       data: {
         name: payload.name,
-        announcements: {
-          deleteMany: {
-            facilityId: context.params.id,
-          },
-          createMany: {
-            data: payload.announcements.map((announcement) => ({
-              content: announcement.content,
-              displayStartMonth: format(
-                announcement.displayStartMonth,
-                "yyyy-MM"
-              ),
-              displayEndMonth: format(announcement.displayEndMonth, "yyyy-MM"),
-            })),
-          },
-        },
+        // announcements: {
+        //   deleteMany: {
+        //     facilityId: context.params.id,
+        //   },
+        //   createMany: {
+        //     data: payload.announcements.map((announcement) => ({
+        //       content: announcement.content,
+        //       displayStartMonth: format(
+        //         announcement.displayStartMonth,
+        //         "yyyy-MM"
+        //       ),
+        //       displayEndMonth: format(announcement.displayEndMonth, "yyyy-MM"),
+        //     })),
+        //   },
+        // },
         scheduleEditablePeriods: {
           deleteMany: {
             facilityId: context.params.id,
           },
           createMany: {
             data: payload.scheduleEditablePeriods.map((period) => ({
-              targetMonth: format(period.targetMonth, "yyyy-MM"),
-              fromDate: format(period.fromDate, "yyyy-MM-dd"),
-              toDate: format(period.toDate, "yyyy-MM-dd"),
+              // targetMonth: format(period.targetMonth, "yyyy-MM"),
+              // fromDate: format(period.fromDate, "yyyy-MM-dd"),
+              // toDate: format(period.toDate, "yyyy-MM-dd"),
+              targetMonth: format(
+                toZonedTime(period.targetMonth, timeZone),
+                "yyyy-MM"
+              ),
+              fromDate: format(
+                toZonedTime(period.fromDate, timeZone),
+                "yyyy-MM-dd"
+              ),
+              toDate: format(
+                toZonedTime(period.toDate, timeZone),
+                "yyyy-MM-dd"
+              ),
             })),
           },
         },
-        mealSettings: {
-          deleteMany: {
-            facilityId: context.params.id,
-          },
-          createMany: {
-            data: mealSettings,
-          },
-        },
+        // mealSettings: {
+        //   deleteMany: {
+        //     facilityId: context.params.id,
+        //   },
+        //   createMany: {
+        //     data: mealSettings,
+        //   },
+        // },
       },
     });
 
