@@ -166,6 +166,8 @@ export async function PATCH(
     });
 
     console.log("before update");
+    console.log(new Date());
+    console.log(toZonedTime(new Date(), timeZone));
     console.log(
       payload.announcements.map((announcement) => ({
         content: announcement.content,
