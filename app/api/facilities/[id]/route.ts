@@ -169,14 +169,8 @@ export async function PATCH(
     console.log(
       payload.announcements.map((announcement) => ({
         content: announcement.content,
-        displayStartMonth: format(
-          toZonedTime(announcement.displayStartMonth, timeZone),
-          "yyyy-MM"
-        ),
-        displayEndMonth: format(
-          toZonedTime(announcement.displayEndMonth, timeZone),
-          "yyyy-MM"
-        ),
+        displayStartMonth: format(announcement.displayStartMonth, "yyyy-MM"),
+        displayEndMonth: format(announcement.displayEndMonth, "yyyy-MM"),
       }))
     );
     console.log(
