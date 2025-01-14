@@ -65,8 +65,6 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async session({ token, session }) {
-      console.log(token);
-
       if (token) {
         session.user.id = token.id;
         session.user.name = token.name;
@@ -92,7 +90,6 @@ export const authOptions: NextAuthOptions = {
         },
       });
 
-      console.log(dbUser);
       if (!dbUser) {
         if (user) {
           token.id = user?.id;

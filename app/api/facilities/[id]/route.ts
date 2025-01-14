@@ -4,6 +4,9 @@ import { facilityUpdateSchema } from "@/lib/validations/facility";
 import { Prisma } from "@prisma/client";
 import { addDays, format, getYear, isSameDay, parse, subDays } from "date-fns";
 import { z } from "zod";
+import { toZonedTime } from "date-fns-tz";
+
+const timeZone = "Asia/Tokyo";
 
 const routeContextSchema = z.object({
   params: z.object({
@@ -166,16 +169,28 @@ export async function PATCH(
     console.log(
       payload.announcements.map((announcement) => ({
         content: announcement.content,
-        displayStartMonth: format(announcement.displayStartMonth, "yyyy-MM"),
-        displayEndMonth: format(announcement.displayEndMonth, "yyyy-MM"),
+        displayStartMonth: format(
+          toZonedTime(announcement.displayStartMonth, timeZone),
+          "yyyy-MM"
+        ),
+        displayEndMonth: format(
+          toZonedTime(announcement.displayEndMonth, timeZone),
+          "yyyy-MM"
+        ),
       }))
     );
     console.log(
       payload.scheduleEditablePeriods
         .map((period) => ({
-          targetMonth: format(period.targetMonth, "yyyy-MM"),
-          fromDate: format(period.fromDate, "yyyy-MM-dd"),
-          toDate: format(period.toDate, "yyyy-MM-dd"),
+          targetMonth: format(
+            toZonedTime(period.targetMonth, timeZone),
+            "yyyy-MM"
+          ),
+          fromDate: format(
+            toZonedTime(period.fromDate, timeZone),
+            "yyyy-MM-dd"
+          ),
+          toDate: format(toZonedTime(period.toDate, timeZone), "yyyy-MM-dd"),
         }))
         .filter(
           (period: any) =>
