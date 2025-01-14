@@ -247,14 +247,14 @@ export async function PATCH(
             })),
           },
         },
-        // mealSettings: {
-        //   deleteMany: {
-        //     facilityId: context.params.id,
-        //   },
-        //   createMany: {
-        //     data: mealSettings,
-        //   },
-        // },
+        mealSettings: {
+          deleteMany: {
+            facilityId: context.params.id,
+          },
+          createMany: {
+            data: mealSettings,
+          },
+        },
       },
     });
 
