@@ -169,8 +169,14 @@ export async function PATCH(
     console.log(
       payload.announcements.map((announcement) => ({
         content: announcement.content,
-        displayStartMonth: format(announcement.displayStartMonth, "yyyy-MM"),
-        displayEndMonth: format(announcement.displayEndMonth, "yyyy-MM"),
+        displayStartMonth: format(
+          toZonedTime(announcement.displayStartMonth, timeZone),
+          "yyyy-MM"
+        ),
+        displayEndMonth: format(
+          toZonedTime(announcement.displayEndMonth, timeZone),
+          "yyyy-MM"
+        ),
       }))
     );
     console.log(
@@ -210,10 +216,13 @@ export async function PATCH(
             data: payload.announcements.map((announcement) => ({
               content: announcement.content,
               displayStartMonth: format(
-                announcement.displayStartMonth,
+                toZonedTime(announcement.displayStartMonth, timeZone),
                 "yyyy-MM"
               ),
-              displayEndMonth: format(announcement.displayEndMonth, "yyyy-MM"),
+              displayEndMonth: format(
+                toZonedTime(announcement.displayEndMonth, timeZone),
+                "yyyy-MM"
+              ),
             })),
           },
         },
