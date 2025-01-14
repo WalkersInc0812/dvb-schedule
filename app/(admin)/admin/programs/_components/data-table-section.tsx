@@ -9,22 +9,25 @@ import {
   DialogDescription,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { Program } from "@prisma/client";
 import { ProgramCreateForm } from "./program-create-form";
 import { ProgramUpdateForm } from "./program-update-form";
+import { ProgramWithFixedUsageDaysCount } from "@/lib/programs";
+import ProgramDeleteForm from "./program-delete-form";
 
-type DialogType = "create" | "update";
+type DialogType = "create" | "update" | "delete";
 
 type Props = {
-  programs: Program[];
+  programs: ProgramWithFixedUsageDaysCount[];
 };
 
 const DataTableSection = ({ programs }: Props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<DialogType>("create");
-  const [clickedProgram, setClickedProgram] = useState<Program | undefined>();
+  const [clickedProgram, setClickedProgram] = useState<
+    ProgramWithFixedUsageDaysCount | undefined
+  >();
 
-  const handleEditClick = (program: Program) => {
+  const handleEditClick = (program: ProgramWithFixedUsageDaysCount) => {
     setClickedProgram(program);
     setDialogType("update");
     setDialogOpen(true);
@@ -36,8 +39,15 @@ const DataTableSection = ({ programs }: Props) => {
     setDialogOpen(true);
   };
 
+  const handleDeleteClick = (program: ProgramWithFixedUsageDaysCount) => {
+    setClickedProgram(program);
+    setDialogType("delete");
+    setDialogOpen(true);
+  };
+
   const columns = makeColumns({
     onEditClick: handleEditClick,
+    onDeleteClick: handleDeleteClick,
   });
 
   return (
@@ -52,14 +62,15 @@ const DataTableSection = ({ programs }: Props) => {
         <DialogContent>
           <DialogHeader>
             <DialogDescription className="text-foreground">
-              {dialogType === "create" ? (
+              {dialogType === "create" && (
                 <ProgramCreateForm
                   onSuccess={() => {
                     setDialogOpen(false);
                     setClickedProgram(undefined);
                   }}
                 />
-              ) : dialogType === "update" && clickedProgram ? (
+              )}
+              {dialogType === "update" && clickedProgram && (
                 <ProgramUpdateForm
                   program={clickedProgram}
                   onSuccess={() => {
@@ -67,7 +78,16 @@ const DataTableSection = ({ programs }: Props) => {
                     setClickedProgram(undefined);
                   }}
                 />
-              ) : null}
+              )}
+              {dialogType === "delete" && clickedProgram && (
+                <ProgramDeleteForm
+                  program={clickedProgram}
+                  onSuccess={() => {
+                    setDialogOpen(false);
+                    setClickedProgram(undefined);
+                  }}
+                />
+              )}
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

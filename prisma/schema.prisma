@@ -267,8 +267,9 @@ model Program {
   fixedUsageDaysOfWeek2 FixedUsageDayOfWeek[] @relation("program_fixed_usage_days_of_week_2")
   fixedUsageDaysOfWeek3 FixedUsageDayOfWeek[] @relation("program_fixed_usage_days_of_week_3")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@map(name: "programs")
 }

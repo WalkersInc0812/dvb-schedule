@@ -11,3 +11,6 @@ export const programUpdateSchema = z.object({
   shortName: z.string().optional(),
 });
 export type ProgramUpdateSchemaType = z.infer<typeof programUpdateSchema>;
+
+export const programDeleteSchema = z.object({});
+export type ProgramDeleteSchemaType = z.infer<typeof programDeleteSchema>;
