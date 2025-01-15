@@ -4,6 +4,8 @@ import { calculateEnrollmentAcademicYear } from "@/lib/students";
 import { studentEditSchema } from "@/lib/validations/student";
 import { z } from "zod";
 
+export const maxDuration = 40;
+
 const routeContextSchema = z.object({
   params: z.object({
     id: z.string(),
