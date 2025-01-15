@@ -17,7 +17,6 @@ export async function PATCH(
   context: z.infer<typeof routeContextSchema>
 ) {
   try {
-    console.time("PATCH /api/students/:id");
     const user = await getCurrentUser();
     if (!user) {
       return new Response(null, { status: 403 });
@@ -36,7 +35,6 @@ export async function PATCH(
       include: { facilities: true },
     });
 
-    console.time("db.$transaction");
     await db.$transaction(
       async (tx) => {
         await tx.user.update({
@@ -69,7 +67,6 @@ export async function PATCH(
           where: { studentId: context.params.id },
         });
 
-        console.time("for create fixedUsageDayOfWeeks");
         const fixedUsageDayOfWeeksData = payload.fixedUsageDayOfWeeks.map(
           (fixedUsageDayOfWeek) => {
             const month = `${fixedUsageDayOfWeek.year}-${fixedUsageDayOfWeek.month}`;
@@ -96,15 +93,12 @@ export async function PATCH(
         await tx.fixedUsageDayOfWeek.createMany({
           data: fixedUsageDayOfWeeksData,
         });
-        console.timeEnd("for create fixedUsageDayOfWeeks");
       },
       {
         maxWait: 2000 * 2.5 * 2,
         timeout: 10000 * 2 * 2,
       }
     );
-    console.timeEnd("db.$transaction");
-    console.timeEnd("PATCH /api/students/:id");
 
     return new Response(null, { status: 200 });
   } catch (e) {
