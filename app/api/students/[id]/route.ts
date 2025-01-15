@@ -74,18 +74,24 @@ export async function PATCH(
               studentId: context.params.id,
               month,
               dayOfWeek: fixedUsageDayOfWeek.dayOfWeek,
-              startTime: fixedUsageDayOfWeek.startTime,
-              endTime: fixedUsageDayOfWeek.endTime,
+              startTime: fixedUsageDayOfWeek.startTime || undefined,
+              endTime: fixedUsageDayOfWeek.endTime || undefined,
               needPickup: fixedUsageDayOfWeek.needPickup,
-              program1Id: fixedUsageDayOfWeek.program1?.programId,
-              program1StartTime: fixedUsageDayOfWeek.program1?.startTime,
-              program1EndTime: fixedUsageDayOfWeek.program1?.endTime,
-              program2Id: fixedUsageDayOfWeek.program2?.programId,
-              program2StartTime: fixedUsageDayOfWeek.program2?.startTime,
-              program2EndTime: fixedUsageDayOfWeek.program2?.endTime,
-              program3Id: fixedUsageDayOfWeek.program3?.programId,
-              program3StartTime: fixedUsageDayOfWeek.program3?.startTime,
-              program3EndTime: fixedUsageDayOfWeek.program3?.endTime,
+              program1Id: fixedUsageDayOfWeek.program1?.programId || undefined,
+              program1StartTime:
+                fixedUsageDayOfWeek.program1?.startTime || undefined,
+              program1EndTime:
+                fixedUsageDayOfWeek.program1?.endTime || undefined,
+              program2Id: fixedUsageDayOfWeek.program2?.programId || undefined,
+              program2StartTime:
+                fixedUsageDayOfWeek.program2?.startTime || undefined,
+              program2EndTime:
+                fixedUsageDayOfWeek.program2?.endTime || undefined,
+              program3Id: fixedUsageDayOfWeek.program3?.programId || undefined,
+              program3StartTime:
+                fixedUsageDayOfWeek.program3?.startTime || undefined,
+              program3EndTime:
+                fixedUsageDayOfWeek.program3?.endTime || undefined,
             };
           }
         );

@@ -49,19 +49,23 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
   const defaultValue = (key: string): any => {
     switch (key) {
       case "startTime":
-        return undefined;
+        return "";
       case "endTime":
-        return undefined;
+        return "";
       case "needPickup":
         return false;
       case "program":
-        return undefined;
+        return {
+          programId: defaultValue("programId"),
+          startTime: defaultValue("startTime"),
+          endTime: defaultValue("endTime"),
+        };
       case "programId":
-        return undefined;
+        return "";
       case "programStartTime":
-        return undefined;
+        return "";
       case "programEndTime":
-        return undefined;
+        return "";
       default:
         return undefined;
     }
@@ -919,16 +923,24 @@ const FixedUsageDayOfWeeksFormField = ({ form }: Props) => {
                   type="button"
                   variant={"outline"}
                   size={"icon"}
+                  disabled={
+                    formType === "month" &&
+                    (typeof year === "undefined" ||
+                      typeof month === "undefined")
+                  }
                   onClick={() => {
+                    const year_ = formType === "month" ? year : "0000";
+                    const month_ = formType === "month" ? month : "00";
                     if (
-                      typeof year === "undefined" ||
-                      typeof month === "undefined"
+                      typeof year_ === "undefined" ||
+                      typeof month_ === "undefined"
                     ) {
                       return;
                     }
+
                     update(
                       field.index,
-                      defaultFixedUsageDay(year, month, field.dayOfWeek)
+                      defaultFixedUsageDay(year_, month_, field.dayOfWeek)
                     );
                   }}
                 >
