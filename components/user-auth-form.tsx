@@ -65,7 +65,7 @@ export function UserAuthForm({
 
       if (result && result.ok) {
         const role = data.role === "PARENT" ? "保護者" : "職員";
-        const path = data.role === "PARENT" ? "/calendar" : "/admin/schedules";
+        const path = data.role === "PARENT" ? "/students" : "/admin/schedules";
         router.push(path);
         setTimeout(() => {
           toast({

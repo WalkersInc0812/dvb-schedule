@@ -21,17 +21,25 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { StudentWithParntAndFacilityAndSchoolAndClasses } from "@/lib/students";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onCreateClick?: () => void;
+  onCreateWithExistingParentClick?: () => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   onCreateClick,
+  onCreateWithExistingParentClick,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -87,10 +95,30 @@ export function DataTable<TData, TValue>({
               label: name,
             }))}
         />
-        <Button onClick={onCreateClick}>
-          <Icons.circlePlus className="mr-2 w-4 h-4" />
-          新規登録
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button>
+              <Icons.circlePlus className="mr-2 w-4 h-4" />
+              新規登録
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              <Button onClick={onCreateClick} className="w-full">
+                新規登録 (まだ保護者が登録されていない場合)
+              </Button>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem>
+              <Button
+                onClick={onCreateWithExistingParentClick}
+                className="w-full"
+              >
+                新規登録 (すでに保護者が登録されている場合)
+              </Button>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <div>
         <Table>

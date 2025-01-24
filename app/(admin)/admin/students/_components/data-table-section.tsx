@@ -15,8 +15,14 @@ import { Facility, FixedUsageDayOfWeek, School } from "@prisma/client";
 import StudentEditForm from "@/components/students/student-edit-form";
 import { getFixedUsageDayOfWeeksWithProgramsByStudentId } from "@/lib/fixedUsageDayOfWeeks";
 import StudentDeleteForm from "./student-delete-form";
+import StudentCreateFormWithExistingParent from "./student-create-form-with-existing-parent";
 
-type DialogType = "create" | "detail" | "edit" | "delete";
+type DialogType =
+  | "create"
+  | "create-with-existing-parent"
+  | "detail"
+  | "edit"
+  | "delete";
 
 type Props = {
   students: StudentWithParntAndFacilityAndSchoolAndClasses[];
@@ -58,6 +64,11 @@ const DataTableSection = ({ students, facilities, schools }: Props) => {
     setDialogOpen(true);
   };
 
+  const handleCreateWithExistingParentClick = () => {
+    setDialogType("create-with-existing-parent");
+    setDialogOpen(true);
+  };
+
   const columns = makeColumns({
     onEditClick: handleEditClick,
     onDeleteClick: handleDeleteClick,
@@ -69,6 +80,7 @@ const DataTableSection = ({ students, facilities, schools }: Props) => {
         columns={columns}
         data={students}
         onCreateClick={handleCreateClick}
+        onCreateWithExistingParentClick={handleCreateWithExistingParentClick}
       />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -77,6 +89,15 @@ const DataTableSection = ({ students, facilities, schools }: Props) => {
             <DialogDescription className="text-foreground">
               {dialogType === "create" && (
                 <StudentCreateForm
+                  facilities={facilities}
+                  schools={schools}
+                  onSuccess={() => {
+                    setDialogOpen(false);
+                  }}
+                />
+              )}
+              {dialogType === "create-with-existing-parent" && (
+                <StudentCreateFormWithExistingParent
                   facilities={facilities}
                   schools={schools}
                   onSuccess={() => {

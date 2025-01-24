@@ -1,13 +1,19 @@
 import z from "zod";
 
 export const studentCreateSchema = z.object({
-  parent: z.object({
-    name: z.string().min(1, "保護者氏名を入力してください"),
-    email: z
-      .string()
-      .min(1, "メールアドレスを入力してください")
-      .email("メールアドレスの形式を正しく入力してください"),
-  }),
+  parent: z
+    .object({
+      id: z.string().min(1, "保護者を選択してください"),
+    })
+    .or(
+      z.object({
+        name: z.string().min(1, "保護者氏名を入力してください"),
+        email: z
+          .string()
+          .min(1, "メールアドレスを入力してください")
+          .email("メールアドレスの形式を正しく入力してください"),
+      })
+    ),
   facilityId: z.string().min(1, "教室を選択してください"),
   schoolId: z.string().min(1, "学校を選択してください"),
   grade: z

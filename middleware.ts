@@ -16,7 +16,7 @@ export default withAuth(
         if (["STAFF", "SUPER_STAFF"].includes(token.role)) {
           return NextResponse.redirect(new URL("/admin", req.url));
         } else {
-          return NextResponse.redirect(new URL("/calendar", req.url));
+          return NextResponse.redirect(new URL("/students", req.url));
         }
       }
 
@@ -28,7 +28,7 @@ export default withAuth(
         return null;
       }
 
-      return NextResponse.redirect(new URL("/calendar", req.url));
+      return NextResponse.redirect(new URL("/students", req.url));
     }
 
     if (!isAuth) {
@@ -55,5 +55,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/admin/:path*", "/calendar/:path*", "/login", "/register"],
+  matcher: ["/admin/:path*", "/students/:path*", "/login", "/register"],
 };

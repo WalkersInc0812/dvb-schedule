@@ -10,3 +10,27 @@ export async function getStudents() {
   });
   return students;
 }
+
+export async function getStudentById({ id }: { id: string }) {
+  const student = await db.student.findUnique({
+    where: {
+      id,
+      deletedAt: null,
+    },
+  });
+  return student;
+}
+
+export async function getStudentsByParentId({
+  parentId,
+}: {
+  parentId: string;
+}) {
+  const students = await db.student.findMany({
+    where: {
+      parentId,
+      deletedAt: null,
+    },
+  });
+  return students;
+}

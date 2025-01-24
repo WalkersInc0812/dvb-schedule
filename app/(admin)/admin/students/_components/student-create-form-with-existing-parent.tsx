@@ -18,19 +18,35 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 
-import React from "react";
-import { Input } from "../ui/input";
-import { Icons } from "../icons";
-import { Facility, School } from "@prisma/client";
+import React, { useEffect, useState, useTransition } from "react";
+import { Facility, School, User } from "@prisma/client";
+import { getMonth, getYear } from "date-fns";
+import { calculateEnrollmentAcademicYear } from "@/lib/students";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { getMonth, getYear } from "date-fns";
-import { calculateEnrollmentAcademicYear } from "@/lib/students";
+} from "@/components/ui/select";
+import { Icons } from "@/components/icons";
+import { getParents } from "@/lib/parents";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 type Props = {
   facilities: Facility[];
@@ -39,12 +55,16 @@ type Props = {
   onError?: () => void;
 };
 
-const StudentCreateForm = ({
+const StudentCreateFormWithExistingParent = ({
   facilities,
   schools,
   onSuccess,
   onError,
 }: Props) => {
+  const [parents, setParents] = useState<User[]>([]);
+  const [parentOpen, setParentOpen] = React.useState(false);
+  const [isPending, startTransition] = useTransition();
+
   const router = useRouter();
 
   const form = useForm<StudentCreateSchemaType>({
@@ -96,40 +116,83 @@ const StudentCreateForm = ({
     }
   };
 
+  useEffect(() => {
+    startTransition(async () => {
+      const parents = await getParents();
+      setParents(parents);
+    });
+  }, []);
+
   return (
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
-            name="parent.name"
-            render={({ field }) => (
-              <FormItem className="flex flex-col items-start">
-                <FormLabel>保護者氏名</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="保護者氏名を入力してください"
-                    {...field}
-                    onBlur={field.onBlur}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="parent.email"
+            name="parent.id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>保護者メールアドレス</FormLabel>
+                <FormLabel>保護者</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="保護者メールアドレスを入力してください"
-                    {...field}
-                    onBlur={field.onBlur}
-                  />
+                  <div>
+                    <Popover open={parentOpen} onOpenChange={setParentOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={parentOpen}
+                          className="w-[200px] justify-between"
+                        >
+                          {field.value
+                            ? parents.find(
+                                (parent) => parent.id === field.value
+                              )?.name
+                            : "保護者を選択してください"}
+                          <ChevronsUpDown className="opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0">
+                        <Command>
+                          <CommandInput placeholder="保護者を選択してください" />
+                          <CommandList>
+                            <CommandEmpty>No framework found.</CommandEmpty>
+                            <CommandGroup>
+                              {parents.map((parent) => (
+                                <CommandItem
+                                  key={parent.id}
+                                  value={parent.name ?? ""}
+                                  onSelect={(selectedValue) => {
+                                    const currentParent = parents.find(
+                                      (parent) => parent.id === field.value
+                                    );
+                                    if (
+                                      currentParent &&
+                                      selectedValue === currentParent.name
+                                    ) {
+                                      field.onChange("");
+                                    } else {
+                                      field.onChange(parent.id);
+                                      setParentOpen(false);
+                                    }
+                                  }}
+                                >
+                                  {parent.name}
+                                  <Check
+                                    className={cn(
+                                      "ml-auto",
+                                      field.value === parent.id
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -276,4 +339,4 @@ const StudentCreateForm = ({
   );
 };
 
-export default StudentCreateForm;
+export default StudentCreateFormWithExistingParent;

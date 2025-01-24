@@ -4,27 +4,22 @@ import {
 } from "@/lib/schedules";
 import React from "react";
 import { CalendarSection } from "./_components/calendar-section";
-import { getCurrentUser } from "@/lib/session";
-import { getStudentsByParentId } from "@/lib/students";
+import { getStudentById } from "@/lib/students";
 import { notFound } from "next/navigation";
 import { UpcomingSection } from "./_components/upcoming-section";
 import { getFacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementById } from "@/lib/facilities";
 import { getFixedUsageDayOfWeeksWithProgramsByStudentId } from "@/lib/fixedUsageDayOfWeeks";
 import { DeletedSection } from "./_components/deleted-section";
 
-type Props = {};
-const CalendarPage = async (props: Props) => {
-  const user = await getCurrentUser();
-  if (!user) {
+type Props = {
+  params: Promise<{ id: string }>;
+};
+const CalendarPage = async ({ params }: Props) => {
+  const id = (await params).id;
+  const student = await getStudentById({ id });
+  if (!student) {
     return notFound();
   }
-
-  const students = await getStudentsByParentId({ parentId: user.id });
-  if (students.length === 0) {
-    return notFound();
-  }
-
-  const student = students[0]; // TODO: 複数studentsに対応できるようにする
 
   const facility =
     await getFacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementById(

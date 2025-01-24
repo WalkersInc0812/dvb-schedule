@@ -20,17 +20,23 @@ export async function POST(req: Request) {
     const payload = studentCreateSchema.parse(body);
 
     await db.$transaction(async (tx) => {
-      const createdParent = await tx.user.create({
-        data: {
-          name: payload.parent.name,
-          email: payload.parent.email,
-          role: "PARENT",
-        },
-      });
+      let parentId: string;
+      if ("id" in payload.parent) {
+        parentId = payload.parent.id;
+      } else {
+        const createdParent = await tx.user.create({
+          data: {
+            name: payload.parent.name,
+            email: payload.parent.email,
+            role: "PARENT",
+          },
+        });
+        parentId = createdParent.id;
+      }
 
       const createdStudent = await tx.student.create({
         data: {
-          parentId: createdParent.id,
+          parentId,
           name: payload.name,
           schoolId: payload.schoolId,
           facilityId: payload.facilityId,
