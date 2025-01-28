@@ -89,4 +89,28 @@ export const makeColumns = ({
       </TooltipProvider>
     ),
   },
+  {
+    id: "calendar",
+    cell: ({ row }) => (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size={"sm"}
+              onClick={() => {
+                const url =
+                  window.location.origin + `/students/${row.original.id}`;
+                window.open(url, "_blank");
+              }}
+            >
+              カレンダー
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>クリックすると別タブでカレンダー画面が開きます</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    ),
+  },
 ];

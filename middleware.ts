@@ -10,37 +10,64 @@ export default withAuth(
       req.nextUrl.pathname.startsWith("/login") ||
       req.nextUrl.pathname.startsWith("/register");
     const isAdminPage = req.nextUrl.pathname.startsWith("/admin");
+    const isParentPage = req.nextUrl.pathname.startsWith("/students");
+    const isAdmin = token && ["STAFF", "SUPER_STAFF"].includes(token.role);
+    const isParent = token && token.role === "PARENT";
 
-    if (isAuthPage) {
-      if (isAuth) {
-        if (["STAFF", "SUPER_STAFF"].includes(token.role)) {
-          return NextResponse.redirect(new URL("/admin", req.url));
-        } else {
-          return NextResponse.redirect(new URL("/students", req.url));
-        }
-      }
-
-      return null;
-    }
-
-    if (isAdminPage) {
-      if (isAuth && ["STAFF", "SUPER_STAFF"].includes(token.role)) {
-        return null;
-      }
-
-      return NextResponse.redirect(new URL("/students", req.url));
-    }
-
+    // ログインしていない場合、
     if (!isAuth) {
-      let from = req.nextUrl.pathname;
-      if (req.nextUrl.search) {
-        from += req.nextUrl.search;
-      }
+      if (isAuthPage) {
+        // ログインページにアクセスしている場合、そのまま表示
+        return null;
+      } else {
+        // ログインページ以外にアクセスしている場合、ログインページにリダイレクト
+        let from = req.nextUrl.pathname;
+        if (req.nextUrl.search) {
+          from += req.nextUrl.search;
+        }
 
-      return NextResponse.redirect(
-        new URL(`/login?from=${encodeURIComponent(from)}`, req.url)
-      );
+        return NextResponse.redirect(
+          new URL(`/login?from=${encodeURIComponent(from)}`, req.url)
+        );
+      }
     }
+
+    // 職員としてログインしている場合、
+    if (isAdmin) {
+      if (isAdminPage) {
+        // 管理者ページにアクセスしている場合、そのまま表示
+        return null;
+      } else if (isParentPage) {
+        // 児童ページにアクセスしている場合、そのまま表示
+        return null;
+      } else if (isAuthPage) {
+        // ログインページにアクセスしている場合、管理者ページにリダイレクト
+        return NextResponse.redirect(new URL("/admin", req.url));
+      } else {
+        // その他の場合、管理者ページにリダイレクト
+        return NextResponse.redirect(new URL("/admin", req.url));
+      }
+    }
+
+    // 親としてログインしている場合、
+    if (isParent) {
+      if (isAdminPage) {
+        // 管理者ページにアクセスしている場合、児童ページにリダイレクト
+        return NextResponse.redirect(new URL("/students", req.url));
+      } else if (isParentPage) {
+        // 児童ページにアクセスしている場合、そのまま表示
+        return null;
+      } else if (isAuthPage) {
+        // ログインページにアクセスしている場合、児童ページにリダイレクト
+        return NextResponse.redirect(new URL("/students", req.url));
+      } else {
+        // その他の場合、児童ページにリダイレクト
+        return NextResponse.redirect(new URL("/students", req.url));
+      }
+    }
+
+    // その他の場合、ログインページにリダイレクト
+    return NextResponse.redirect(new URL("/login", req.url));
   },
   {
     callbacks: {

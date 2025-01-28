@@ -15,7 +15,7 @@ import React, { useEffect, useState, useTransition } from "react";
 import { useParams } from "next/navigation";
 import { UserId, UserRole } from "@/types/next-auth";
 import { User } from "next-auth";
-import { getStudentsByParentId } from "@/lib/students2";
+import { getStudentById, getStudentsByParentId } from "@/lib/students2";
 
 type Props = {
   user: User & {
@@ -32,13 +32,33 @@ const CalendarHeader = ({ user }: Props) => {
 
   const router = useRouter();
 
+  // 職員の場合の処理
   useEffect(() => {
+    if (!["STAFF", "SUPER_STAFF"].includes(user.role)) {
+      return;
+    }
+
+    startTransition(async () => {
+      const student = await getStudentById({ id: params.id });
+      if (student) {
+        setStudents([student]);
+      }
+    });
+  }, [user, params.id]);
+
+  // 親の場合の処理
+  useEffect(() => {
+    if (user.role !== "PARENT") {
+      return;
+    }
+
     startTransition(async () => {
       const students = await getStudentsByParentId({ parentId: user.id });
       setStudents(students);
     });
   }, [user]);
 
+  // studentsから児童を取得
   useEffect(() => {
     startTransition(async () => {
       const student = students.find((student) => student.id === params.id);
@@ -58,7 +78,10 @@ const CalendarHeader = ({ user }: Props) => {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="bg-primary text-[12px]">
               <div>
-                <p>{user.name}</p>
+                <p>
+                  {user.name}
+                  {["STAFF", "SUPER_STAFF"].includes(user.role) && " (職員)"}
+                </p>
                 <p>{student?.name}</p>
               </div>
             </Button>
