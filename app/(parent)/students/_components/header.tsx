@@ -15,10 +15,7 @@ import React, { useEffect, useState, useTransition } from "react";
 import { useParams } from "next/navigation";
 import { UserId, UserRole } from "@/types/next-auth";
 import { User } from "next-auth";
-import { getStudentById } from "@/lib/students2";
 import { getStudentsByParentId } from "@/lib/students2";
-
-export const dynamic = "force-dynamic";
 
 type Props = {
   user: User & {
@@ -39,14 +36,18 @@ const CalendarHeader = ({ user }: Props) => {
     startTransition(async () => {
       const students = await getStudentsByParentId({ parentId: user.id });
       setStudents(students);
+    });
+  }, [user]);
 
-      if (!params.id) {
+  useEffect(() => {
+    startTransition(async () => {
+      const student = students.find((student) => student.id === params.id);
+      if (!student) {
         return;
       }
-      const student = await getStudentById({ id: params.id });
       setStudent(student);
     });
-  }, [user, params.id]);
+  }, [students, params.id]);
 
   return (
     <div className="bg-primary text-primary-foreground h-[56px] text-[20px] font-medium">
@@ -70,7 +71,7 @@ const CalendarHeader = ({ user }: Props) => {
                     onClick={() => {
                       router.push(`/students/${student.id}`);
                     }}
-                    className="cursor-pointer"
+                    className="cursor-pointer w-full"
                   >
                     {student.name}
                   </p>
