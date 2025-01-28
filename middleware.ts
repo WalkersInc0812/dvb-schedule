@@ -67,7 +67,7 @@ export default withAuth(
     }
 
     // その他の場合、ログインページにリダイレクト
-    return NextResponse.redirect(new URL("/login", req.url));
+    // return NextResponse.redirect(new URL("/login", req.url));
   },
   {
     callbacks: {
