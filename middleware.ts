@@ -65,9 +65,6 @@ export default withAuth(
         return NextResponse.redirect(new URL("/students", req.url));
       }
     }
-
-    // その他の場合、ログインページにリダイレクト
-    // return NextResponse.redirect(new URL("/login", req.url));
   },
   {
     callbacks: {
@@ -82,5 +79,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/admin/:path*", "/students/:path*", "/login", "/register"],
+  matcher: ["/", "/admin/:path*", "/students/:path*", "/login", "/register"],
 };
