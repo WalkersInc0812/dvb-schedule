@@ -12,7 +12,7 @@ const AdminHeader = (props: Props) => {
   const router = useRouter();
 
   return (
-    <div className="bg-primary text-primary-foreground h-[56px] flex items-center justify-between px-[72px] overflow-scroll top-0 z-50 sticky">
+    <div className="bg-primary text-primary-foreground h-[56px] flex items-center justify-between px-[72px] top-0 z-50 sticky">
       <p className="text-[20px] font-medium">
         {process.env.NEXT_PUBLIC_SITE_NAME}【管理者画面】
       </p>
