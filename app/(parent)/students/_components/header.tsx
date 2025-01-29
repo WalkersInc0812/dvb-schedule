@@ -111,7 +111,7 @@ const CalendarHeader = ({ user }: Props) => {
                     title: "ログアウトしました",
                   });
                 }}
-                className="cursor-pointer text-destructive"
+                className="cursor-pointer text-destructive w-full"
               >
                 ログアウト
               </p>
