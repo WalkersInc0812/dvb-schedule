@@ -4,6 +4,12 @@ import { Table } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -16,10 +22,19 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   return (
     <div className="flex items-center justify-end">
-      <Button onClick={onCreateClick}>
-        <Icons.circlePlus className="mr-2 w-4 h-4" />
-        習い事を新規登録する
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button onClick={onCreateClick}>
+              <Icons.circlePlus className="mr-2 w-4 h-4" />
+              習い事を新規登録する
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>習い事を新しく登録するウィンドウがポップアップします</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 }

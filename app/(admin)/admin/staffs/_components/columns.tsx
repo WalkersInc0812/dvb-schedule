@@ -3,6 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { User } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Props = {
   onEditClick: (staff: User) => void;
@@ -25,21 +31,39 @@ export const makeColumns = ({
   {
     id: "edit",
     cell: ({ row }) => (
-      <Button size={"sm"} onClick={() => onEditClick(row.original)}>
-        編集
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button size={"sm"} onClick={() => onEditClick(row.original)}>
+              編集
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>クリックするとモーダルが表示されます</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     ),
   },
   {
     id: "edit",
     cell: ({ row }) => (
-      <Button
-        size={"sm"}
-        variant={"destructive"}
-        onClick={() => onDeleteClick(row.original)}
-      >
-        削除
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              size={"sm"}
+              variant={"destructive"}
+              onClick={() => onDeleteClick(row.original)}
+            >
+              削除
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>クリックするとモーダルが表示されます</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     ),
   },
 ];
