@@ -8,6 +8,12 @@ import { ja } from "date-fns/locale";
 import { format } from "date-fns";
 import { calculateGrade } from "@/lib/students";
 import { filterFns } from "@/components/data-table/helpers";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const formatAndSortForCsv = (
   table: Table<ScheduleWithStudentAndFacilityAndSchool>
@@ -130,9 +136,18 @@ export const makeColumns = ({
       row.original.deletedAt ? (
         <></>
       ) : (
-        <Button size={"sm"} onClick={() => onEditClick(row.original)}>
-          編集
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size={"sm"} onClick={() => onEditClick(row.original)}>
+                編集
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>クリックするとモーダルが表示されます</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       ),
   },
   {
@@ -141,13 +156,22 @@ export const makeColumns = ({
       row.original.deletedAt ? (
         <p className="text-center">削除済</p>
       ) : (
-        <Button
-          size={"sm"}
-          variant="destructive"
-          onClick={() => onDeleteClick(row.original)}
-        >
-          削除
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size={"sm"}
+                variant="destructive"
+                onClick={() => onDeleteClick(row.original)}
+              >
+                削除
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>クリックするとモーダルが表示されます</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       ),
   },
 ];
