@@ -27,6 +27,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -104,18 +110,36 @@ export function DataTable<TData, TValue>({
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>
-              <Button onClick={onCreateClick} className="w-full">
-                新規登録 (まだ保護者が登録されていない場合)
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button onClick={onCreateClick} className="w-full">
+                      新規登録 (まだ保護者が登録されていない場合)
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>保護者と児童の新規登録を同時に行います</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </DropdownMenuItem>
 
             <DropdownMenuItem>
-              <Button
-                onClick={onCreateWithExistingParentClick}
-                className="w-full"
-              >
-                新規登録 (すでに保護者が登録されている場合)
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      onClick={onCreateWithExistingParentClick}
+                      className="w-full"
+                    >
+                      新規登録 (すでに保護者が登録されている場合)
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>既存の保護者に新しい児童を登録します</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
