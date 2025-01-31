@@ -131,19 +131,34 @@ export function DataTableToolbar({
 
       <div className="flex justify-between">
         <div className="flex gap-2">
-          <Button
-            disabled={
-              !(table.getIsSomeRowsSelected() || table.getIsAllRowsSelected())
-            }
-            onClick={() =>
-              onMultiUpdateClick(
-                table.getSelectedRowModel().rows.map((row) => row.original)
-              )
-            }
-          >
-            <Icons.pencil className="mr-2 w-4 h-4" />
-            登園時間を一括変更する ({table.getSelectedRowModel().rows.length}件)
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  disabled={
+                    !(
+                      table.getIsSomeRowsSelected() ||
+                      table.getIsAllRowsSelected()
+                    )
+                  }
+                  onClick={() =>
+                    onMultiUpdateClick(
+                      table
+                        .getSelectedRowModel()
+                        .rows.map((row) => row.original)
+                    )
+                  }
+                >
+                  <Icons.pencil className="mr-2 w-4 h-4" />
+                  登園時間を一括変更する (
+                  {table.getSelectedRowModel().rows.length}件)
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>チェックを入れた登園予定の時間を一括変更できます</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           <TooltipProvider>
             <Tooltip>
@@ -161,26 +176,44 @@ export function DataTableToolbar({
           </TooltipProvider>
 
           <div className="flex items-center space-x-2">
-            <Switch
-              id="airplane-mode"
-              checked={deleted}
-              onCheckedChange={(value) =>
-                router.push(
-                  pathname +
-                    "?" +
-                    createQueryString("deleted", value.toString())
-                )
-              }
-            />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Switch
+                    id="airplane-mode"
+                    checked={deleted}
+                    onCheckedChange={(value) =>
+                      router.push(
+                        pathname +
+                          "?" +
+                          createQueryString("deleted", value.toString())
+                      )
+                    }
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>オンにすると削除された登園予定も表示します</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <Label htmlFor="airplane-mode">削除済を表示する</Label>
           </div>
         </div>
 
         <div>
-          <Button onClick={onCreateClick}>
-            <Icons.circlePlus className="mr-2 w-4 h-4" />
-            新規登録
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button onClick={onCreateClick}>
+                  <Icons.circlePlus className="mr-2 w-4 h-4" />
+                  新規登録
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>登園予定を新しく登録するウィンドウがポップアップします</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     </div>
