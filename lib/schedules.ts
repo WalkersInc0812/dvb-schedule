@@ -2,11 +2,46 @@
 
 import { Prisma } from "@prisma/client";
 import { db } from "./db";
+import { get } from "http";
 
 export async function getSchedules() {
   const schedules = await db.schedule.findMany({
     where: {
       deletedAt: null,
+    },
+  });
+  return schedules;
+}
+
+export async function getSchedulesOfThisAndNextMonth() {
+  const today = new Date();
+  const thisMonth = today.getMonth();
+  const afterNextMonth = thisMonth + 2;
+  const thisMonthFirstDay = new Date(
+    today.getFullYear(),
+    thisMonth,
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+  const afterNextMonthFirstDay = new Date(
+    today.getFullYear(),
+    afterNextMonth,
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+  const schedules = await db.schedule.findMany({
+    where: {
+      deletedAt: null,
+      start: {
+        gte: thisMonthFirstDay,
+        lt: afterNextMonthFirstDay,
+      },
     },
   });
   return schedules;

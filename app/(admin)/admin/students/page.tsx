@@ -3,7 +3,7 @@ import React from "react";
 import DataTableSection from "./_components/data-table-section";
 import { getFacilities } from "@/lib/facilities";
 import { getSchools } from "@/lib/schools";
-import { getSchedules } from "@/lib/schedules";
+import { getSchedulesOfThisAndNextMonth } from "@/lib/schedules";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ const AdminStudentPage = async (props: Props) => {
   const students = await getStudents();
   const facilities = await getFacilities();
   const schools = await getSchools();
-  const schedules = await getSchedules();
+  const schedules = await getSchedulesOfThisAndNextMonth();
 
   return (
     <div>
