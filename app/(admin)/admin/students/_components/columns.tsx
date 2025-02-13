@@ -98,12 +98,12 @@ export const makeColumns = ({
   },
   {
     id: "scheduleStatusOfThisMonth",
-    header: "当月の予定提出",
+    header: "当月予定",
     accessorFn: (info) => checkScheduleOfThisMonth(info.schedules, info.id),
   },
   {
     id: "scheduleStatusOfNextMonth",
-    header: "翌月の予定提出",
+    header: "翌月予定",
     accessorFn: (info) => checkScheduleOfNextMonth(info.schedules, info.id),
   },
   {
