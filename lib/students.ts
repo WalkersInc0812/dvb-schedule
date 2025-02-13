@@ -9,6 +9,7 @@ export type StudentWithParntAndFacilityAndSchoolAndClasses =
       facility: true;
       school: true;
       classes: true;
+      schedules: true;
     };
   }>;
 export async function getStudents(): Promise<
@@ -19,6 +20,7 @@ export async function getStudents(): Promise<
       parent: true,
       facility: true,
       school: true,
+      schedules: true,
       classes: {
         orderBy: {
           name: "asc",

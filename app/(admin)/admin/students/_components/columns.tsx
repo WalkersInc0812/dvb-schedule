@@ -14,6 +14,70 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+function checkScheduleOfThisMonth(schedules: any, id: string): string {
+  if (schedules.length == 0) {
+    return "未提出";
+  }
+  const today = new Date();
+  const thisMonth = today.getMonth();
+  const nextMonth = thisMonth + 1;
+  const thisMonthFirstDay = new Date(
+    today.getFullYear(),
+    thisMonth,
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+  const nextMonthFirstDay = new Date(
+    today.getFullYear(),
+    nextMonth,
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+  for (const schedule in schedules) {
+    const student = schedules[parseInt(schedule)]["studentId"];
+    const dateOfSchedule = new Date(schedules[parseInt(schedule)]["start"]);
+    if (
+      student == id &&
+      dateOfSchedule >= thisMonthFirstDay &&
+      dateOfSchedule < nextMonthFirstDay
+    ) {
+      return "完了";
+    }
+  }
+  return "未提出";
+}
+
+function checkScheduleOfNextMonth(schedules: any, id: string): string {
+  if (schedules.length == 0) {
+    return "未提出";
+  }
+  const today = new Date();
+  const nextMonth = today.getMonth() + 1; // 翌月
+  const nextMonthFirstDay = new Date(
+    today.getFullYear(),
+    nextMonth,
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+  for (const schedule in schedules) {
+    const student = schedules[parseInt(schedule)]["studentId"];
+    const dateOfSchedule = new Date(schedules[parseInt(schedule)]["start"]);
+    if (student == id && dateOfSchedule >= nextMonthFirstDay) {
+      return "完了";
+    }
+  }
+  return "未提出";
+}
+
 type Props = {
   onEditClick: (student: any) => void;
   onDeleteClick: (student: any) => void;
@@ -31,6 +95,16 @@ export const makeColumns = ({
     id: "name",
     header: "児童氏名",
     accessorKey: "name",
+  },
+  {
+    id: "scheduleStatusOfThisMonth",
+    header: "当月の予定提出",
+    accessorFn: (info) => checkScheduleOfThisMonth(info.schedules, info.id),
+  },
+  {
+    id: "scheduleStatusOfNextMonth",
+    header: "翌月の予定提出",
+    accessorFn: (info) => checkScheduleOfNextMonth(info.schedules, info.id),
   },
   {
     id: "facilityName",

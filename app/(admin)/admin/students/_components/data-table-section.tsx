@@ -11,7 +11,12 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import StudentCreateForm from "@/components/students/student-create-form";
-import { Facility, FixedUsageDayOfWeek, School } from "@prisma/client";
+import {
+  Facility,
+  FixedUsageDayOfWeek,
+  School,
+  Schedule,
+} from "@prisma/client";
 import StudentEditForm from "@/components/students/student-edit-form";
 import { getFixedUsageDayOfWeeksWithProgramsByStudentId } from "@/lib/fixedUsageDayOfWeeks";
 import StudentDeleteForm from "./student-delete-form";
@@ -28,9 +33,15 @@ type Props = {
   students: StudentWithParntAndFacilityAndSchoolAndClasses[];
   facilities: Facility[];
   schools: School[];
+  schedules: Schedule[];
 };
 
-const DataTableSection = ({ students, facilities, schools }: Props) => {
+const DataTableSection = ({
+  students,
+  facilities,
+  schools,
+  schedules,
+}: Props) => {
   const [dialogType, setDialogType] = useState<DialogType>("create");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] =
