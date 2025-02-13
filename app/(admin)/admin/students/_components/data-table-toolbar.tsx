@@ -65,6 +65,26 @@ export function DataTableToolbar<TData>({
             ]}
           />
         )}
+        {table.getColumn("scheduleStatusOfThisMonth") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("scheduleStatusOfThisMonth")}
+            title="当月予定提出状況で絞り込む"
+            options={[
+              { value: "完了", label: "完了" },
+              { value: "未提出", label: "未提出" },
+            ]}
+          />
+        )}
+        {table.getColumn("scheduleStatusOfNextMonth") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("scheduleStatusOfNextMonth")}
+            title="翌月予定提出状況で絞り込む"
+            options={[
+              { value: "完了", label: "完了" },
+              { value: "未提出", label: "未提出" },
+            ]}
+          />
+        )}
         {isFiltered && (
           <Button
             variant="ghost"
