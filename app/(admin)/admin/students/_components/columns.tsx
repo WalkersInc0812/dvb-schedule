@@ -14,10 +14,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-function checkScheduleOfThisMonth(schedules: any, id: string): string {
+function checkScheduleOfThisMonth(schedules: any, id: string): any {
   if (schedules.length == 0) {
     return "未提出";
   }
+  let numOfSchedule = 0;
   const today = new Date();
   const thisMonth = today.getMonth();
   const nextMonth = thisMonth + 1;
@@ -45,18 +46,24 @@ function checkScheduleOfThisMonth(schedules: any, id: string): string {
     if (
       student == id &&
       dateOfSchedule >= thisMonthFirstDay &&
-      dateOfSchedule < nextMonthFirstDay
+      dateOfSchedule < nextMonthFirstDay &&
+      schedules[parseInt(schedule)]["deletedAt"] == null
     ) {
-      return "完了";
+      numOfSchedule += 1;
     }
   }
-  return "未提出";
+  if (numOfSchedule > 0) {
+    return numOfSchedule.toString() + "件";
+  } else {
+    return "未提出";
+  }
 }
 
-function checkScheduleOfNextMonth(schedules: any, id: string): string {
+function checkScheduleOfNextMonth(schedules: any, id: string): any {
   if (schedules.length == 0) {
     return "未提出";
   }
+  let numOfSchedule = 0;
   const today = new Date();
   const nextMonth = today.getMonth() + 1; // 翌月
   const nextMonthFirstDay = new Date(
@@ -71,11 +78,19 @@ function checkScheduleOfNextMonth(schedules: any, id: string): string {
   for (const schedule in schedules) {
     const student = schedules[parseInt(schedule)]["studentId"];
     const dateOfSchedule = new Date(schedules[parseInt(schedule)]["start"]);
-    if (student == id && dateOfSchedule >= nextMonthFirstDay) {
-      return "完了";
+    if (
+      student == id &&
+      dateOfSchedule >= nextMonthFirstDay &&
+      schedules[parseInt(schedule)]["deletedAt"] == null
+    ) {
+      numOfSchedule += 1;
     }
   }
-  return "未提出";
+  if (numOfSchedule > 0) {
+    return numOfSchedule.toString() + "件";
+  } else {
+    return "未提出";
+  }
 }
 
 type Props = {
