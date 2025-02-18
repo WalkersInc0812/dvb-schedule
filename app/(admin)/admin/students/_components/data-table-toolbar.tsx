@@ -95,7 +95,7 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("scheduleStatusOfThisMonth")}
             title="当月予定で絞り込む"
             options={[
-              { value: "完了", label: "完了" },
+              // { value: "完了", label: "完了" },
               { value: "未提出", label: "未提出" },
             ]}
           />
@@ -105,7 +105,7 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("scheduleStatusOfNextMonth")}
             title="翌月予定で絞り込む"
             options={[
-              { value: "完了", label: "完了" },
+              // { value: "完了", label: "完了" },
               { value: "未提出", label: "未提出" },
             ]}
           />
