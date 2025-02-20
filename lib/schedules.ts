@@ -2,7 +2,6 @@
 
 import { Prisma } from "@prisma/client";
 import { db } from "./db";
-import { get } from "http";
 
 export async function getSchedules() {
   const schedules = await db.schedule.findMany({

@@ -7,17 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
-
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
   facilities: {
@@ -37,20 +26,6 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
     table.getState().columnFilters.length > 0 || table.getState().globalFilter;
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-
-      return params.toString();
-    },
-    [searchParams]
-  );
-
-  const deleted = searchParams.get("deleted") === "true";
 
   return (
     <div className="flex items-center justify-between">
@@ -94,20 +69,14 @@ export function DataTableToolbar<TData>({
           <DataTableFacetedFilter
             column={table.getColumn("scheduleStatusOfThisMonth")}
             title="当月予定で絞り込む"
-            options={[
-              // { value: "完了", label: "完了" },
-              { value: "未提出", label: "未提出" },
-            ]}
+            options={[{ value: "未提出", label: "未提出" }]}
           />
         )}
         {table.getColumn("scheduleStatusOfNextMonth") && (
           <DataTableFacetedFilter
             column={table.getColumn("scheduleStatusOfNextMonth")}
             title="翌月予定で絞り込む"
-            options={[
-              // { value: "完了", label: "完了" },
-              { value: "未提出", label: "未提出" },
-            ]}
+            options={[{ value: "未提出", label: "未提出" }]}
           />
         )}
         {isFiltered && (
@@ -124,29 +93,6 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      {/* <div className="flex items-center space-x-2">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <Switch
-                id="schedule-thismonth-notcollect"
-                checked={deleted}
-                onCheckedChange={(value) =>
-                  router.push(
-                    pathname +
-                      "?" +
-                      createQueryString("deleted", value.toString())
-                  )
-                }
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>オンにすると当月未提出の生徒のみを抽出します</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <Label htmlFor="schedule-thismonth-notcollect">当月未提出</Label>
-      </div> */}
     </div>
   );
 }

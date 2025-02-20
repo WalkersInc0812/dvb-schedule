@@ -115,17 +115,6 @@ export const makeColumns = ({
     id: "scheduleStatusOfThisMonth",
     header: "当月予定",
     accessorFn: (info) => checkScheduleOfThisMonth(info.schedules, info.id),
-    // cell: ({ row }) => {
-    //   const value = checkScheduleOfThisMonth(
-    //     row.original.schedules,
-    //     row.original.id
-    //   );
-    //   if (value === "未提出") {
-    //     return <span className="text-destructive">{value}</span>;
-    //   } else {
-    //     return { value };
-    //   }
-    // },
   },
   {
     id: "scheduleStatusOfNextMonth",

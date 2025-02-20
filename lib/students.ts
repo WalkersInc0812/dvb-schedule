@@ -9,7 +9,7 @@ export type StudentWithParntAndFacilityAndSchoolAndClasses =
       facility: true;
       school: true;
       classes: true;
-      schedules: true;
+      // schedules: true;
     };
   }>;
 export async function getStudents(): Promise<
