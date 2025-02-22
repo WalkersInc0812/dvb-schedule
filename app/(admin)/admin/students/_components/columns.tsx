@@ -20,11 +20,9 @@ function checkScheduleOfThisMonth(schedules: any, id: string): any {
   }
   let numOfSchedule = 0;
   const today = new Date();
-  const thisMonth = today.getMonth();
-  const nextMonth = thisMonth + 1;
   const thisMonthFirstDay = new Date(
     today.getFullYear(),
-    thisMonth,
+    today.getMonth(),
     1,
     0,
     0,
@@ -33,7 +31,7 @@ function checkScheduleOfThisMonth(schedules: any, id: string): any {
   );
   const nextMonthFirstDay = new Date(
     today.getFullYear(),
-    nextMonth,
+    today.getMonth() + 1,
     1,
     0,
     0,
@@ -65,10 +63,9 @@ function checkScheduleOfNextMonth(schedules: any, id: string): any {
   }
   let numOfSchedule = 0;
   const today = new Date();
-  const nextMonth = today.getMonth() + 1; // 翌月
   const nextMonthFirstDay = new Date(
     today.getFullYear(),
-    nextMonth,
+    today.getMonth() + 1,
     1,
     0,
     0,
