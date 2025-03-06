@@ -9,11 +9,31 @@ export type StudentWithParntAndFacilityAndSchoolAndClasses =
       facility: true;
       school: true;
       classes: true;
+      schedules: true;
     };
   }>;
 export async function getStudents(): Promise<
   StudentWithParntAndFacilityAndSchoolAndClasses[]
 > {
+  const today = new Date();
+  const thisMonthFirstDay = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+  const monthAfterNextFirstDay = new Date(
+    today.getFullYear(),
+    today.getMonth() + 2,
+    1,
+    0,
+    0,
+    0,
+    0
+  );
   const students = await db.student.findMany({
     include: {
       parent: true,
@@ -22,6 +42,15 @@ export async function getStudents(): Promise<
       classes: {
         orderBy: {
           name: "asc",
+        },
+      },
+      schedules: {
+        where: {
+          start: {
+            gte: thisMonthFirstDay,
+            lt: monthAfterNextFirstDay,
+          },
+          deletedAt: null,
         },
       },
     },

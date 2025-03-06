@@ -14,6 +14,82 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+function checkScheduleOfThisMonth(schedules: any, id: string): any {
+  if (schedules.length == 0) {
+    return "未提出";
+  }
+  let numOfSchedule = 0;
+  const today = new Date();
+  const thisMonthFirstDay = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+  const nextMonthFirstDay = new Date(
+    today.getFullYear(),
+    today.getMonth() + 1,
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+  for (const schedule in schedules) {
+    const student = schedules[parseInt(schedule)]["studentId"];
+    const dateOfSchedule = new Date(schedules[parseInt(schedule)]["start"]);
+    if (
+      student == id &&
+      dateOfSchedule >= thisMonthFirstDay &&
+      dateOfSchedule < nextMonthFirstDay &&
+      schedules[parseInt(schedule)]["deletedAt"] == null
+    ) {
+      numOfSchedule += 1;
+    }
+  }
+  if (numOfSchedule > 0) {
+    return numOfSchedule.toString() + "件";
+  } else {
+    return "未提出";
+  }
+}
+
+function checkScheduleOfNextMonth(schedules: any, id: string): any {
+  if (schedules.length == 0) {
+    return "未提出";
+  }
+  let numOfSchedule = 0;
+  const today = new Date();
+  const nextMonthFirstDay = new Date(
+    today.getFullYear(),
+    today.getMonth() + 1,
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+  for (const schedule in schedules) {
+    const student = schedules[parseInt(schedule)]["studentId"];
+    const dateOfSchedule = new Date(schedules[parseInt(schedule)]["start"]);
+    if (
+      student == id &&
+      dateOfSchedule >= nextMonthFirstDay &&
+      schedules[parseInt(schedule)]["deletedAt"] == null
+    ) {
+      numOfSchedule += 1;
+    }
+  }
+  if (numOfSchedule > 0) {
+    return numOfSchedule.toString() + "件";
+  } else {
+    return "未提出";
+  }
+}
+
 type Props = {
   onEditClick: (student: any) => void;
   onDeleteClick: (student: any) => void;
@@ -31,6 +107,16 @@ export const makeColumns = ({
     id: "name",
     header: "児童氏名",
     accessorKey: "name",
+  },
+  {
+    id: "scheduleStatusOfThisMonth",
+    header: "当月予定",
+    accessorFn: (info) => checkScheduleOfThisMonth(info.schedules, info.id),
+  },
+  {
+    id: "scheduleStatusOfNextMonth",
+    header: "翌月予定",
+    accessorFn: (info) => checkScheduleOfNextMonth(info.schedules, info.id),
   },
   {
     id: "facilityName",
