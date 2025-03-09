@@ -38,6 +38,9 @@ function checkScheduleOfThisMonth(schedules: any, id: string): any {
     0,
     0
   );
+  // TODO: for - of -のほうがパフォーマンスいいかもしれない
+  for (const schedule of schedules) {
+  }
   for (const schedule in schedules) {
     const student = schedules[parseInt(schedule)]["studentId"];
     const dateOfSchedule = new Date(schedules[parseInt(schedule)]["start"]);
