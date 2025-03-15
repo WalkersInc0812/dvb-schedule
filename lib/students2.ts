@@ -28,7 +28,11 @@ export async function getStudentsByParentId({
 }) {
   const students = await db.student.findMany({
     where: {
-      parentId,
+      parents: {
+        some: {
+          id: parentId,
+        },
+      },
       deletedAt: null,
     },
   });

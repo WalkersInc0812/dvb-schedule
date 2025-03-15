@@ -196,7 +196,11 @@ export async function checkIsScheduleOwner({
       where: {
         id: scheduleId,
         student: {
-          parentId,
+          parents: {
+            some: {
+              id: parentId,
+            },
+          },
         },
       },
     })) !== "undefined";
