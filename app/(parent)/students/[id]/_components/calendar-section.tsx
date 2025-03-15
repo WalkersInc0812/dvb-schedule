@@ -68,12 +68,14 @@ type Props = {
   facility: FacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncement;
   schedules: Schedule[];
   fixedUsageDayOfWeeks: FixedUsageDayOfWeekWithPrograms[];
+  isStaff: boolean;
 };
 export const CalendarSection = ({
   studentId,
   facility,
   schedules,
   fixedUsageDayOfWeeks,
+  isStaff,
 }: Props) => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [clickedDate, setClickedDate] = React.useState<Date | undefined>();
@@ -132,12 +134,17 @@ export const CalendarSection = ({
       (p) => p.targetMonth === targetMonth
     );
     setScheduleEditablePeriod(period);
-    setIsMonthEditable(
-      !!period &&
-        startOfDay(parse(period.fromDate, "yyyy-MM-dd", new Date())) <=
-          new Date() &&
-        new Date() <= endOfDay(parse(period.toDate, "yyyy-MM-dd", new Date()))
-    );
+
+    if (isStaff) {
+      setIsMonthEditable(true);
+    } else {
+      setIsMonthEditable(
+        !!period &&
+          startOfDay(parse(period.fromDate, "yyyy-MM-dd", new Date())) <=
+            new Date() &&
+          new Date() <= endOfDay(parse(period.toDate, "yyyy-MM-dd", new Date()))
+      );
+    }
 
     setMonth(date);
   };
@@ -152,15 +159,21 @@ export const CalendarSection = ({
     const targetScheduleEditablePeriod = facility.scheduleEditablePeriods.find(
       (p) => p.targetMonth === targetMonth
     );
-    const editable =
-      !!targetScheduleEditablePeriod &&
-      startOfDay(
-        parse(targetScheduleEditablePeriod.fromDate, "yyyy-MM-dd", new Date())
-      ) <= new Date() &&
-      new Date() <=
-        endOfDay(
-          parse(targetScheduleEditablePeriod.toDate, "yyyy-MM-dd", new Date())
-        );
+
+    let editable = false;
+    if (isStaff) {
+      editable = true;
+    } else {
+      editable =
+        !!targetScheduleEditablePeriod &&
+        startOfDay(
+          parse(targetScheduleEditablePeriod.fromDate, "yyyy-MM-dd", new Date())
+        ) <= new Date() &&
+        new Date() <=
+          endOfDay(
+            parse(targetScheduleEditablePeriod.toDate, "yyyy-MM-dd", new Date())
+          );
+    }
 
     // editable ではなく、 create の時はそのままreturn
     if (!editable && !schedules.find((s) => isSameDay(s.start, date))) {
@@ -411,6 +424,10 @@ export const CalendarSection = ({
           modifiers={{
             selectedForMultiCreate: selectedDatesForMultiCreate,
             nothing: (day: Date) => {
+              if (isStaff) {
+                return false;
+              }
+
               const targetMonth = format(day, "yyyy-MM");
               const targetScheduleEditablePeriod =
                 facility.scheduleEditablePeriods.find(
@@ -483,6 +500,10 @@ export const CalendarSection = ({
             (day: Date) => holidayJp.isHoliday(day),
             // noting
             (day: Date) => {
+              if (isStaff) {
+                return false;
+              }
+
               const targetMonth = format(day, "yyyy-MM");
               const targetScheduleEditablePeriod =
                 facility.scheduleEditablePeriods.find(
@@ -613,6 +634,7 @@ export const CalendarSection = ({
                   logs={<Logs value={clickedScheduleLogs} />}
                   onClickUpdate={handleClickUpdateInDetail}
                   onClickDelete={handleClickDeleteInDetail}
+                  isStaff={isStaff}
                 />
               ) : dialogType === "update" && clickedSchedule ? (
                 <ScheduleUpdateForm

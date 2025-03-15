@@ -10,11 +10,14 @@ import { UpcomingSection } from "./_components/upcoming-section";
 import { getFacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementById } from "@/lib/facilities";
 import { getFixedUsageDayOfWeeksWithProgramsByStudentId } from "@/lib/fixedUsageDayOfWeeks";
 import { DeletedSection } from "./_components/deleted-section";
+import { checkIsStaff } from "@/lib/session";
 
 type Props = {
   params: Promise<{ id: string }>;
 };
 const CalendarPage = async ({ params }: Props) => {
+  const isStaff = await checkIsStaff();
+
   const id = (await params).id;
   const student = await getStudentById({ id });
   if (!student) {
@@ -43,6 +46,7 @@ const CalendarPage = async ({ params }: Props) => {
             facility={facility}
             schedules={schedules}
             fixedUsageDayOfWeeks={fixedUsageDayOfWeeks}
+            isStaff={isStaff}
           />
         )}
         <UpcomingSection schedules={schedules} />

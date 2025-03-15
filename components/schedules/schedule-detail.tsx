@@ -12,6 +12,7 @@ type ScheduleDetailProps = {
   logs: JSX.Element;
   onClickUpdate: () => void;
   onClickDelete: () => void;
+  isStaff: boolean;
 };
 export const ScheduleDetail = ({
   schedule,
@@ -19,11 +20,13 @@ export const ScheduleDetail = ({
   logs,
   onClickUpdate,
   onClickDelete,
+  isStaff,
 }: ScheduleDetailProps) => {
   const editable =
-    !!editablePeriod &&
-    parse(editablePeriod.fromDate, "yyyy-MM-dd", new Date()) <= new Date() &&
-    new Date() <= parse(editablePeriod.toDate, "yyyy-MM-dd", new Date());
+    isStaff ||
+    (!!editablePeriod &&
+      parse(editablePeriod.fromDate, "yyyy-MM-dd", new Date()) <= new Date() &&
+      new Date() <= parse(editablePeriod.toDate, "yyyy-MM-dd", new Date()));
 
   return (
     <div className="space-y-4 text-start">
