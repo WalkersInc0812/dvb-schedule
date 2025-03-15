@@ -47,6 +47,24 @@ type Props = {
   onError?: () => void;
 };
 
+// 2人目の保護者名or空欄を表示する
+function getSecondParentsName(parents: any): any {
+  if (parents.length > 1) {
+    return parents[1].name;
+  } else {
+    return null;
+  }
+}
+
+// 2人目の保護者メアドor空欄を表示する
+function getSecondParentsEmail(parents: any): any {
+  if (parents.length > 1) {
+    return parents[1].email;
+  } else {
+    return null;
+  }
+}
+
 const StudentEditForm = ({
   student,
   studentFixedUsageDayOfWeeks,
@@ -62,8 +80,12 @@ const StudentEditForm = ({
     resolver: zodResolver(studentEditSchema),
     defaultValues: {
       parent: {
-        name: student.parent.name ?? undefined,
-        email: student.parent.email,
+        name: student.parents[0].name ?? undefined,
+        email: student.parents[0].email,
+      },
+      parent2: {
+        name: getSecondParentsName(student.parents),
+        email: getSecondParentsEmail(student.parents),
       },
       name: student.name,
       facilityId: student.facilityId,
@@ -162,6 +184,42 @@ const StudentEditForm = ({
                 <FormControl>
                   <Input
                     placeholder="メールアドレスを入力してください"
+                    {...field}
+                    onBlur={field.onBlur}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="parent2.name"
+            render={({ field }) => (
+              <FormItem className="flex flex-col items-start">
+                <FormLabel>保護者氏名(2人目)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="保護者氏名(2人目)を入力してください"
+                    {...field}
+                    onBlur={field.onBlur}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="parent2.email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>メールアドレス(2人目)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="メールアドレス(2人目)を入力してください"
                     {...field}
                     onBlur={field.onBlur}
                   />
