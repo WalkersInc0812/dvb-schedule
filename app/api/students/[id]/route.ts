@@ -18,8 +18,6 @@ export async function PATCH(
   context: z.infer<typeof routeContextSchema>
 ) {
   try {
-    // console.log((await req.json()).parents);
-    // return new Response(null, { status: 200 });
     const user = await getCurrentUser();
     if (!user) {
       return new Response(null, { status: 403 });
@@ -118,68 +116,57 @@ export async function PATCH(
           }
         }
 
-        // await tx.user.update({
-        //   where: { id: parents[0].id },
-        //   data: {
-        //     name: payload.parent.name,
-        //     email: payload.parent.email,
-        //     facilities: {
-        //       set: [{ id: payload.facilityId }],
-        //     },
-        //   },
-        // });
+        await tx.student.update({
+          where: { id: context.params.id },
+          data: {
+            name: payload.name,
+            schoolId: payload.schoolId,
+            facilityId: payload.facilityId,
+            schoolEnrollmentAcademicYear: calculateEnrollmentAcademicYear(
+              payload.grade
+            ),
+            classes: {
+              set: payload.classes.map((class_) => ({ id: class_.id })),
+            },
+          },
+        });
 
-        // await tx.student.update({
-        //   where: { id: context.params.id },
-        //   data: {
-        //     name: payload.name,
-        //     schoolId: payload.schoolId,
-        //     facilityId: payload.facilityId,
-        //     schoolEnrollmentAcademicYear: calculateEnrollmentAcademicYear(
-        //       payload.grade
-        //     ),
-        //     classes: {
-        //       set: payload.classes.map((class_) => ({ id: class_.id })),
-        //     },
-        //   },
-        // });
+        await tx.fixedUsageDayOfWeek.deleteMany({
+          where: { studentId: context.params.id },
+        });
 
-        // await tx.fixedUsageDayOfWeek.deleteMany({
-        //   where: { studentId: context.params.id },
-        // });
+        const fixedUsageDayOfWeeksData = payload.fixedUsageDayOfWeeks.map(
+          (fixedUsageDayOfWeek) => {
+            const month = `${fixedUsageDayOfWeek.year}-${fixedUsageDayOfWeek.month}`;
+            return {
+              studentId: context.params.id,
+              month,
+              dayOfWeek: fixedUsageDayOfWeek.dayOfWeek,
+              startTime: fixedUsageDayOfWeek.startTime || undefined,
+              endTime: fixedUsageDayOfWeek.endTime || undefined,
+              needPickup: fixedUsageDayOfWeek.needPickup,
+              program1Id: fixedUsageDayOfWeek.program1?.programId || undefined,
+              program1StartTime:
+                fixedUsageDayOfWeek.program1?.startTime || undefined,
+              program1EndTime:
+                fixedUsageDayOfWeek.program1?.endTime || undefined,
+              program2Id: fixedUsageDayOfWeek.program2?.programId || undefined,
+              program2StartTime:
+                fixedUsageDayOfWeek.program2?.startTime || undefined,
+              program2EndTime:
+                fixedUsageDayOfWeek.program2?.endTime || undefined,
+              program3Id: fixedUsageDayOfWeek.program3?.programId || undefined,
+              program3StartTime:
+                fixedUsageDayOfWeek.program3?.startTime || undefined,
+              program3EndTime:
+                fixedUsageDayOfWeek.program3?.endTime || undefined,
+            };
+          }
+        );
 
-        // const fixedUsageDayOfWeeksData = payload.fixedUsageDayOfWeeks.map(
-        //   (fixedUsageDayOfWeek) => {
-        //     const month = `${fixedUsageDayOfWeek.year}-${fixedUsageDayOfWeek.month}`;
-        //     return {
-        //       studentId: context.params.id,
-        //       month,
-        //       dayOfWeek: fixedUsageDayOfWeek.dayOfWeek,
-        //       startTime: fixedUsageDayOfWeek.startTime || undefined,
-        //       endTime: fixedUsageDayOfWeek.endTime || undefined,
-        //       needPickup: fixedUsageDayOfWeek.needPickup,
-        //       program1Id: fixedUsageDayOfWeek.program1?.programId || undefined,
-        //       program1StartTime:
-        //         fixedUsageDayOfWeek.program1?.startTime || undefined,
-        //       program1EndTime:
-        //         fixedUsageDayOfWeek.program1?.endTime || undefined,
-        //       program2Id: fixedUsageDayOfWeek.program2?.programId || undefined,
-        //       program2StartTime:
-        //         fixedUsageDayOfWeek.program2?.startTime || undefined,
-        //       program2EndTime:
-        //         fixedUsageDayOfWeek.program2?.endTime || undefined,
-        //       program3Id: fixedUsageDayOfWeek.program3?.programId || undefined,
-        //       program3StartTime:
-        //         fixedUsageDayOfWeek.program3?.startTime || undefined,
-        //       program3EndTime:
-        //         fixedUsageDayOfWeek.program3?.endTime || undefined,
-        //     };
-        //   }
-        // );
-
-        // await tx.fixedUsageDayOfWeek.createMany({
-        //   data: fixedUsageDayOfWeeksData,
-        // });
+        await tx.fixedUsageDayOfWeek.createMany({
+          data: fixedUsageDayOfWeeksData,
+        });
       },
       {
         maxWait: 2000 * 2.5 * 2,
