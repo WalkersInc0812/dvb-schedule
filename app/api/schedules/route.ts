@@ -26,7 +26,8 @@ export async function POST(req: Request) {
         typeof (await db.student.findFirst({
           where: {
             id: payload.studentId,
-            parentId: user.id,
+            // おそらくここは要書き換え
+            // parentId: user.id,
           },
         })) !== "undefined";
       if (!isStudentParent) {

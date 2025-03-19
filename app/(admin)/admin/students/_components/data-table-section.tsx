@@ -36,12 +36,7 @@ type Props = {
   schedules: Schedule[];
 };
 
-const DataTableSection = ({
-  students,
-  facilities,
-  schools,
-  schedules,
-}: Props) => {
+const DataTableSection = ({ students, facilities, schools }: Props) => {
   const [dialogType, setDialogType] = useState<DialogType>("create");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] =

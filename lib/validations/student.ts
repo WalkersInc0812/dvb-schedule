@@ -14,24 +14,6 @@ export const studentCreateSchema = z.object({
           .email("メールアドレスの形式を正しく入力してください"),
       })
     ),
-  // 初回登録時から2名保護者登録できたほうがいい？
-  parent2: z
-    .object({
-      id: z.string().min(1, "保護者(2人目)を選択してください").nullable(),
-    })
-    .or(
-      z.object({
-        name: z
-          .string()
-          .min(1, "保護者氏名(2人目)を入力してください")
-          .nullable(),
-        email: z
-          .string()
-          .min(1, "メールアドレス(2人目)を入力してください")
-          .email("メールアドレスの形式を正しく入力してください")
-          .nullable(),
-      })
-    ),
   facilityId: z.string().min(1, "教室を選択してください"),
   schoolId: z.string().min(1, "学校を選択してください"),
   grade: z
@@ -44,21 +26,18 @@ export const studentCreateSchema = z.object({
 export type StudentCreateSchemaType = z.infer<typeof studentCreateSchema>;
 
 export const studentEditSchema = z.object({
-  parent: z.object({
-    name: z.string().min(1, "保護者氏名を入力してください"),
-    email: z
-      .string()
-      .min(1, "メールアドレスを入力してください")
-      .email("メールアドレスの形式を正しく入力してください"),
-  }),
-  parent2: z.object({
-    name: z.string().min(1, "保護者氏名(2人目)を入力してください").nullable(),
-    email: z
-      .string()
-      .min(1, "メールアドレス(2人目)を入力してください")
-      .email("メールアドレスの形式を正しく入力してください")
-      .nullable(),
-  }),
+  parents: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        name: z.string().min(1, "保護者氏名を入力してください"),
+        email: z
+          .string()
+          .min(1, "メールアドレスを入力してください")
+          .email("メールアドレスの形式を正しく入力してください"),
+      })
+    )
+    .min(1, "保護者を1人以上入力してください"),
   facilityId: z.string().min(1, "教室を選択してください"),
   schoolId: z.string().min(1, "学校を選択してください"),
   grade: z
