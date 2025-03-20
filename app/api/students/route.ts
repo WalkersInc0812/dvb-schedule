@@ -19,7 +19,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const payload = studentCreateSchema.parse(body);
 
-    // おそらくここは要書き換え
     await db.$transaction(async (tx) => {
       let parentId: string;
       if ("id" in payload.parent) {
@@ -35,20 +34,17 @@ export async function POST(req: Request) {
         parentId = createdParent.id;
       }
 
-      const createdStudent = await tx.student.create(
-        {
-          data: {
-            // parentId,
-            name: payload.name,
-            schoolId: payload.schoolId,
-            facilityId: payload.facilityId,
-            schoolEnrollmentAcademicYear: calculateEnrollmentAcademicYear(
-              payload.grade
-            ),
-          },
-        }
-        // ここでparent-studentのcreate行う？
-      );
+      const createdStudent = await tx.student.create({
+        data: {
+          parents: { connect: [{ id: parentId }] },
+          name: payload.name,
+          schoolId: payload.schoolId,
+          facilityId: payload.facilityId,
+          schoolEnrollmentAcademicYear: calculateEnrollmentAcademicYear(
+            payload.grade
+          ),
+        },
+      });
     });
 
     return new Response(null, { status: 200 });
