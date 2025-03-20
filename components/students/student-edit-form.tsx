@@ -142,63 +142,70 @@ const StudentEditForm = ({
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {parentFieldArray.fields.map((field, index) => (
-            <div key={field.id}>
-              <FormField
-                control={form.control}
-                name={`parents.${index}.name`}
-                render={({ field: formField }) => (
-                  <FormItem className="flex flex-col items-start">
-                    <FormLabel>保護者氏名</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="保護者氏名を入力してください"
-                        {...formField}
-                        onBlur={formField.onBlur}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`parents.${index}.email`}
-                render={({ field: formField }) => (
-                  <FormItem>
-                    <FormLabel>メールアドレス</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="メールアドレスを入力してください"
-                        {...formField}
-                        onBlur={formField.onBlur}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="mt-2">
-                {parentFieldArray.fields.length > 1 && (
-                  <Button
-                    type="button"
-                    onClick={() => parentFieldArray.remove(index)}
-                    variant="destructive"
-                    className="w-full"
-                  >
-                    この保護者を削除
-                  </Button>
-                )}
+          <div>
+            {parentFieldArray.fields.map((field, index) => (
+              <div key={field.id} className="space-y-2">
+                <FormField
+                  control={form.control}
+                  name={`parents.${index}.name`}
+                  render={({ field: formField }) => (
+                    <FormItem className="flex flex-col items-start">
+                      <FormLabel>保護者氏名</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="保護者氏名を入力してください"
+                          {...formField}
+                          onBlur={formField.onBlur}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`parents.${index}.email`}
+                  render={({ field: formField }) => (
+                    <FormItem>
+                      <FormLabel>メールアドレス</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="メールアドレスを入力してください"
+                          {...formField}
+                          onBlur={formField.onBlur}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="mt-2 flex justify-end">
+                  {parentFieldArray.fields.length > 1 && (
+                    <Button
+                      type="button"
+                      onClick={() => parentFieldArray.remove(index)}
+                      variant="outline"
+                      size="sm"
+                      className="w-fit"
+                    >
+                      <Icons.trash className="mr-2 w-4 h-4" />
+                      上記の保護者を削除
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-          <Button
-            type="button"
-            onClick={() => parentFieldArray.append({ name: "", email: "" })}
-            className="w-full"
-          >
-            保護者を追加
-          </Button>
+            ))}
+            <Button
+              type="button"
+              onClick={() => parentFieldArray.append({ name: "", email: "" })}
+              variant="outline"
+              size="sm"
+              className="w-full mt-1"
+            >
+              <Icons.circlePlus className="mr-2 w-4 h-4" />
+              保護者を追加
+            </Button>
+          </div>
 
           <FormField
             control={form.control}
