@@ -26,13 +26,18 @@ export const studentCreateSchema = z.object({
 export type StudentCreateSchemaType = z.infer<typeof studentCreateSchema>;
 
 export const studentEditSchema = z.object({
-  parent: z.object({
-    name: z.string().min(1, "保護者氏名を入力してください"),
-    email: z
-      .string()
-      .min(1, "メールアドレスを入力してください")
-      .email("メールアドレスの形式を正しく入力してください"),
-  }),
+  parents: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        name: z.string().min(1, "保護者氏名を入力してください"),
+        email: z
+          .string()
+          .min(1, "メールアドレスを入力してください")
+          .email("メールアドレスの形式を正しく入力してください"),
+      })
+    )
+    .min(1, "保護者を1人以上入力してください"),
   facilityId: z.string().min(1, "教室を選択してください"),
   schoolId: z.string().min(1, "学校を選択してください"),
   grade: z

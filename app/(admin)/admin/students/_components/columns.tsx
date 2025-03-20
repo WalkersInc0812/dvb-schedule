@@ -90,6 +90,15 @@ function checkScheduleOfNextMonth(schedules: any, id: string): any {
   }
 }
 
+// 保護者が複数の際に保護者名をつなげて表示する
+function getParentsName(parents: any): any {
+  let parentsName = "";
+  for (const parent in parents) {
+    parentsName = parentsName + parents[parseInt(parent)].name + " ";
+  }
+  return parentsName;
+}
+
 type Props = {
   onEditClick: (student: any) => void;
   onDeleteClick: (student: any) => void;
@@ -101,7 +110,7 @@ export const makeColumns = ({
   {
     id: "parentName",
     header: "保護者氏名",
-    accessorFn: (info) => info.parent.name,
+    accessorFn: (info) => getParentsName(info.parents),
   },
   {
     id: "name",

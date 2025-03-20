@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
       const createdStudent = await tx.student.create({
         data: {
-          parentId,
+          parents: { connect: [{ id: parentId }] },
           name: payload.name,
           schoolId: payload.schoolId,
           facilityId: payload.facilityId,

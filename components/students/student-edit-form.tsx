@@ -21,7 +21,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { Input } from "../ui/input";
 import { Icons } from "../icons";
-import { Facility, FixedUsageDayOfWeek, School } from "@prisma/client";
+import { Facility, FixedUsageDayOfWeek, School, User } from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -37,6 +37,7 @@ import {
 import ClassesFormField from "./classes-form-field";
 import { DevTool } from "@hookform/devtools";
 import FixedUsageDayOfWeeksFormField from "./fixed-usage-day-of-weeks-form-field";
+import { nullable } from "zod";
 
 type Props = {
   student: StudentWithParntAndFacilityAndSchoolAndClasses;
@@ -61,10 +62,11 @@ const StudentEditForm = ({
     mode: "onBlur",
     resolver: zodResolver(studentEditSchema),
     defaultValues: {
-      parent: {
-        name: student.parent.name ?? undefined,
-        email: student.parent.email,
-      },
+      parents: student.parents.map((p) => ({
+        id: p.id,
+        name: p.name ?? undefined,
+        email: p.email,
+      })),
       name: student.name,
       facilityId: student.facilityId,
       schoolId: student.schoolId,
@@ -89,6 +91,11 @@ const StudentEditForm = ({
         },
       })),
     },
+  });
+
+  const parentFieldArray = useFieldArray({
+    control: form.control,
+    name: "parents",
   });
 
   const classFieldArray = useFieldArray({
@@ -135,41 +142,70 @@ const StudentEditForm = ({
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="parent.name"
-            render={({ field }) => (
-              <FormItem className="flex flex-col items-start">
-                <FormLabel>保護者氏名</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="保護者氏名を入力してください"
-                    {...field}
-                    onBlur={field.onBlur}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="parent.email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>メールアドレス</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="メールアドレスを入力してください"
-                    {...field}
-                    onBlur={field.onBlur}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div>
+            {parentFieldArray.fields.map((field, index) => (
+              <div key={field.id} className="space-y-2">
+                <FormField
+                  control={form.control}
+                  name={`parents.${index}.name`}
+                  render={({ field: formField }) => (
+                    <FormItem className="flex flex-col items-start">
+                      <FormLabel>保護者氏名</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="保護者氏名を入力してください"
+                          {...formField}
+                          onBlur={formField.onBlur}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`parents.${index}.email`}
+                  render={({ field: formField }) => (
+                    <FormItem>
+                      <FormLabel>メールアドレス</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="メールアドレスを入力してください"
+                          {...formField}
+                          onBlur={formField.onBlur}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="mt-2 flex justify-end">
+                  {parentFieldArray.fields.length > 1 && (
+                    <Button
+                      type="button"
+                      onClick={() => parentFieldArray.remove(index)}
+                      variant="outline"
+                      size="sm"
+                      className="w-fit"
+                    >
+                      <Icons.trash className="mr-2 w-4 h-4" />
+                      上記の保護者を削除
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+            <Button
+              type="button"
+              onClick={() => parentFieldArray.append({ name: "", email: "" })}
+              variant="outline"
+              size="sm"
+              className="w-full mt-1"
+            >
+              <Icons.circlePlus className="mr-2 w-4 h-4" />
+              保護者を追加
+            </Button>
+          </div>
 
           <FormField
             control={form.control}

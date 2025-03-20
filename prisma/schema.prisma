@@ -201,17 +201,16 @@ model Class {
 // 学童保育の生徒
 model Student {
   id                           String @id @default(cuid())
-  parentId                     String
   schoolId                     String
   facilityId                   String
   name                         String
   schoolEnrollmentAcademicYear Int // 学校への入学年度
 
-  parent               User                  @relation(fields: [parentId], references: [id])
   facility             Facility              @relation(fields: [facilityId], references: [id])
   school               School                @relation(fields: [schoolId], references: [id])
   classes              Class[] // TODO: 未確定の場合どうする？
   schedules            Schedule[]
+  parents              User[]
   fixedUsageDayOfWeeks FixedUsageDayOfWeek[]
 
   createdAt DateTime  @default(now())

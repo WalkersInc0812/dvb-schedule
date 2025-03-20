@@ -5,7 +5,7 @@ import { getYear, getMonth } from "date-fns";
 export type StudentWithParntAndFacilityAndSchoolAndClasses =
   Prisma.StudentGetPayload<{
     include: {
-      parent: true;
+      parents: true;
       facility: true;
       school: true;
       classes: true;
@@ -36,7 +36,7 @@ export async function getStudents(): Promise<
   );
   const students = await db.student.findMany({
     include: {
-      parent: true,
+      parents: true,
       facility: true,
       school: true,
       classes: {
@@ -78,7 +78,11 @@ export async function getStudentsByParentId({
 }) {
   const students = await db.student.findMany({
     where: {
-      parentId,
+      parents: {
+        some: {
+          id: parentId,
+        },
+      },
     },
   });
   return students;
