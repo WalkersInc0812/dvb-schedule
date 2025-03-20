@@ -30,16 +30,9 @@ export async function POST(req: Request) {
     if (isStaff) {
       // ok
     } else if (isParent) {
-      const isStudentParent =
-        typeof (await db.student.findFirst({
-          where: {
-            id: payload.studentId,
-            parentId: user.id,
-          },
-        })) !== "undefined";
-      if (!isStudentParent) {
-        return new Response(null, { status: 400 });
-      }
+      // ok
+    } else {
+      return new Response(null, { status: 400 });
     }
 
     const student = await getStudentById({ id: payload.studentId });
