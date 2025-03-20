@@ -12,7 +12,6 @@ const routeContextSchema = z.object({
   }),
 });
 
-// ここがDB実装
 export async function PATCH(
   req: Request,
   context: z.infer<typeof routeContextSchema>
@@ -42,11 +41,6 @@ export async function PATCH(
 
     await db.$transaction(
       async (tx) => {
-        // parents.idがDBにあればupdate
-        // parents.idがDBになければcreate
-        // payload.parents.idが無いがpayload.parents.emailがDB上にあれば接続
-        // DBにあるのにpayloadに無ければ接続解除
-
         // 学生の親のIDの配列を取得
         const existingParentIds = parents.map((parent) => parent.id);
         // payloadの親のIDの配列を取得
