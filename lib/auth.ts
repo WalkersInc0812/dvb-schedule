@@ -83,9 +83,14 @@ export const authOptions: NextAuthOptions = {
         return token;
       }
 
+      // token.emailの大文字小文字を区別しない処理を正規表現により入れる
+
       const dbUser = await db.user.findFirst({
         where: {
-          email: token.email,
+          email: {
+            equals: token.email,
+            mode: "insensitive",
+          },
           deletedAt: null, // TODO: 動作確認
         },
       });
