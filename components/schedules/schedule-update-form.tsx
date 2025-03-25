@@ -39,6 +39,7 @@ type ScheduleUpdateFormProps = {
   logs: JSX.Element;
   onSuccess?: () => void;
   onError?: () => void;
+  startTransition?: React.TransitionStartFunction;
 };
 export const ScheduleUpdateForm = ({
   schedule,
@@ -46,6 +47,7 @@ export const ScheduleUpdateForm = ({
   logs,
   onSuccess,
   onError,
+  startTransition,
 }: ScheduleUpdateFormProps) => {
   const router = useRouter();
 
@@ -86,7 +88,13 @@ export const ScheduleUpdateForm = ({
 
       onSuccess?.();
 
-      router.refresh();
+      if (startTransition) {
+        startTransition(() => {
+          router.refresh();
+        });
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       onError?.();
 
