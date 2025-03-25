@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { format, parse } from "date-fns";
+import { endOfDay, format, parse, startOfDay } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Schedule, ScheduleEditablePeriod } from "@prisma/client";
 import { cn } from "@/lib/utils";
@@ -25,8 +25,10 @@ export const ScheduleDetail = ({
   const editable =
     isStaff ||
     (!!editablePeriod &&
-      parse(editablePeriod.fromDate, "yyyy-MM-dd", new Date()) <= new Date() &&
-      new Date() <= parse(editablePeriod.toDate, "yyyy-MM-dd", new Date()));
+      startOfDay(parse(editablePeriod.fromDate, "yyyy-MM-dd", new Date())) <=
+        new Date() &&
+      new Date() <=
+        endOfDay(parse(editablePeriod.toDate, "yyyy-MM-dd", new Date())));
 
   return (
     <div className="space-y-4 text-start">
