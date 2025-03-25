@@ -34,7 +34,11 @@ export const DeletedSection = ({ schedules }: Props) => {
                 <ul>
                   {s.logs.map((log) => (
                     <li key={log.id} className="list-inside">
-                      ・{format(log.timestamp, "yyyy/MM/dd HH:mm:ss")}{" "}
+                      ・
+                      {format(
+                        toZonedTime(log.timestamp, timeZone),
+                        "yyyy/MM/dd HH:mm:ss"
+                      )}{" "}
                       {log.user.name}さんが
                       {log.operation === "CREATE"
                         ? "作成"
