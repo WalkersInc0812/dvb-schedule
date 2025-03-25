@@ -3,7 +3,7 @@
 
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useTransition } from "react";
 
 import { Calendar } from "@/components/ui/calendar";
 
@@ -94,6 +94,9 @@ export const CalendarSection = ({
   const [scheduleEditablePeriod, setScheduleEditablePeriod] = React.useState<
     ScheduleEditablePeriod | undefined
   >(undefined);
+
+  const [isPending, startTransition] = useTransition();
+
   // TODO: refactor
   // TODO: check timezone
   const announcements = facility.announcements.filter(
@@ -221,7 +224,7 @@ export const CalendarSection = ({
   const formatCaption: DateFormatter = (date) => {
     return (
       <p className="text-[18px] font-medium">
-        {format(date, "yyyy年MM月", { locale: ja })}
+        {isPending ? "更新中..." : format(date, "yyyy年MM月", { locale: ja })}
       </p>
     );
   };
@@ -240,7 +243,7 @@ export const CalendarSection = ({
     <div className="p-[16px]">
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-[22px] font-bold">カレンダー</h2>
-        {isMonthEditable ? (
+        {isMonthEditable && !isPending ? (
           mode === "single" ? (
             <Button
               size={"sm"}
@@ -399,63 +402,136 @@ export const CalendarSection = ({
       </div>
 
       <div className="flex flex-col items-center gap-2">
-        <Calendar
-          locale={ja}
-          formatters={{ formatCaption }}
-          mode="multiple"
-          month={month}
-          onMonthChange={handleMonthChange}
-          selected={schedules.map((schedule) => schedule.start)}
-          onDayClick={handleDayClick}
-          weekStartsOn={1}
-          showOutsideDays={false}
-          className="rounded-md border w-full"
-          classNames={{
-            months: "flex flex-col space-y-4 sm:space-x-4 sm:space-y-0",
-            head_cell:
-              "text-muted-foreground rounded-md w-[calc(100%/7)] font-normal text-[0.8rem]",
-            cell: "h-12 w-[calc(100%/7)] text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-            day: cn(
-              buttonVariants({ variant: "ghost" }),
-              "h-12 w-full p-0 font-normal aria-selected:opacity-100 text-wrap"
-            ),
-          }}
-          // TODO: refactor
-          modifiers={{
-            selectedForMultiCreate: selectedDatesForMultiCreate,
-            nothing: (day: Date) => {
-              if (isStaff) {
-                return false;
-              }
+        {isPending ? (
+          <Calendar
+            locale={ja}
+            formatters={{ formatCaption }}
+            mode="multiple"
+            month={month}
+            weekStartsOn={1}
+            showOutsideDays={false}
+            className="rounded-md border w-full"
+            classNames={{
+              months: "flex flex-col space-y-4 sm:space-x-4 sm:space-y-0",
+              head_cell:
+                "text-muted-foreground rounded-md w-[calc(100%/7)] font-normal text-[0.8rem]",
+              cell: "h-12 w-[calc(100%/7)] text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+              day: cn(
+                buttonVariants({ variant: "ghost" }),
+                "h-12 w-full p-0 font-normal aria-selected:opacity-100 text-wrap"
+              ),
+            }}
+            modifiers={{
+              dayOff: [
+                {
+                  dayOfWeek: [0, 6],
+                },
+                (day: Date) => {
+                  const closed = [
+                    "12/29",
+                    "12/30",
+                    "12/31",
+                    "01/01",
+                    "01/02",
+                    "01/03",
+                  ];
 
-              const targetMonth = format(day, "yyyy-MM");
-              const targetScheduleEditablePeriod =
-                facility.scheduleEditablePeriods.find(
-                  (p) => p.targetMonth === targetMonth
-                );
-              const editable =
-                !!targetScheduleEditablePeriod &&
-                startOfDay(
-                  parse(
-                    targetScheduleEditablePeriod.fromDate,
-                    "yyyy-MM-dd",
-                    new Date()
-                  )
-                ) <= new Date() &&
-                new Date() <=
-                  endOfDay(
+                  return closed.includes(format(day, "MM/dd"));
+                },
+                (day: Date) => holidayJp.isHoliday(day),
+              ],
+            }}
+            modifiersClassNames={{
+              dayOff: "text-red-700",
+            }}
+            disabled={[() => true]}
+          />
+        ) : (
+          <Calendar
+            locale={ja}
+            formatters={{ formatCaption }}
+            mode="multiple"
+            month={month}
+            onMonthChange={handleMonthChange}
+            selected={schedules.map((schedule) => schedule.start)}
+            onDayClick={handleDayClick}
+            weekStartsOn={1}
+            showOutsideDays={false}
+            className="rounded-md border w-full"
+            classNames={{
+              months: "flex flex-col space-y-4 sm:space-x-4 sm:space-y-0",
+              head_cell:
+                "text-muted-foreground rounded-md w-[calc(100%/7)] font-normal text-[0.8rem]",
+              cell: "h-12 w-[calc(100%/7)] text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+              day: cn(
+                buttonVariants({ variant: "ghost" }),
+                "h-12 w-full p-0 font-normal aria-selected:opacity-100 text-wrap"
+              ),
+            }}
+            // TODO: refactor
+            modifiers={{
+              selectedForMultiCreate: selectedDatesForMultiCreate,
+              nothing: (day: Date) => {
+                if (isStaff) {
+                  return false;
+                }
+
+                const targetMonth = format(day, "yyyy-MM");
+                const targetScheduleEditablePeriod =
+                  facility.scheduleEditablePeriods.find(
+                    (p) => p.targetMonth === targetMonth
+                  );
+                const editable =
+                  !!targetScheduleEditablePeriod &&
+                  startOfDay(
                     parse(
-                      targetScheduleEditablePeriod.toDate,
+                      targetScheduleEditablePeriod.fromDate,
                       "yyyy-MM-dd",
                       new Date()
                     )
-                  );
+                  ) <= new Date() &&
+                  new Date() <=
+                    endOfDay(
+                      parse(
+                        targetScheduleEditablePeriod.toDate,
+                        "yyyy-MM-dd",
+                        new Date()
+                      )
+                    );
 
-              const notExist = !schedules.find((s) => isSameDay(s.start, day));
+                const notExist = !schedules.find((s) =>
+                  isSameDay(s.start, day)
+                );
 
-              return !editable && notExist;
-            },
-            dayOff: [
+                return !editable && notExist;
+              },
+              dayOff: [
+                {
+                  dayOfWeek: [0, 6],
+                },
+                (day: Date) => {
+                  const closed = [
+                    "12/29",
+                    "12/30",
+                    "12/31",
+                    "01/01",
+                    "01/02",
+                    "01/03",
+                  ];
+
+                  return closed.includes(format(day, "MM/dd"));
+                },
+                (day: Date) => holidayJp.isHoliday(day),
+              ],
+            }}
+            modifiersClassNames={{
+              selectedForMultiCreate: "border border-primary",
+              nothing: "text-gray-400",
+              dayOff: "text-red-700",
+            }}
+            // TODO: refactor
+            disabled={[
+              // day off
               {
                 dayOfWeek: [0, 6],
               },
@@ -472,67 +548,44 @@ export const CalendarSection = ({
                 return closed.includes(format(day, "MM/dd"));
               },
               (day: Date) => holidayJp.isHoliday(day),
-            ],
-          }}
-          modifiersClassNames={{
-            selectedForMultiCreate: "border border-primary",
-            nothing: "text-gray-400",
-            dayOff: "text-red-700",
-          }}
-          // TODO: refactor
-          disabled={[
-            // day off
-            {
-              dayOfWeek: [0, 6],
-            },
-            (day: Date) => {
-              const closed = [
-                "12/29",
-                "12/30",
-                "12/31",
-                "01/01",
-                "01/02",
-                "01/03",
-              ];
+              // noting
+              (day: Date) => {
+                if (isStaff) {
+                  return false;
+                }
 
-              return closed.includes(format(day, "MM/dd"));
-            },
-            (day: Date) => holidayJp.isHoliday(day),
-            // noting
-            (day: Date) => {
-              if (isStaff) {
-                return false;
-              }
-
-              const targetMonth = format(day, "yyyy-MM");
-              const targetScheduleEditablePeriod =
-                facility.scheduleEditablePeriods.find(
-                  (p) => p.targetMonth === targetMonth
-                );
-              const editable =
-                !!targetScheduleEditablePeriod &&
-                startOfDay(
-                  parse(
-                    targetScheduleEditablePeriod.fromDate,
-                    "yyyy-MM-dd",
-                    new Date()
-                  )
-                ) <= new Date() &&
-                new Date() <=
-                  endOfDay(
+                const targetMonth = format(day, "yyyy-MM");
+                const targetScheduleEditablePeriod =
+                  facility.scheduleEditablePeriods.find(
+                    (p) => p.targetMonth === targetMonth
+                  );
+                const editable =
+                  !!targetScheduleEditablePeriod &&
+                  startOfDay(
                     parse(
-                      targetScheduleEditablePeriod.toDate,
+                      targetScheduleEditablePeriod.fromDate,
                       "yyyy-MM-dd",
                       new Date()
                     )
-                  );
+                  ) <= new Date() &&
+                  new Date() <=
+                    endOfDay(
+                      parse(
+                        targetScheduleEditablePeriod.toDate,
+                        "yyyy-MM-dd",
+                        new Date()
+                      )
+                    );
 
-              const notExist = !schedules.find((s) => isSameDay(s.start, day));
+                const notExist = !schedules.find((s) =>
+                  isSameDay(s.start, day)
+                );
 
-              return !editable && notExist;
-            },
-          ]}
-        />
+                return !editable && notExist;
+              },
+            ]}
+          />
+        )}
 
         {mode === "multiple" && (
           <div className="flex gap-2">
@@ -611,6 +664,7 @@ export const CalendarSection = ({
                     setDialogOpen(false);
                     setClickedDate(undefined);
                   }}
+                  startTransition={startTransition}
                 />
               ) : dialogType === "multi-create" &&
                 selectedDatesForMultiCreate.length > 0 ? (
@@ -623,6 +677,7 @@ export const CalendarSection = ({
                     setMode("single");
                     setSelectedDatesForMultiCreate([]);
                   }}
+                  startTransition={startTransition}
                 />
               ) : dialogType === "read" && clickedSchedule ? (
                 <ScheduleDetail
@@ -654,6 +709,7 @@ export const CalendarSection = ({
                     setDialogOpen(false);
                     setClickedDate(undefined);
                   }}
+                  startTransition={startTransition}
                 />
               ) : dialogType === "delete" && clickedSchedule ? (
                 <ScheduleDeleteForm
@@ -663,6 +719,7 @@ export const CalendarSection = ({
                     setDialogOpen(false);
                     setClickedDate(undefined);
                   }}
+                  startTransition={startTransition}
                 />
               ) : null}
             </DialogDescription>

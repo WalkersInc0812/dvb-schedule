@@ -12,12 +12,14 @@ type ScheduleDeleteFormProps = {
   logs: JSX.Element;
   onSuccess?: () => void;
   onError?: () => void;
+  startTransition?: React.TransitionStartFunction;
 };
 export const ScheduleDeleteForm = ({
   schedule,
   logs,
   onSuccess,
   onError,
+  startTransition,
 }: ScheduleDeleteFormProps) => {
   const router = useRouter();
 
@@ -39,7 +41,13 @@ export const ScheduleDeleteForm = ({
 
       onSuccess?.();
 
-      router.refresh();
+      if (startTransition) {
+        startTransition(() => {
+          router.refresh();
+        });
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       onError?.();
 

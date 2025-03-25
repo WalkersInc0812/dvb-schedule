@@ -36,6 +36,7 @@ type ScheduleCreateFormProps = {
   mealServable: boolean;
   onSuccess?: () => void;
   onError?: () => void;
+  startTransition?: React.TransitionStartFunction;
 };
 export const ScheduleCreateForm = ({
   studentId,
@@ -43,6 +44,7 @@ export const ScheduleCreateForm = ({
   mealServable,
   onSuccess,
   onError,
+  startTransition,
 }: ScheduleCreateFormProps) => {
   const router = useRouter();
 
@@ -85,7 +87,13 @@ export const ScheduleCreateForm = ({
 
       onSuccess?.();
 
-      router.refresh();
+      if (startTransition) {
+        startTransition(() => {
+          router.refresh();
+        });
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       onError?.();
 
