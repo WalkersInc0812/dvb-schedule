@@ -4,8 +4,6 @@ import { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { toZonedTime } from "date-fns-tz";
 
-const timeZone = "Asia/Tokyo";
-
 export async function getSchedules() {
   const schedules = await db.schedule.findMany({
     where: {
@@ -96,6 +94,8 @@ export async function getSchedulesByMonth({
   year: number;
   month: number;
 }): Promise<ScheduleWithStudent[]> {
+  const timeZone = "Asia/Tokyo";
+
   const gte = new Date(year, month - 1, 1);
   const gteZoned = toZonedTime(gte, timeZone);
   const lt = new Date(year, month, 1);
@@ -118,11 +118,13 @@ export async function getSchedulesByMonth({
         },
         {
           start: {
+            // gte, // TODO: remove this line
             gte: gteZoned,
           },
         },
         {
           start: {
+            // lt, // TODO: remove this line
             lt: ltZoned,
           },
         },
