@@ -100,12 +100,6 @@ export async function getSchedulesByMonth({
   const gte = fromZonedTime(gteZoned, timeZone);
   const ltZoned = new Date(year, month, 1);
   const lt = fromZonedTime(ltZoned, timeZone);
-  console.log({
-    gte,
-    gteZoned,
-    lt,
-    ltZoned,
-  }); // TODO: remove this log
 
   const schedules = await db.schedule.findMany({
     include: {
@@ -119,24 +113,16 @@ export async function getSchedulesByMonth({
         {
           start: {
             gte,
-            // gte: gteZoned, // TODO: remove this line
           },
         },
         {
           start: {
             lt,
-            // lt: ltZoned, // TODO: remove this line
           },
         },
       ],
     },
   });
-
-  console.log(
-    schedules.filter(
-      (s) => s.student.name === "241203-児童" || s.student.name === "奥田正幸"
-    )
-  ); // TODO: remove this log
 
   return schedules;
 }
