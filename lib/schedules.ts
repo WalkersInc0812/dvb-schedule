@@ -115,6 +115,13 @@ export async function getSchedulesByMonth({
       ],
     },
   });
+
+  console.log(
+    schedules.filter(
+      (s) => s.student.name === "241203-児童" || s.student.name === "奥田正幸"
+    )
+  ); // TODO: remove this log
+
   return schedules;
 }
 
