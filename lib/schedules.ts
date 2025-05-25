@@ -2,7 +2,7 @@
 
 import { Prisma } from "@prisma/client";
 import { db } from "./db";
-import { toZonedTime } from "date-fns-tz";
+import { fromZonedTime } from "date-fns-tz";
 
 export async function getSchedules() {
   const schedules = await db.schedule.findMany({
@@ -96,10 +96,10 @@ export async function getSchedulesByMonth({
 }): Promise<ScheduleWithStudent[]> {
   const timeZone = "Asia/Tokyo";
 
-  const gte = new Date(year, month - 1, 1);
-  const gteZoned = toZonedTime(gte, timeZone);
-  const lt = new Date(year, month, 1);
-  const ltZoned = toZonedTime(lt, timeZone);
+  const gteZoned = new Date(year, month - 1, 1);
+  const gte = fromZonedTime(gteZoned, timeZone);
+  const ltZoned = new Date(year, month, 1);
+  const lt = fromZonedTime(ltZoned, timeZone);
   console.log({
     gte,
     gteZoned,
@@ -118,14 +118,14 @@ export async function getSchedulesByMonth({
         },
         {
           start: {
-            // gte, // TODO: remove this line
-            gte: gteZoned,
+            gte,
+            // gte: gteZoned, // TODO: remove this line
           },
         },
         {
           start: {
-            // lt, // TODO: remove this line
-            lt: ltZoned,
+            lt,
+            // lt: ltZoned, // TODO: remove this line
           },
         },
       ],
