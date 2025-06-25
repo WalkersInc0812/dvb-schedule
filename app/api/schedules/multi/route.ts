@@ -49,32 +49,41 @@ export async function POST(req: Request) {
     }
 
     await db.$transaction(
-      payload.dates.map((date) =>
-        db.schedule.create({
-          data: {
-            start: date.start,
-            end: date.end,
-            // TODO: 境界値のチェック
-            // TODO: timezoneのチェック
-            meal:
-              payload.meal &&
-              facility.mealSettings.some(
-                (s) =>
-                  parse(s.activeFromDate, "yyyy-MM-dd", new Date()) <=
-                    date.start &&
-                  date.start <= parse(s.activeToDate, "yyyy-MM-dd", new Date())
-              ),
-            notes: payload.notes,
-            studentId: payload.studentId,
-            logs: {
-              create: {
-                userId: user.id,
-                operation: "CREATE",
+      async (tx) => {
+        const schedules = await Promise.all(
+          payload.dates.map((date) =>
+            tx.schedule.create({
+              data: {
+                start: date.start,
+                end: date.end,
+                // TODO: 境界値のチェック
+                // TODO: timezoneのチェック
+                meal:
+                  payload.meal &&
+                  facility.mealSettings.some(
+                    (s) =>
+                      parse(s.activeFromDate, "yyyy-MM-dd", new Date()) <=
+                        date.start &&
+                      date.start <= parse(s.activeToDate, "yyyy-MM-dd", new Date())
+                  ),
+                notes: payload.notes,
+                studentId: payload.studentId,
+                logs: {
+                  create: {
+                    userId: user.id,
+                    operation: "CREATE",
+                  },
+                },
               },
-            },
-          },
-        })
-      )
+            })
+          )
+        );
+        return schedules;
+      },
+      {
+        maxWait: 5000, // 5秒（デフォルト: 2秒）
+        timeout: 30000, // 30秒（デフォルト: 5秒）
+      }
     );
 
     return new Response(null, { status: 200 });
