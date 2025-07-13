@@ -28,6 +28,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { format, parse, setHours, setMinutes } from "date-fns";
 import { ja } from "date-fns/locale";
+import { zonedTimeToUtc } from "date-fns-tz";
 import { MealSetting } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { Icons } from "../icons";
@@ -67,12 +68,22 @@ export const ScheduleMultiCreateForm = ({
 
   const onSubmit = async (data: ScheduleMultiCreateSchemaType) => {
     try {
+      // Convert JST dates to UTC properly to avoid timezone shift
+      const timeZone = "Asia/Tokyo";
+      const dataWithUtcDates = {
+        ...data,
+        dates: data.dates.map(date => ({
+          start: zonedTimeToUtc(date.start, timeZone),
+          end: zonedTimeToUtc(date.end, timeZone),
+        })),
+      };
+      
       const response = await fetch(`/api/schedules/multi`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(dataWithUtcDates),
       });
 
       if (!response.ok) {

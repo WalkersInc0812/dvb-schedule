@@ -18,6 +18,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { format, setHours, setMinutes } from "date-fns";
 import { ja } from "date-fns/locale";
+import { zonedTimeToUtc } from "date-fns-tz";
 import { cn } from "@/lib/utils";
 import { Icons } from "../icons";
 import { DevTool } from "@hookform/devtools";
@@ -62,6 +63,11 @@ export const ScheduleCreateForm = ({
 
   const onSubmit = async (data: ScheduleSchemaType) => {
     try {
+      // Convert JST dates to UTC properly to avoid timezone shift
+      const timeZone = "Asia/Tokyo";
+      const startUtc = zonedTimeToUtc(data.start, timeZone);
+      const endUtc = zonedTimeToUtc(data.end, timeZone);
+      
       const response = await fetch(`/api/schedules`, {
         method: "POST",
         headers: {
@@ -69,8 +75,8 @@ export const ScheduleCreateForm = ({
         },
         body: JSON.stringify({
           studentId: data.studentId,
-          start: data.start.toISOString(),
-          end: data.end.toISOString(),
+          start: startUtc.toISOString(),
+          end: endUtc.toISOString(),
           meal: data.meal,
           notes: data.notes,
         }),

@@ -28,6 +28,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
+import { zonedTimeToUtc } from "date-fns-tz";
 import { Schedule } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { Icons } from "../icons";
@@ -64,14 +65,19 @@ export const ScheduleUpdateForm = ({
 
   const onSubmit = async (data: ScheduleUpdateSchemaType) => {
     try {
+      // Convert JST dates to UTC properly to avoid timezone shift
+      const timeZone = "Asia/Tokyo";
+      const startUtc = zonedTimeToUtc(data.start, timeZone);
+      const endUtc = zonedTimeToUtc(data.end, timeZone);
+      
       const response = await fetch(`/api/schedules/${schedule.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          start: data.start.toISOString(),
-          end: data.end.toISOString(),
+          start: startUtc.toISOString(),
+          end: endUtc.toISOString(),
           meal: data.meal,
           notes: data.notes,
         }),

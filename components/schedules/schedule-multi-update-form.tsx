@@ -27,6 +27,7 @@ import { Button } from "../ui/button";
 import { Icons } from "../icons";
 import { useTime } from "./use-time";
 import { cn } from "@/lib/utils";
+import { zonedTimeToUtc } from "date-fns-tz";
 
 type Props = {
   schedules: Schedule[];
@@ -47,12 +48,19 @@ const ScheduleMultiUpdateForm = ({ schedules, onSuccess, onError }: Props) => {
 
   const onSubmit = async (data: ScheduleMultiUpdateSchemaType) => {
     try {
+      // Convert JST dates to UTC properly to avoid timezone shift
+      const timeZone = "Asia/Tokyo";
+      const dataWithUtcDate = {
+        ...data,
+        start: zonedTimeToUtc(data.start, timeZone),
+      };
+      
       const response = await fetch(`/api/schedules/multi`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(dataWithUtcDate),
       });
 
       if (!response.ok) {

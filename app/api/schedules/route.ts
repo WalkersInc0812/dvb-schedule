@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { checkIsParent, checkIsStaff, getCurrentUser } from "@/lib/session";
 import { scheduleSchema } from "@/lib/validations/schedule";
 import { z } from "zod";
+import { fromZonedTime } from "date-fns-tz";
 
 export async function POST(req: Request) {
   try {
@@ -11,6 +12,11 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+    
+    // Parse dates accounting for Japan Standard Time (JST)
+    // When frontend sends ISO strings, they represent UTC time
+    // but the user intended them to be JST, so we parse as-is 
+    // since the database stores in UTC
     const payload = scheduleSchema.parse({
       ...body,
       start: new Date(body.start),
