@@ -25,3 +25,5 @@ cp .env.example .env
 ```sh
 pnpm dev
 ```
+
+...
