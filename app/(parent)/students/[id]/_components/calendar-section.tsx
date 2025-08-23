@@ -61,6 +61,8 @@ import { LinkifyText } from "@/components/linkify-text";
 
 import holidayJp from "@holiday-jp/holiday_jp";
 
+const timeZone = "Asia/Tokyo";
+
 type Mode = "single" | "multiple";
 type DialogType = "create" | "multi-create" | "read" | "update" | "delete";
 
@@ -455,8 +457,13 @@ export const CalendarSection = ({
             month={month}
             onMonthChange={handleMonthChange}
             selected={schedules.map((schedule) => {
-              const japanTime = toZonedTime(schedule.start, "Asia/Tokyo");
-              console.log("schedule.start", schedule.start, "japanTime", japanTime); // TODO: remove
+              const japanTime = toZonedTime(schedule.start, timeZone);
+              console.log(
+                "schedule.start",
+                schedule.start,
+                "japanTime",
+                japanTime
+              ); // TODO: remove
               return japanTime;
             })}
             onDayClick={handleDayClick}
@@ -505,7 +512,7 @@ export const CalendarSection = ({
                     );
 
                 const notExist = !schedules.find((s) =>
-                  isSameDay(s.start, day)
+                  isSameDay(toZonedTime(s.start, timeZone), day)
                 );
 
                 return !editable && notExist;
@@ -583,7 +590,7 @@ export const CalendarSection = ({
                     );
 
                 const notExist = !schedules.find((s) =>
-                  isSameDay(s.start, day)
+                  isSameDay(toZonedTime(s.start, timeZone), day)
                 );
 
                 return !editable && notExist;
