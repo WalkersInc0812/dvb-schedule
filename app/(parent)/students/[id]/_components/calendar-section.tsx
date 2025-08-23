@@ -453,7 +453,10 @@ export const CalendarSection = ({
             mode="multiple"
             month={month}
             onMonthChange={handleMonthChange}
-            selected={schedules.map((schedule) => schedule.start)}
+            selected={schedules.map((schedule) => {
+              console.log("schedule.start", schedule.start); // TODO: remove
+              return schedule.start;
+            })}
             onDayClick={handleDayClick}
             weekStartsOn={1}
             showOutsideDays={false}
