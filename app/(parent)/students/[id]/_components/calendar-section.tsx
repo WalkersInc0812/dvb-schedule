@@ -22,6 +22,7 @@ import {
   startOfDay,
   startOfMonth,
 } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { Schedule, ScheduleEditablePeriod } from "@prisma/client";
 import { ScheduleCreateForm } from "@/components/schedules/schedule-create-form";
 import { ScheduleDetail } from "@/components/schedules/schedule-detail";
@@ -454,8 +455,9 @@ export const CalendarSection = ({
             month={month}
             onMonthChange={handleMonthChange}
             selected={schedules.map((schedule) => {
-              console.log("schedule.start", schedule.start); // TODO: remove
-              return schedule.start;
+              const japanTime = toZonedTime(schedule.start, "Asia/Tokyo");
+              console.log("schedule.start", schedule.start, "japanTime", japanTime); // TODO: remove
+              return japanTime;
             })}
             onDayClick={handleDayClick}
             weekStartsOn={1}

@@ -140,6 +140,7 @@ export async function getSchedulesByStudentId({
       deletedAt: null,
     },
   });
+  console.log("schedules", schedules); // TODO: remove
   return schedules;
 }
 
