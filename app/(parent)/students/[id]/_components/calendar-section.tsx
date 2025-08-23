@@ -458,12 +458,6 @@ export const CalendarSection = ({
             onMonthChange={handleMonthChange}
             selected={schedules.map((schedule) => {
               const japanTime = toZonedTime(schedule.start, timeZone);
-              console.log(
-                "schedule.start",
-                schedule.start,
-                "japanTime",
-                japanTime
-              ); // TODO: remove
               return japanTime;
             })}
             onDayClick={handleDayClick}
