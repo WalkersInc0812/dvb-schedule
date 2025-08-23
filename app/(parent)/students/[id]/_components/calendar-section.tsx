@@ -22,6 +22,7 @@ import {
   startOfDay,
   startOfMonth,
 } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { Schedule, ScheduleEditablePeriod } from "@prisma/client";
 import { ScheduleCreateForm } from "@/components/schedules/schedule-create-form";
 import { ScheduleDetail } from "@/components/schedules/schedule-detail";
@@ -59,6 +60,8 @@ import { cn } from "@/lib/utils";
 import { LinkifyText } from "@/components/linkify-text";
 
 import holidayJp from "@holiday-jp/holiday_jp";
+
+const timeZone = "Asia/Tokyo";
 
 type Mode = "single" | "multiple";
 type DialogType = "create" | "multi-create" | "read" | "update" | "delete";
@@ -453,7 +456,10 @@ export const CalendarSection = ({
             mode="multiple"
             month={month}
             onMonthChange={handleMonthChange}
-            selected={schedules.map((schedule) => schedule.start)}
+            selected={schedules.map((schedule) => {
+              const japanTime = toZonedTime(schedule.start, timeZone);
+              return japanTime;
+            })}
             onDayClick={handleDayClick}
             weekStartsOn={1}
             showOutsideDays={false}
@@ -500,7 +506,7 @@ export const CalendarSection = ({
                     );
 
                 const notExist = !schedules.find((s) =>
-                  isSameDay(s.start, day)
+                  isSameDay(toZonedTime(s.start, timeZone), day)
                 );
 
                 return !editable && notExist;
@@ -578,7 +584,7 @@ export const CalendarSection = ({
                     );
 
                 const notExist = !schedules.find((s) =>
-                  isSameDay(s.start, day)
+                  isSameDay(toZonedTime(s.start, timeZone), day)
                 );
 
                 return !editable && notExist;
