@@ -34,8 +34,22 @@ export function DataTable<TData, TValue>({
   onCreateClick,
   onMultiUpdateClick,
 }: DataTableProps<ScheduleWithStudentAndFacilityAndSchool, TValue>) {
+  const now = new Date();
+  const threeMonthsAgo = new Date(now);
+  threeMonthsAgo.setMonth(now.getMonth() - 3);
+  const threeMonthsLater = new Date(now);
+  threeMonthsLater.setMonth(now.getMonth() + 3);
+
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([
+    {
+      id: "date",
+      value: {
+        from: threeMonthsAgo,
+        to: threeMonthsLater,
+      },
+    },
+  ]);
   const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({

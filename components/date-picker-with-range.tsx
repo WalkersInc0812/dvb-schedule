@@ -55,11 +55,11 @@ export function DatePickerWithRange({
             {value?.from ? (
               value.to ? (
                 <>
-                  {format(value.from, "LLL dd, y")} -{" "}
-                  {format(value.to, "LLL dd, y")}
+                  {format(value.from, "yyyy年MM月dd日", { locale: ja })} -{" "}
+                  {format(value.to, "yyyy年MM月dd日", { locale: ja })}
                 </>
               ) : (
-                format(value.from, "LLL dd, y")
+                format(value.from, "yyyy年MM月dd日", { locale: ja })
               )
             ) : (
               <span>{placeholder}</span>
