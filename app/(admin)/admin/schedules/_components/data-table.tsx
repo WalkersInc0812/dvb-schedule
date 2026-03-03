@@ -22,6 +22,8 @@ import { ScheduleWithStudentAndFacilityAndSchool } from "@/lib/schedules";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  dateRange: { from: string; to: string };
+  onBeforeDateRangeChange?: () => void;
   onCreateClick: () => void;
   onMultiUpdateClick: (
     schedules: ScheduleWithStudentAndFacilityAndSchool[]
@@ -31,25 +33,13 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
+  dateRange,
+  onBeforeDateRangeChange,
   onCreateClick,
   onMultiUpdateClick,
 }: DataTableProps<ScheduleWithStudentAndFacilityAndSchool, TValue>) {
-  const now = new Date();
-  const threeMonthsAgo = new Date(now);
-  threeMonthsAgo.setMonth(now.getMonth() - 3);
-  const threeMonthsLater = new Date(now);
-  threeMonthsLater.setMonth(now.getMonth() + 3);
-
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([
-    {
-      id: "date",
-      value: {
-        from: threeMonthsAgo,
-        to: threeMonthsLater,
-      },
-    },
-  ]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
@@ -73,6 +63,8 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       <DataTableToolbar
         table={table}
+        dateRange={dateRange}
+        onBeforeDateRangeChange={onBeforeDateRangeChange}
         facilities={Array.from(
           new Set(
             data.map(
