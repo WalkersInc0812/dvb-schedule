@@ -2,8 +2,9 @@ import { DatePickerWithRange } from "@/components/date-picker-with-range";
 import { Icons } from "@/components/icons";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Table } from "@tanstack/react-table";
-import { DateRange, isDateRange } from "react-day-picker";
+import { DateRange } from "react-day-picker";
 import { unparse } from "papaparse";
+import { format } from "date-fns";
 import { ScheduleWithStudentAndFacilityAndSchool } from "@/lib/schedules";
 import { formatAndSortForCsv } from "./columns";
 import {
@@ -20,6 +21,8 @@ import { useCallback } from "react";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
+  dateRange: { from: string; to: string };
+  onBeforeDateRangeChange?: () => void;
   facilities: {
     value: string;
     label: string;
@@ -36,6 +39,8 @@ interface DataTableToolbarProps<TData> {
 
 export function DataTableToolbar({
   table,
+  dateRange,
+  onBeforeDateRangeChange,
   facilities,
   schools,
   onCreateClick,
@@ -71,6 +76,24 @@ export function DataTableToolbar({
     [searchParams]
   );
 
+  const setDateRangeInUrl = useCallback(
+    (range: DateRange | undefined) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (range?.from) {
+        params.set("from", format(range.from, "yyyy-MM-dd"));
+      } else {
+        params.delete("from");
+      }
+      if (range?.to) {
+        params.set("to", format(range.to, "yyyy-MM-dd"));
+      } else {
+        params.delete("to");
+      }
+      router.push(pathname + (params.toString() ? "?" + params.toString() : ""));
+    },
+    [pathname, router, searchParams]
+  );
+
   const deleted = searchParams.get("deleted") === "true";
 
   return (
@@ -78,12 +101,21 @@ export function DataTableToolbar({
       <div className="flex flex-1 items-center space-x-2">
         <DatePickerWithRange
           placeholder="日付で絞り込む"
-          value={
-            isDateRange(table.getColumn("date")?.getFilterValue())
-              ? (table.getColumn("date")?.getFilterValue() as DateRange)
-              : { from: undefined }
-          }
-          onSelect={(value) => table.getColumn("date")?.setFilterValue(value)}
+          value={{
+            from: new Date(dateRange.from + "T00:00:00"),
+            to: new Date(dateRange.to + "T00:00:00"),
+          }}
+          onSelect={(value) => {
+            const range =
+              value &&
+              typeof value === "object" &&
+              "from" in value &&
+              value.from instanceof Date
+                ? { from: value.from, to: value.to }
+                : undefined;
+            onBeforeDateRangeChange?.();
+            setDateRangeInUrl(range);
+          }}
         />
         {table.getColumn("facilityName") && (
           <DataTableFacetedFilter

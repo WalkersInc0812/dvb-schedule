@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { makeColumns } from "./columns";
 import { DataTable } from "./data-table";
 import { ScheduleWithStudentAndFacilityAndSchool } from "@/lib/schedules";
@@ -20,14 +20,17 @@ import {
 import { Logs } from "./logs";
 import ScheduleCreateForm from "./schedule-create-form";
 import { toast } from "@/components/ui/use-toast";
+import { Icons } from "@/components/icons";
 
 type DialogType = "create" | "read" | "update" | "multi-update" | "delete";
 
 type Props = {
   schedules: ScheduleWithStudentAndFacilityAndSchool[];
+  dateRange: { from: string; to: string };
 };
 
-const DataTableSection = ({ schedules }: Props) => {
+const DataTableSection = ({ schedules, dateRange }: Props) => {
+  const [isTableLoading, setIsTableLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [dialogType, setDialogType] = React.useState<DialogType>("read");
   const [clickedSchedule, setClickedSchedule] = React.useState<
@@ -86,14 +89,30 @@ const DataTableSection = ({ schedules }: Props) => {
     onDeleteClick: handleDeleteClick,
   });
 
+  useEffect(() => {
+    setIsTableLoading(false);
+  }, [schedules, dateRange]);
+
   return (
     <>
-      <DataTable
-        columns={columns}
-        data={schedules}
-        onCreateClick={handleCreateClick}
-        onMultiUpdateClick={handleMultiUpdateClick}
-      />
+      <div className="relative">
+        <DataTable
+          columns={columns}
+          data={schedules}
+          dateRange={dateRange}
+          onBeforeDateRangeChange={() => setIsTableLoading(true)}
+          onCreateClick={handleCreateClick}
+          onMultiUpdateClick={handleMultiUpdateClick}
+        />
+        {isTableLoading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-background/80 backdrop-blur-[1px]">
+            <div className="flex flex-col items-center gap-2">
+              <Icons.spinner className="h-8 w-8 animate-spin text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">読み込み中...</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

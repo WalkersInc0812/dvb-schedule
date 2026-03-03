@@ -61,10 +61,24 @@ export type ScheduleWithStudentAndFacilityAndSchool =
   }>;
 export async function getSchedulesWithStudentAndFacilityAndSchool(options?: {
   deleted?: boolean;
+  from?: string;
+  to?: string;
 }): Promise<ScheduleWithStudentAndFacilityAndSchool[]> {
+  const timeZone = "Asia/Tokyo";
+  const startCondition: { gte?: Date; lt?: Date } = {};
+  if (options?.from) {
+    const [y, m, d] = options.from.split("-").map(Number);
+    startCondition.gte = fromZonedTime(new Date(y, m - 1, d), timeZone);
+  }
+  if (options?.to) {
+    const [y, m, d] = options.to.split("-").map(Number);
+    startCondition.lt = fromZonedTime(new Date(y, m - 1, d + 1), timeZone);
+  }
+
   const schedules = await db.schedule.findMany({
     where: {
       deletedAt: options?.deleted ? undefined : null,
+      ...(Object.keys(startCondition).length > 0 && { start: startCondition }),
     },
     include: {
       student: {
