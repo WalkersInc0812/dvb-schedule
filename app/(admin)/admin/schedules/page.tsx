@@ -24,18 +24,18 @@ const AdminSchedulePage = async ({ searchParams }: Props) => {
   const params = await searchParams;
   const deleted = params.deleted === "true";
   const defaultRange = getDefaultDateRange();
-  const from =
-    typeof params.from === "string" && params.from
-      ? params.from
-      : defaultRange.from;
-  const to =
-    typeof params.to === "string" && params.to ? params.to : defaultRange.to;
+  const from = params.from === "null" ? undefined : typeof params.from === "string" ? params.from : defaultRange.from;
+  const to = params.to === "null" ? undefined : typeof params.to === "string" ? params.to : defaultRange.to;
 
-  const schedules = await getSchedulesWithStudentAndFacilityAndSchool({
+  const schedules = from && to ? await getSchedulesWithStudentAndFacilityAndSchool({
     deleted,
     from,
     to,
-  });
+  }) : from ? await getSchedulesWithStudentAndFacilityAndSchool({
+    deleted,
+    from,
+    to: from,
+  }) : [];
 
   return (
     <div>

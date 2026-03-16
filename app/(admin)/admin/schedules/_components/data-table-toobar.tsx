@@ -21,7 +21,7 @@ import { useCallback } from "react";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
-  dateRange: { from: string; to: string };
+  dateRange: { from: string | undefined; to: string | undefined };
   onBeforeDateRangeChange?: () => void;
   facilities: {
     value: string;
@@ -82,12 +82,12 @@ export function DataTableToolbar({
       if (range?.from) {
         params.set("from", format(range.from, "yyyy-MM-dd"));
       } else {
-        params.delete("from");
+        params.set("from", "null");
       }
       if (range?.to) {
         params.set("to", format(range.to, "yyyy-MM-dd"));
       } else {
-        params.delete("to");
+        params.set("to", "null");
       }
       router.push(pathname + (params.toString() ? "?" + params.toString() : ""));
     },
@@ -101,10 +101,13 @@ export function DataTableToolbar({
       <div className="flex flex-1 items-center space-x-2">
         <DatePickerWithRange
           placeholder="日付で絞り込む"
-          value={{
+          value={ dateRange.from && dateRange.to ? {
             from: new Date(dateRange.from + "T00:00:00"),
             to: new Date(dateRange.to + "T00:00:00"),
-          }}
+          } : dateRange.from ? {
+            from: new Date(dateRange.from + "T00:00:00"),
+            to: new Date(dateRange.from + "T00:00:00"),
+          } : undefined}
           onSelect={(value) => {
             const range =
               value &&

@@ -26,7 +26,7 @@ type DialogType = "create" | "read" | "update" | "multi-update" | "delete";
 
 type Props = {
   schedules: ScheduleWithStudentAndFacilityAndSchool[];
-  dateRange: { from: string; to: string };
+  dateRange: { from: string | undefined; to: string | undefined };
 };
 
 const DataTableSection = ({ schedules, dateRange }: Props) => {

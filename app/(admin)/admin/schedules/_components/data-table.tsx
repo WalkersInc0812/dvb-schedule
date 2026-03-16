@@ -22,7 +22,7 @@ import { ScheduleWithStudentAndFacilityAndSchool } from "@/lib/schedules";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  dateRange: { from: string; to: string };
+  dateRange: { from: string | undefined; to: string | undefined };
   onBeforeDateRangeChange?: () => void;
   onCreateClick: () => void;
   onMultiUpdateClick: (
