@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
 import { getFacilityWithMealSettingAndScheduleEditablePeriodAndAnnouncementById } from "@/lib/facilities";
 import { checkIsParent, checkIsStaff, getCurrentUser } from "@/lib/session";
-import { getStudentById } from "@/lib/students";
 import {
   scheduleMultiCreateSchema,
   scheduleMultiUpdateSchema,
@@ -35,7 +34,21 @@ export async function POST(req: Request) {
       return new Response(null, { status: 400 });
     }
 
-    const student = await getStudentById({ id: payload.studentId });
+    const student = await db.student.findFirst({
+      where: {
+        id: payload.studentId,
+        deletedAt: null,
+        ...(isParent
+          ? {
+              parents: {
+                some: {
+                  id: user.id,
+                },
+              },
+            }
+          : {}),
+      },
+    });
     if (!student) {
       return new Response(null, { status: 404 });
     }

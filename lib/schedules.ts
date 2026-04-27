@@ -78,6 +78,9 @@ export async function getSchedulesWithStudentAndFacilityAndSchool(options?: {
   const schedules = await db.schedule.findMany({
     where: {
       deletedAt: options?.deleted ? undefined : null,
+      student: {
+        deletedAt: null,
+      },
       ...(Object.keys(startCondition).length > 0 && { start: startCondition }),
     },
     include: {
@@ -123,6 +126,11 @@ export async function getSchedulesByMonth({
       AND: [
         {
           deletedAt: null,
+        },
+        {
+          student: {
+            deletedAt: null,
+          },
         },
         {
           start: {
