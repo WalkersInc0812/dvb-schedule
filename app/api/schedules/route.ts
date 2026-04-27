@@ -22,9 +22,34 @@ export async function POST(req: Request) {
     if (isStaff) {
       // ok
     } else if (isParent) {
-      // ok
+      const parentOwnedStudent = await db.student.findFirst({
+        where: {
+          id: payload.studentId,
+          deletedAt: null,
+          parents: {
+            some: {
+              id: user.id,
+            },
+          },
+        },
+      });
+      if (!parentOwnedStudent) {
+        return new Response(null, { status: 404 });
+      }
     } else {
       return new Response(null, { status: 400 });
+    }
+
+    if (isStaff) {
+      const activeStudent = await db.student.findFirst({
+        where: {
+          id: payload.studentId,
+          deletedAt: null,
+        },
+      });
+      if (!activeStudent) {
+        return new Response(null, { status: 404 });
+      }
     }
 
     await db.schedule.create({

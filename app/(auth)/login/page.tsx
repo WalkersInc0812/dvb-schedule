@@ -22,7 +22,7 @@ export default async function LoginPage({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const debugMode = true;
+  const debugMode = false;
   const testParam = searchParams?.test;
   const isTestMode =
     debugMode &&

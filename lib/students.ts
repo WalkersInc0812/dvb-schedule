@@ -62,9 +62,10 @@ export async function getStudents(): Promise<
 }
 
 export async function getStudentById({ id }: { id: string }) {
-  const student = await db.student.findUnique({
+  const student = await db.student.findFirst({
     where: {
       id,
+      deletedAt: null,
     },
   });
 
@@ -83,6 +84,7 @@ export async function getStudentsByParentId({
           id: parentId,
         },
       },
+      deletedAt: null,
     },
   });
   return students;
