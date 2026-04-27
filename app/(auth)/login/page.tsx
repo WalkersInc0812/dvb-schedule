@@ -17,9 +17,26 @@ async function getAllUsersByRole(role: string) {
   });
 }
 
-export default async function LoginPage() {
-  const parents = await getAllUsersByRole("PARENT");
-  const staffs = await getAllUsersByRole("STAFF");
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
+  const debugMode = true;
+  const testParam = searchParams?.test;
+  const isTestMode =
+    debugMode &&
+    (typeof testParam === "string"
+      ? testParam === "true"
+      : testParam?.includes("true") ?? false);
+
+  const canUseUserAuthForm =
+    process.env.VERCEL_ENV !== "production" || isTestMode;
+
+  const parents = canUseUserAuthForm
+    ? await getAllUsersByRole("PARENT")
+    : [];
+  const staffs = canUseUserAuthForm ? await getAllUsersByRole("STAFF") : [];
 
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center gap-10">
@@ -33,7 +50,7 @@ export default async function LoginPage() {
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <SignIn />
 
-        {process.env.VERCEL_ENV !== "production" && (
+        {canUseUserAuthForm && (
           <UserAuthForm parents={parents} staffs={staffs} />
         )}
       </div>
